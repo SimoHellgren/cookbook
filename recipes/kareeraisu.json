@@ -1,0 +1,28 @@
+{
+    "name": "カレーライス",
+    "tags": ["japani"],
+    "ingredients": [
+        {"name": "Valkosipuli", "quantity": 20, "measure": "g"},
+        {"name": "Inkivääri", "quantity": 30, "measure": "g"},
+        {"name": "Sipuli", "quantity": 600, "measure": "g"},
+        {"name": "Porkkanaraaste", "quantity": 70, "measure": "g"},
+        {"name": "Dashi", "quantity": 1.1, "measure": "l"},
+        {"name": "Suola", "quantity": 1, "measure": "tl"},
+        {"name": "Ruokasooda", "quantity": 0.125, "measure": "tl"},
+        {"name": "Curryjauhe", "quantity": 3, "measure": "rkl"},
+        {"name": "Cayennejauhe", "quantity": 0.5, "measure": "tl"},
+        {"name": "Kypsä banaani", "quantity": 1, "measure": "kpl"},
+        {"name": "Laakerinlehti", "quantity": 1, "measure": "kpl"},
+        {"name": "Tähtianis", "quantity": 1, "measure": "kpl"},
+        {"name": "Soija", "quantity": 2, "measure": "rkl"},
+        {"name": "Chuno", "quantity": 1, "measure": "rkl"},
+        {"name": "Tomaattipyre", "quantity": 1, "measure": "rkl"},
+        {"name": "Kaakaojauhe", "quantity": 2, "measure": "tl"},
+        {"name": "Peruna", "quantity": 400, "measure": "g"},
+        {"name": "Porkkana", "quantity": 300, "measure": "g"}        
+    ],
+
+    "method": "(Tee dashin esityö 1vrk ennen)\n(viimeistele　出汁 med 鰹節)\nSekoita 0.6dl vettä, suola ja ruokasooda\nRaasta inkivääri ja valkosipuli\nPilko sipulit\nRaasta porkkana\nRuskista kattilassa inkivääri ja valkosipuli esim. Ankanrasvassa (saa tarttua pohjaan, mutta varo palamista)\nLaita mukaan sipulit ja ruokasoodaliuos, sekoita ja peitä kannella. Lämpö miedolle ja anna muhia 10min.\nKuori ja pilko perunat ja porkkanat\nPoista kansi ja lisää porkkanaraaste. Nosta lämpötilaa, anna nesteen haihtua ja karamellisoi halutun väriseksi (kestää kauan).\nSekoita mukaan curryjauhe (ja cayenne), paahda noin puoli minuuttia (elä polta)\nKaada dashi mukaan (jos kattilan pohjaan on tarttunut kovasti töhnää, voit ensin irrottaa sen pienellä määrällä dashia ennen koko satsin lisäämistä)\nLisää banaani ja aja käsiblenderillä sileäksi\nLisää loput ainekset ja hauduta.\nLisää suolaa maun mukaan.\nTarjoile riisin ja esim. Paistetun tofun tai friteeratun kanan kera."
+}
+
+

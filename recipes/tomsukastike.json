@@ -1,0 +1,19 @@
+{
+    "name": "Tomaattikastike",
+    "tags": ["pasta"],
+    "ingredients": [
+        {"name": "Tomaatti", "quantity": 4, "measure": "kpl"},
+        {"name": "Kirsikkatomaatti", "quantity": 250, "measure": "g"},
+        {"name": "Sipuli", "quantity": 1, "measure": "kpl"},
+        {"name": "Valkosipulinkynsi", "quantity": 4, "measure": "kpl"},
+        {"name": "Basilikanlehti", "quantity": 1, "measure": "dl"},
+        {"name": "Basilikanvarsi", "quantity": 0.5, "measure": "dl"},
+        {"name": "Punaviini", "quantity": 1, "measure": "dl"},
+        {"name": "Lihaliemikuutio", "quantity": 1, "measure": "kpl"},
+        {"name": "Chili", "quantity": 0.5, "measure": "kpl"}
+    ],
+
+    "method": "Tomaatit puoliksi,  oliiviöljyä, suolaa, mupii. Uuniin, roasto.\nPannulla sipuli, valkosipuli, chili, basilikan varsi, öljy, suolaa\nTomaatit uunista blenderiin. Jätä mahdollisimman paljon öljyä paahtoastiaan.\nPannulle punaviini ja pilkottu lihaliemikuuto\nTomaatit pannulle\nBasilikan lehtiä sekaan\nTomaattien paahtamisesta jäänyt öljy sekaan juuri ennen asettelua\n\nPidempi versio\nTomaatit lohkoiksi, öljy, mupi, suola. Uuniin, roasto\nPannulla sipuli, valkosipuli, chili, basilikan varsi, öljy, suolaa\nTomaaatit uunista pannulle\nRasia miniluumutomaatteja pannulle\nKansi päälle ja lämpö pienelle\n(huom. Ei punaviinia eikä lihalientä)\nLopuksi basilikan lehtiä sekä tomaattien öljy sekaan\nOhenna pastan keitinvedellä"
+}
+
+

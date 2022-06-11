@@ -1,0 +1,28 @@
+<!doctype html>
+<title>{% block title %}{% endblock %} - Flaskr</title>
+<nav>
+  <h1>Flaskr</h1>
+  <ul>
+    <li>Test 1</li>
+    <li>Test 2</li>
+  </ul>
+</nav>
+<section class="content">
+  <header>
+    {% block header %}{% endblock %}
+  </header>
+  {% for message in get_flashed_messages() %}
+    <div class="flash">{{ message }}</div>
+  {% endfor %}
+  {% block content %}
+    {% for recipe in recipes %}
+        <h1>{{recipe['name']}}</h1>
+        <ul>
+            {% for ingredient in recipe['ingredients'] %}
+                <li>{{ingredient['name']}} {{ingredient['quantity']}}{{ingredient['measure']}}</li>
+            {% endfor %}
+        </ul>
+        <p>{{recipe['method']}}</p>
+    {% endfor %}
+  {% endblock %}
+</section>

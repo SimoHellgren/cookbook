@@ -21,3 +21,8 @@ def create_recipe(filename, name, ingredients, method, tags=None):
             {"name": name, "ingredients": ingredients, "method": method, "tags": tags},
             f,
         )
+
+
+def read_mealplan():
+    with open("./mealplan/mealplan.json", "r") as f:
+        return json.load(f)

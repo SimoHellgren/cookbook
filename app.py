@@ -2,7 +2,7 @@ from itertools import chain
 
 from flask import Flask, render_template, request
 
-from db import create_recipe, read_recipes
+from db import create_recipe, read_recipes, read_mealplan
 
 app = Flask(__name__)
 
@@ -57,3 +57,8 @@ def add_recipe():
         )
 
     return render_template("add_recipe.html")
+
+
+@app.route("/mealplan")
+def mealplan():
+    return render_template('mealplan.html', mealplan=read_mealplan())

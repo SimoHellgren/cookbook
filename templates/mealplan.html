@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+
+{% block title %}Mealplan{% endblock %}
+
+{% block content%}
+    {% for row in mealplan%}
+        <p>{{ row['date'] }}: {{ row['lunch'] }} (lunch) & {{ row['dinner'] }} (dinner)</p>
+    {% endfor %}
+{% endblock %}

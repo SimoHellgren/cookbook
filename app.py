@@ -2,7 +2,7 @@ from itertools import chain
 
 from flask import Flask, render_template, request
 
-from db import create_recipe, read_recipes, read_mealplan
+from db import create_recipe, read_recipes, read_mealplan, write_mealplan
 
 app = Flask(__name__)
 
@@ -59,6 +59,16 @@ def add_recipe():
     return render_template("add_recipe.html")
 
 
-@app.route("/mealplan")
+@app.route("/mealplan", methods=("GET", "POST"))
 def mealplan():
-    return render_template('mealplan.html', mealplan=read_mealplan())
+    mp = read_mealplan()
+    if request.method == "POST":
+        date = request.form["date"]
+        lunch = request.form["lunch"]
+        dinner = request.form["dinner"]
+        new_mealplan = [{"date": date, "lunch": lunch, "dinner": dinner}, *mp]
+        write_mealplan(new_mealplan)
+
+        return render_template("mealplan.html", mealplan=new_mealplan)
+
+    return render_template("mealplan.html", mealplan=mp)

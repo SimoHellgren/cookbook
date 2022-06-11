@@ -20,6 +20,7 @@ def create_recipe(filename, name, portions, ingredients, method, tags=None):
         json.dump(
             {"name": name, "portions": portions, "ingredients": ingredients, "method": method, "tags": tags},
             f,
+            indent=2
         )
 
 

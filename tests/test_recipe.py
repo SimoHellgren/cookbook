@@ -8,6 +8,7 @@ def test_create_recipe():
         "name": "test",
         "ingredients": [{"name": "Test ingredient", "quantity": 1, "measure": "kpl"}],
         "method": "Put the thing in the place",
+        "tags": ["tagge"]
     }
     db.create_recipe(filename=filename, **data)
 

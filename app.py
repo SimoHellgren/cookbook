@@ -11,15 +11,25 @@ app = Flask(__name__)
 def recipes():
     recipes = list(read_recipes())
 
-    all_tags = sorted(set(chain.from_iterable(r["tags"] for r in recipes)))
-
     filters = request.args.get("tags")
 
-    recipes_to_show = filter(
-        lambda r: all(tag in r["tags"] for tag in filters.split(',')), recipes
-    ) if filters else recipes
+    recipes_to_show = (
+        list(
+            filter(
+                lambda r: all(tag in r["tags"] for tag in filters.split(",")), recipes
+            )
+        )
+        if filters
+        else recipes
+    )
 
-    return render_template("recipes.html", recipes=list(recipes_to_show), tags=all_tags)
+    available_tags = sorted(
+        set(chain.from_iterable(r["tags"] for r in recipes_to_show))
+    )
+
+    return render_template(
+        "recipes.html", recipes=list(recipes_to_show), tags=available_tags
+    )
 
 
 @app.route("/add_recipe", methods=("GET", "POST"))

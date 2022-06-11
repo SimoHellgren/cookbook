@@ -4,7 +4,7 @@
 
 {% block content%}
     <h1>Tags</h1>
-    {{tags}}
+    Available tags: {{', '.join(tags)}}
     <form>
         <label for="tags">Filter tags:</label>
         <input name="tags" id="tags">

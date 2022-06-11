@@ -38,6 +38,8 @@ def add_recipe():
     if request.method == "POST":
         name = request.form["name"]
 
+        portions = request.form['portions']
+
         ingredient_list = (
             i.split(";") for i in request.form["ingredients"].split("\r\n")
         )
@@ -51,6 +53,7 @@ def add_recipe():
         create_recipe(
             f"{name.lower().replace(' ', '_')}.json",
             name=name,
+            portions=portions,
             ingredients=ingredients,
             method=method,
             tags=tags,

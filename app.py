@@ -25,9 +25,13 @@ def add_recipe():
         method = request.form["method"]
 
         tags = [t.strip() for t in request.form["tags"].split(",")]
-        
+
         create_recipe(
-            f"{name}.json", name=name, ingredients=ingredients, method=method, tags=tags
+            f"{name.lower().replace(' ', '_')}.json",
+            name=name,
+            ingredients=ingredients,
+            method=method,
+            tags=tags,
         )
 
     return render_template("add_recipe.html")

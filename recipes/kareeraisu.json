@@ -1,6 +1,7 @@
 {
     "name": "カレーライス",
     "tags": ["japani"],
+    "portions": 6,
     "ingredients": [
         {"name": "Valkosipuli", "quantity": 20, "measure": "g"},
         {"name": "Inkivääri", "quantity": 30, "measure": "g"},

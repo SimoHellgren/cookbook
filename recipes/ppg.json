@@ -1,6 +1,7 @@
 {
     "name": "Parsa-piparjuurignocchit",
     "tags": ["pasta", "gnocchi"],
+    "portions": 4,
     "ingredients": [
         {"name": "Parsa", "quantity": 500, "measure": "g" },
         {"name": "Gnocchi", "quantity": 500, "measure": "g" },

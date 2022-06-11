@@ -1,6 +1,7 @@
 {
     "name": "Tomaattikastike",
     "tags": ["pasta"],
+    "portions": 4,
     "ingredients": [
         {"name": "Tomaatti", "quantity": 4, "measure": "kpl"},
         {"name": "Kirsikkatomaatti", "quantity": 250, "measure": "g"},

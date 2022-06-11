@@ -13,12 +13,12 @@ def read_recipes():
             yield json.load(f)
 
 
-def create_recipe(filename, name, ingredients, method, tags=None):
+def create_recipe(filename, name, portions, ingredients, method, tags=None):
     if not tags:
         tags = []
     with open(os.path.join(BASEPATH, filename), "w") as f:
         json.dump(
-            {"name": name, "ingredients": ingredients, "method": method, "tags": tags},
+            {"name": name, "portions": portions, "ingredients": ingredients, "method": method, "tags": tags},
             f,
         )
 

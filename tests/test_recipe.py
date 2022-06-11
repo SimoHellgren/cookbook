@@ -6,6 +6,7 @@ def test_create_recipe():
     filename = "test_recipe.json"
     data = {
         "name": "test",
+        "portions": 5,
         "ingredients": [{"name": "Test ingredient", "quantity": 1, "measure": "kpl"}],
         "method": "Put the thing in the place",
         "tags": ["tagge"]

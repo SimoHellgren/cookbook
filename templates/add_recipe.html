@@ -3,5 +3,20 @@
 {% block content%}
 
 <h1>Add recipe</h1>
+<form method="post">
+    <label for="name">Recipe name</label>
+    <input name="name" id="name" required>
+    
+    <label for="tags">Tags (comma-separated)</label>
+    <input name="tags" id="tags">
 
+    <label for="ingredients">Ingredients (one per row)</label>
+    <textarea name="ingredients" id="ingredients" required>ingredient;quantity;measure</textarea>
+
+    <label for="method">Method</label>
+    <textarea name="method" id="method"></textarea>
+
+    <input type="submit" value="Save">
+
+</form>
 {% endblock %}

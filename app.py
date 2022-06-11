@@ -1,3 +1,5 @@
+from itertools import chain
+
 from flask import Flask, render_template, request
 
 from db import create_recipe, read_recipes
@@ -8,7 +10,16 @@ app = Flask(__name__)
 @app.route("/")
 def recipes():
     recipes = list(read_recipes())
-    return render_template("recipes.html", recipes=recipes)
+
+    all_tags = sorted(set(chain.from_iterable(r["tags"] for r in recipes)))
+
+    filters = request.args.get("tags")
+
+    recipes_to_show = filter(
+        lambda r: all(tag in r["tags"] for tag in filters.split(',')), recipes
+    ) if filters else recipes
+
+    return render_template("recipes.html", recipes=list(recipes_to_show), tags=all_tags)
 
 
 @app.route("/add_recipe", methods=("GET", "POST"))

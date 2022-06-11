@@ -3,6 +3,14 @@
 {% block title %}Recipes{% endblock %}
 
 {% block content%}
+    <h1>Tags</h1>
+    {{tags}}
+    <form>
+        <label for="tags">Filter tags:</label>
+        <input name="tags" id="tags">
+        <input type="submit" hidden/>
+    </form>
+    
     <h1>Recipes</h1>
     <ul>
         {% for recipe in recipes %}
@@ -13,6 +21,7 @@
 
     {% for recipe in recipes %}
         <h2 id="{{recipe['name']}}">{{recipe['name']}}</h2>
+        <b>Tags:</b> {{ ', '.join(recipe['tags']) }}
         <ul>
             {% for ingredient in recipe['ingredients'] %}
                 <li>{{ingredient['name']}} {{ingredient['quantity']}}{{ingredient['measure']}}</li>

@@ -12,6 +12,10 @@
     </form>
     
     <h1>Recipes</h1>
+    <form>
+        <input name="search" id="search" placeholder="Search by name">
+        <input type="submit" hidden/>
+    </form>
     <ul>
         {% for recipe in recipes %}
             <p><a href="#{{recipe['name']}}">{{recipe['name']}}</a></p>

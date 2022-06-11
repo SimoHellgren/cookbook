@@ -13,15 +13,16 @@ def recipes():
 
     filters = request.args.get("tags")
 
-    recipes_to_show = (
-        list(
-            filter(
-                lambda r: all(tag in r["tags"] for tag in filters.split(",")), recipes
-            )
-        )
+    filtered_by_tags = (
+        filter(lambda r: all(tag in r["tags"] for tag in filters.split(",")), recipes)
         if filters
         else recipes
     )
+
+    search = request.args.get("search", "").lower()
+    filter_by_search = (r for r in filtered_by_tags if search in r["name"].lower())
+
+    recipes_to_show = list(filter_by_search)
 
     available_tags = sorted(
         set(chain.from_iterable(r["tags"] for r in recipes_to_show))

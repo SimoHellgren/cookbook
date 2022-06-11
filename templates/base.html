@@ -3,8 +3,8 @@
 <nav>
   <h1>Flaskr</h1>
   <ul>
-    <li>Test 1</li>
-    <li>Test 2</li>
+    <li><a href="{{ url_for('recipes') }}">Recipes</a>
+    <li><a href="{{ url_for('add_recipe') }}">Add recipe</a>
   </ul>
 </nav>
 <section class="content">
@@ -14,15 +14,5 @@
   {% for message in get_flashed_messages() %}
     <div class="flash">{{ message }}</div>
   {% endfor %}
-  {% block content %}
-    {% for recipe in recipes %}
-        <h1>{{recipe['name']}}</h1>
-        <ul>
-            {% for ingredient in recipe['ingredients'] %}
-                <li>{{ingredient['name']}} {{ingredient['quantity']}}{{ingredient['measure']}}</li>
-            {% endfor %}
-        </ul>
-        <p>{{recipe['method']}}</p>
-    {% endfor %}
-  {% endblock %}
+  {% block content %}{% endblock %}
 </section>

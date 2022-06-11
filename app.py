@@ -38,7 +38,7 @@ def add_recipe():
     if request.method == "POST":
         name = request.form["name"]
 
-        portions = request.form['portions']
+        portions = request.form["portions"]
 
         ingredient_list = (
             i.split(";") for i in request.form["ingredients"].split("\r\n")
@@ -67,11 +67,15 @@ def mealplan():
     mp = read_mealplan()
     if request.method == "POST":
         date = request.form["date"]
-        lunch = request.form["lunch"]
-        dinner = request.form["dinner"]
-        new_mealplan = [{"date": date, "lunch": lunch, "dinner": dinner}, *mp]
-        write_mealplan(new_mealplan)
 
-        return render_template("mealplan.html", mealplan=new_mealplan)
+        form_meals = filter(None, request.form["meals"].split("\r\n"))
+        cols = ("name", "portions")
 
-    return render_template("mealplan.html", mealplan=mp)
+        meals = [dict(zip(cols, row.split(";"))) for row in form_meals]
+
+        mp = [{"date": date, "meals": meals}, *mp]  # mutation :|
+        write_mealplan(mp)
+
+    return render_template(
+        "mealplan.html", mealplan=sorted(mp, key=lambda x: x["date"], reverse=True)
+    )

@@ -31,4 +31,4 @@ def read_mealplan():
 
 def write_mealplan(mp):
     with open('./mealplan/mealplan.json', 'w') as f:
-        json.dump(mp, f)
+        json.dump(mp, f, indent=2)

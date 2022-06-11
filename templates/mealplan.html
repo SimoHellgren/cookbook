@@ -3,21 +3,24 @@
 {% block title %}Mealplan{% endblock %}
 
 {% block content%}
-    <h1>Add new</h1>
+    <h1>Initialize mealplan</h1>
     <form method="post">
         <label for="date">Date</label>
-        <input name="date" id="date" type="date"/>
+        <input name="date" id="date" type="date" required/>
 
-        <label for="lunch">Lunch</label>
-        <input name="lunch" id="lunch"/>
-        
-        <label for="dinner">Dinner</label>
-        <input name="dinner" id="dinner"/>
+        <label for="meals">Meals (1 per row, <i>name;portions</i>)</label>
+        <textarea name="meals" id="meals" required>lunch;2
+dinner;2</textarea>
 
         <input type="submit">
 
     </form>
     {% for row in mealplan%}
-        <p>{{ row['date'] }}: {{ row['lunch'] }} (lunch) & {{ row['dinner'] }} (dinner)</p>
+        <p>{{ row['date'] }}</p>
+        <ul>
+            {% for meal in row['meals']%}
+                <li>{{meal['name']}}: {{ meal['portions'] }} portions</li>
+            {% endfor %}
+        </ul>
     {% endfor %}
 {% endblock %}

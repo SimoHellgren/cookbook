@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}Shopping list{% endblock %}
+
+{% block content%}
+<form method="post">
+    <select name="recipes" multiple>
+        {% for recipe in recipes %}
+            <option value="{{ recipe['name']}}">{{ recipe['name'] }}</option>
+        {% endfor %}
+    </select>
+    <input type="submit">
+    <h1>Shopping list</h1>
+    <ul>
+        {% for item in items %}
+            <li>{{ item['name'] }}: {{ item['quantity'] }}{{ item['measure'] }}</li>
+        {% endfor %}
+    </ul>
+</form>
+
+{% endblock %}

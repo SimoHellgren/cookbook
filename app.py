@@ -1,4 +1,4 @@
-from itertools import chain
+from itertools import chain, groupby
 
 from flask import Flask, render_template, request
 
@@ -79,3 +79,28 @@ def mealplan():
     return render_template(
         "mealplan.html", mealplan=sorted(mp, key=lambda x: x["date"], reverse=True)
     )
+
+
+@app.route("/shoppinglist", methods=("GET", "POST"))
+def shopping_list():
+    all_recipes = list(read_recipes())
+    items = []
+    if request.method == "POST":
+        choices = request.form.getlist("recipes")
+        ingredients = chain.from_iterable(
+            r["ingredients"] for r in all_recipes if r["name"] in choices
+        )
+
+        kf = lambda x: (x["name"], x["measure"])  # noqa: E731
+        gb = groupby(sorted(ingredients, key=kf), key=kf)
+
+        items = [
+            {
+                "name": name,
+                "measure": measure,
+                "quantity": sum(float(row["quantity"]) for row in rows),
+            }
+            for (name, measure), rows in gb
+        ]
+
+    return render_template("shoppinglist.html", recipes=all_recipes, items=items)

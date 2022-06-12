@@ -8,6 +8,7 @@ app = Flask(__name__)
 
 
 @app.route("/")
+@app.route("/recipes")
 def recipes():
     recipes = list(read_recipes())
 
@@ -33,31 +34,51 @@ def recipes():
     )
 
 
+def recipe_from_form(form):
+    name = form["name"]
+
+    portions = form["portions"]
+
+    ingredient_list = (i.split(";") for i in form["ingredients"].split("\r\n"))
+    cols = ("name", "quantity", "measure")
+    ingredients = [dict(zip(cols, row)) for row in ingredient_list]
+
+    method = form["method"]
+
+    tags = [t.strip() for t in form["tags"].split(",")]
+
+    return {
+        "name": name,
+        "portions": portions,
+        "ingredients": ingredients,
+        "method": method,
+        "tags": tags,
+    }
+
+
+@app.route("/recipes/<id>", methods=("GET", "POST"))
+def get_recipe(id):
+    recipe = next(r for r in read_recipes() if r["name"] == id)
+
+    if request.method == "POST":
+        recipe = recipe_from_form(request.form)  # mutation :|
+        create_recipe(f"{recipe['name'].lower().replace(' ', '_')}.json", **recipe)
+
+    ingredientstring = "\r\n".join(
+        f"{i['name']};{i['quantity']};{i['measure']}" for i in recipe["ingredients"]
+    )
+    return render_template(
+        "recipe.html", recipe=recipe, ingredientstring=ingredientstring
+    )
+
+
 @app.route("/add_recipe", methods=("GET", "POST"))
 def add_recipe():
     if request.method == "POST":
-        name = request.form["name"]
 
-        portions = request.form["portions"]
+        recipe = recipe_from_form(request.form)
 
-        ingredient_list = (
-            i.split(";") for i in request.form["ingredients"].split("\r\n")
-        )
-        cols = ("name", "quantity", "measure")
-        ingredients = [dict(zip(cols, row)) for row in ingredient_list]
-
-        method = request.form["method"]
-
-        tags = [t.strip() for t in request.form["tags"].split(",")]
-
-        create_recipe(
-            f"{name.lower().replace(' ', '_')}.json",
-            name=name,
-            portions=portions,
-            ingredients=ingredients,
-            method=method,
-            tags=tags,
-        )
+        create_recipe(f"{recipe['name'].lower().replace(' ', '_')}.json", **recipe)
 
     return render_template("add_recipe.html")
 

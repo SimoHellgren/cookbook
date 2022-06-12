@@ -24,7 +24,7 @@
 
 
     {% for recipe in recipes %}
-        <h2 id="{{recipe['name']}}">{{recipe['name']}} ({{ recipe['portions'] }} portions)</h2>
+        <h2 id="{{recipe['name']}}"><a href="{{ url_for('get_recipe', id=recipe['name'])}}">{{recipe['name']}} ({{ recipe['portions'] }} portions)</a></h2>
         <b>Tags:</b> {{ ', '.join(recipe['tags']) }}
         <ul>
             {% for ingredient in recipe['ingredients'] %}

@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ recipe['name'] }}{% endblock %}
+
+{% block content%}
+
+<h1>Edit recipe</h1>
+<form method="post">
+    <label for="name">Recipe name</label>
+    <input name="name" id="name" value="{{ recipe['name'] }}" required>
+    
+    <label for="tags">Tags (comma-separated)</label>
+    <input name="tags" id="tags" value="{{ ','.join(recipe['tags']) }}">
+
+    <label for="portions">Portions</label>
+    <input name="portions" id="portions" value="{{ recipe['portions'] }}">
+
+    <label for="ingredients">Ingredients (one per row)</label>
+    <textarea name="ingredients" id="ingredients"required>{{ ingredientstring }}</textarea>
+
+    <label for="method">Method</label>
+    <textarea name="method" id="method">{{ recipe['method'] }}</textarea>
+
+    <input type="submit" value="Save">
+
+</form>
+{% endblock %}

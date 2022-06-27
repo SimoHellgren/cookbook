@@ -24,3 +24,8 @@ def create_recipe():
 @bp.get('/<id>')
 def read_recipe(id):
     return jsonify(db.get_recipe_by_id(id))
+
+
+@bp.get('/<id>/ingredients')
+def read_recipe_ingredients(id):
+    return jsonify(db.get_recipe_ingredients_by_recipe_id(id))

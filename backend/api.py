@@ -1,11 +1,11 @@
 from flask import Blueprint
-from . import recipe
-from . import ingredient
+from . import recipes
+from . import ingredients
 
 bp = Blueprint('api', __name__, url_prefix='/api')
 
-bp.register_blueprint(recipe.bp)
-bp.register_blueprint(ingredient.bp)
+bp.register_blueprint(recipes.bp)
+bp.register_blueprint(ingredients.bp)
 
 
 @bp.get('/')

@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 import db
-bp = Blueprint('recipe', __name__, url_prefix='/recipe')
+bp = Blueprint('recipes', __name__, url_prefix='/recipes')
 
 
 @bp.get('/')

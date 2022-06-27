@@ -24,10 +24,10 @@
 
 
     {% for recipe in recipes %}
-        <h2 id="{{recipe['name']}}"><a href="{{ url_for('get_recipe', id=recipe['name'])}}">{{recipe['name']}} ({{ recipe['portions'] }} portions)</a></h2>
-        <b>Tags:</b> {{ ', '.join(recipe['tags']) }}
+        <h2 id="{{recipe['name']}}"><a href="{{ url_for('get_recipe', id=recipe['id'])}}">{{recipe['name']}} ({{ recipe['portions'] }} portions)</a></h2>
+        <b>Tags:</b> {{ recipe['tags'] }}
         <ul>
-            {% for ingredient in recipe['ingredients'] %}
+            {% for ingredient in ingredients|selectattr("recipe_id", "equalto", recipe['id']) %}
                 <li>{{ingredient['name']}} {{ingredient['quantity']}}{{ingredient['measure']}}</li>
             {% endfor %}
         </ul>

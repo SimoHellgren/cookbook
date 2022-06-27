@@ -15,12 +15,7 @@ dinner;2</textarea>
         <input type="submit">
 
     </form>
-    {% for row in mealplan%}
-        <p>{{ row['date'] }}</p>
-        <ul>
-            {% for meal in row['meals']%}
-                <li>{{meal['name']}}: {{ meal['portions'] }} portions</li>
-            {% endfor %}
-        </ul>
+    {% for meal in mealplan%}
+        <p>{{ meal['date'] }} - {{meal['name']}}: {{ meal['servings'] }} portions</p>
     {% endfor %}
 {% endblock %}

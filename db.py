@@ -126,6 +126,12 @@ def get_recipe_ingredients():
         return cur_to_dicts(cur)
 
 
+def get_ingredients():
+    with SQLite(DB) as cur:
+        cur.execute('SELECT * FROM ingredient')
+        return cur_to_dicts(cur)
+
+
 def get_mealplans():
     with SQLite(DB) as cur:
         cur.execute('select * from mealplan')

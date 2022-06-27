@@ -18,7 +18,7 @@ def create_recipe():
         tags=data.get('tags', '')
     )
 
-    return db_recipe
+    return jsonify(db_recipe)
 
 
 @bp.get('/<id>')

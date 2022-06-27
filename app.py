@@ -4,7 +4,11 @@ from flask import Flask, render_template, request
 
 from db import create_ingredient, create_mealplan, create_recipe, create_recipe_ingredient, get_mealplans, get_recipe_by_id, get_recipe_ingredients, get_recipe_ingredients_by_recipe_id, get_recipes
 
+from backend import api
+
 app = Flask(__name__)
+
+app.register_blueprint(api.bp)
 
 
 @app.route("/")

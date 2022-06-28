@@ -61,18 +61,6 @@ def cur_to_dicts(cur):
     return [dict(zip(cols, row)) for row in cur.fetchall()]
 
 
-def get_recipe_ingredients():
-    with SQLite(DB) as cur:
-        cur.execute(
-            'SELECT '
-            'ingredient.name name,'
-            'recipe_ingredient.* '
-            'FROM ingredient '
-            'JOIN recipe_ingredient ON recipe_ingredient.ingredient_id = ingredient.id '
-        )
-        return cur_to_dicts(cur)
-
-
 def get_mealplans():
     with SQLite(DB) as cur:
         cur.execute('select * from mealplan')

@@ -104,13 +104,14 @@ def add_recipe():
         db_recipe = post('/recipes', json=recipe).json()
 
         for ingredient in ingredients:
-            db_ingredient = db_ingredient = post('/ingredients', json=ingredient).json()
+            db_ingredient = post('/ingredients', json=ingredient).json()
             recipe_ingredient_data = {
                 'ingredient_id': db_ingredient['id'],
                 'quantity': ingredient['quantity'],
                 'measure': ingredient['measure']
             }
-            post(f"/recipe/{db_recipe['id']}/ingeredients", json=recipe_ingredient_data)
+
+            post(f"/recipes/{db_recipe['id']}/ingeredients", json=recipe_ingredient_data)
 
     return render_template("add_recipe.html")
 

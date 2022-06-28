@@ -1,9 +1,12 @@
+from functools import partial
 import os
 from itertools import chain, groupby
 
+import requests
+
 from flask import Flask, render_template, request
 
-from db import create_ingredient, create_mealplan, create_recipe, create_recipe_ingredient, get_mealplans, get_recipe_by_id, get_recipe_ingredients, get_recipe_ingredients_by_recipe_id, get_recipes
+from db import create_mealplan, get_mealplans
 
 from backend import api
 
@@ -12,12 +15,18 @@ app = Flask(__name__, template_folder=template_dir)
 
 app.register_blueprint(api.bp)
 
+API_BASE_URL = 'http://localhost:5000/api'
+
+apirequest = lambda method, endpoint, *args, **kwargs: requests.request(method, API_BASE_URL + endpoint, *args, **kwargs)  # noqa E731
+get = partial(apirequest, 'GET')
+post = partial(apirequest, 'POST')
+
 
 @app.route("/")
 @app.route("/recipes")
 def recipes():
-    recipes = get_recipes()
-    ingredients = get_recipe_ingredients()
+    recipes = get('/recipes').json()
+    ingredients = get('/recipe_ingredients').json()
 
     filters = request.args.get("tags")
 
@@ -64,16 +73,21 @@ def recipe_from_form(form):
 
 @app.route("/recipes/<id>", methods=("GET", "POST"))
 def get_recipe(id):
-    recipe = get_recipe_by_id(id)
-    ingredients = get_recipe_ingredients_by_recipe_id(id)
+    recipe = get(f'/recipes/{id}').json()
+    ingredients = get(f'/recipes/{id}/ingredients').json()
 
     if request.method == "POST":
         recipe, ingredients = recipe_from_form(request.form)  # mutation :|
-        db_recipe = create_recipe(**recipe)
+        db_recipe = post('/recipes', json=recipe).json()
 
         for ingredient in ingredients:
-            db_ingredient = create_ingredient(ingredient['name'])
-            create_recipe_ingredient(db_recipe['id'], db_ingredient['id'], ingredient['quantity'], ingredient['measure'])
+            db_ingredient = post('/ingredients', json=ingredient).json()
+            recipe_ingredient_data = {
+                'ingredient_id': db_ingredient['id'],
+                'quantity': ingredient['quantity'],
+                'measure': ingredient['measure']
+            }
+            post(f"/recipe/{db_recipe['id']}/ingeredients", json=recipe_ingredient_data)
 
     ingredientstring = "\r\n".join(
         f"{i['name']};{i['quantity']};{i['measure']}" for i in ingredients
@@ -89,11 +103,16 @@ def add_recipe():
 
         recipe, ingredients = recipe_from_form(request.form)
 
-        db_recipe = create_recipe(**recipe)
+        db_recipe = post('/recipes', json=recipe).json()
 
         for ingredient in ingredients:
-            db_ingredient = create_ingredient(ingredient['name'])
-            create_recipe_ingredient(db_recipe['id'], db_ingredient['id'], ingredient['quantity'], ingredient['measure'])
+            db_ingredient = db_ingredient = post('/ingredients', json=ingredient).json()
+            recipe_ingredient_data = {
+                'ingredient_id': db_ingredient['id'],
+                'quantity': ingredient['quantity'],
+                'measure': ingredient['measure']
+            }
+            post(f"/recipe/{db_recipe['id']}/ingeredients", json=recipe_ingredient_data)
 
     return render_template("add_recipe.html")
 
@@ -121,12 +140,12 @@ def mealplan():
 
 @app.route("/shoppinglist", methods=("GET", "POST"))
 def shopping_list():
-    all_recipes = get_recipes()
+    all_recipes = get('/recipes').json()
     items = []
     if request.method == "POST":
         choices = request.form.getlist("recipes")
         ingredients = chain.from_iterable(
-            get_recipe_ingredients_by_recipe_id(r['id']) for r in all_recipes if r["name"] in choices
+            get(f"/recipe/{r['id']}/ingredients") for r in all_recipes if r["name"] in choices
         )
 
         kf = lambda x: (x["name"], x["measure"])  # noqa: E731

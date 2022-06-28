@@ -6,6 +6,7 @@ html {
 
 main {
     margin-top: 5rem;
+    padding: 1rem;
 }
 
 .navbar {
@@ -13,7 +14,6 @@ main {
     width: 100vw;
     height: 5rem;
     position: fixed;
-    transition: height 200ms ease;
 }
 
 .navbar-nav {
@@ -54,20 +54,28 @@ body {
 
 .tag {
     background-color: #ebb5e6;
-    border-radius: 5px;
+    border:1px solid #bf93bb;
+    border-radius: 3px;
+    margin: 1rem;
+    padding: 0.5rem;
+    text-align: center;
+    width: fit-content;
 }
 
 .basic-grid {
+    padding-left: 1rem;
+    margin-left: 10rem;
     display: grid;
     gap: 1rem;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr))
 }
 
-h1 {
-    margin: 0;
-    padding: 20px 0;
-    font-size: 60px;
-    text-align: center;
+.sidebar {
+    background-color: #d9d9d4;
+    width: 10rem;
+    height: 100vh;
+    position: fixed;
+    transition: width 200ms ease;
 }
 
 p, li {

@@ -3,25 +3,24 @@
 {% block title %}Recipes{% endblock %}
 
 {% block content%}
-    <h1>Tags</h1>
-    Available tags: {{', '.join(tags)}}
-    <form>
-        <label for="tags">Filter tags:</label>
-        <input name="tags" id="tags">
-        <input type="submit" hidden/>
-    </form>
-    
-    <h1>Recipes</h1>
-    <form>
-        <input name="search" id="search" placeholder="Search by name">
-        <input type="submit" hidden/>
-    </form>
+    <section class="sidebar">
+        <p>Search recipes</p>
+        <form>
+            <input name="search" id="search" placeholder="Search by name">
+            <input type="submit" hidden/>
+        </form>
+        {% for tag in tags %}
+            <div class="tag">{{ tag }}</div>
+        {% endfor %}
+    </section>
 
     <section class="basic-grid">
     {% for recipe in recipes %}
     <div class="card">
         <h2 id="{{recipe['name']}}"><a href="{{ url_for('get_recipe', id=recipe['id'])}}">{{recipe['name']}} ({{ recipe['servings'] }} servings)</a></h2>
-        <b>Tags:</b> <div class="tag">{{ recipe['tags'] }}</div>
+        {% for tag in recipe['tags'].split(',') %}
+            <div class="tag">{{ tag }}</div>
+        {% endfor %}
     </div>
     {% endfor %}
     </section>

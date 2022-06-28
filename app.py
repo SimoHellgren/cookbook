@@ -143,7 +143,7 @@ def shopping_list():
     if request.method == "POST":
         choices = request.form.getlist("recipes")
         ingredients = chain.from_iterable(
-            get(f"/recipe/{r['id']}/ingredients") for r in all_recipes if r["name"] in choices
+            get(f"/recipes/{r['id']}/ingredients").json() for r in all_recipes if r["name"] in choices
         )
 
         kf = lambda x: (x["name"], x["measure"])  # noqa: E731

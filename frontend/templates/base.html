@@ -1,20 +1,43 @@
 <!doctype html>
 <title>{% block title %}{% endblock %} - Cookbook</title>
-<nav>
-  <h1>Menu</h1>
-  <ul>
-    <li><a href="{{ url_for('recipes') }}">Recipes</a>
-    <li><a href="{{ url_for('add_recipe') }}">Add recipe</a>
-    <li><a href="{{ url_for('mealplan') }}">Mealplan</a>
-    <li><a href="{{ url_for('shopping_list') }}">Shopping list</a>
-  </ul>
-</nav>
-<section class="content">
-  <header>
-    {% block header %}{% endblock %}
-  </header>
-  {% for message in get_flashed_messages() %}
-    <div class="flash">{{ message }}</div>
-  {% endfor %}
-  {% block content %}{% endblock %}
-</section>
+<head>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <nav class="navbar">
+    <ul class="navbar-nav">
+      <li class="navbar-item">
+        <a href="{{ url_for('recipes') }}", class="nav-link">
+          <span class="link-text">Recipes</span>
+        </a>
+      </li>
+      <li class="navbar-item">
+        <a href="{{ url_for('add_recipe') }}", class="nav-link">
+          <span class="link-text">Add recipe</span>
+        </a>
+      </li>
+      <li class="navbar-item">
+        <a href="{{ url_for('mealplan') }}", class="nav-link">
+          <span class="link-text">Mealplan</span>
+        </a>
+      </li>
+      <li class="navbar-item">
+        <a href="{{ url_for('shopping_list') }}", class="nav-link">
+          <span class="link-text">Shopping list</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <main>
+    <section class="content">
+      <header>
+        {% block header %}{% endblock %}
+      </header>
+      {% for message in get_flashed_messages() %}
+        <div class="flash">{{ message }}</div>
+      {% endfor %}
+      {% block content %}{% endblock %}
+    </section>
+  </main>
+</body>

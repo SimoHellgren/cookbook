@@ -16,22 +16,13 @@
         <input name="search" id="search" placeholder="Search by name">
         <input type="submit" hidden/>
     </form>
-    <ul>
-        {% for recipe in recipes %}
-            <p><a href="#{{recipe['name']}}">{{recipe['name']}}</a></p>
-        {% endfor %}
-    </ul>
 
-
+    <section class="basic-grid">
     {% for recipe in recipes %}
+    <div class="card">
         <h2 id="{{recipe['name']}}"><a href="{{ url_for('get_recipe', id=recipe['id'])}}">{{recipe['name']}} ({{ recipe['servings'] }} servings)</a></h2>
-        <b>Tags:</b> {{ recipe['tags'] }}
-        <ul>
-            {% for ingredient in ingredients|selectattr("recipe_id", "equalto", recipe['id']) %}
-                <li>{{ingredient['name']}} {{ingredient['quantity']}}{{ingredient['measure']}}</li>
-            {% endfor %}
-        </ul>
-        <p>{{recipe['method']}}</p>
+        <b>Tags:</b> <div class="tag">{{ recipe['tags'] }}</div>
+    </div>
     {% endfor %}
-
+    </section>
 {% endblock %}

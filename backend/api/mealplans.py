@@ -1,18 +1,18 @@
 from flask import Blueprint, jsonify, request
-import backend.db as db
+from backend import crud
 
 bp = Blueprint('mealplans', __name__, url_prefix='/mealplans')
 
 
 @bp.get('/')
 def read_mealpans():
-    return jsonify(db.get_mealplans())
+    return jsonify(crud.mealplan.get_all())
 
 
 @bp.post('/')
 def create_mealplan():
     data = request.get_json()
-    db_mealplan = db.create_mealplan(
+    db_mealplan = crud.mealplan.create(
         date=data['date'],
         name=data['name'],
         servings=data['servings']

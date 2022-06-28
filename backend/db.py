@@ -59,18 +59,3 @@ def init_db(db):
 def cur_to_dicts(cur):
     cols = [c[0] for c in cur.description]
     return [dict(zip(cols, row)) for row in cur.fetchall()]
-
-
-def get_mealplans():
-    with SQLite(DB) as cur:
-        cur.execute('select * from mealplan')
-        return cur_to_dicts(cur)
-
-
-def create_mealplan(date, name, servings):
-    with SQLite(DB) as cur:
-        cur.execute('INSERT INTO mealplan(date, name, servings) VALUES (?,?,?)', (date, name, servings))
-
-        cur.execute('SELECT * FROM mealplan WHERE date = ? AND name = ?', (date, name))
-
-        return cur_to_dicts(cur)[0]

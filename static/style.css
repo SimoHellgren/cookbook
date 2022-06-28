@@ -1,4 +1,8 @@
 html {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
     font-size: 10px;
     font-family: sans-serif;
     background-color: #f2f2ed;
@@ -11,6 +15,7 @@ main {
 
 .navbar {
     background-color: #d9d9d4;
+    top: 0;
     width: 100vw;
     height: 5rem;
     position: fixed;
@@ -39,10 +44,10 @@ main {
 
 
 body {
-    margin: 0 auto;
+    margin: 0;
     padding: 0;
+    border: 0;
     background-color: #FAF9F6;
-    border: 5px solid black;
 }
 
 .card {

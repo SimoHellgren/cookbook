@@ -61,15 +61,6 @@ def cur_to_dicts(cur):
     return [dict(zip(cols, row)) for row in cur.fetchall()]
 
 
-def create_ingredient(name):
-    with SQLite(DB) as cur:
-        cur.execute('INSERT OR IGNORE INTO ingredient(name) values (?)', (name,))
-
-        # SQLite doesn't support RETURNING, so we query for the new record separately
-        cur.execute('SELECT * FROM ingredient where name == ?', (name,))
-        return cur_to_dicts(cur)[0]
-
-
 def get_recipe_ingredients():
     with SQLite(DB) as cur:
         cur.execute(
@@ -79,12 +70,6 @@ def get_recipe_ingredients():
             'FROM ingredient '
             'JOIN recipe_ingredient ON recipe_ingredient.ingredient_id = ingredient.id '
         )
-        return cur_to_dicts(cur)
-
-
-def get_ingredients():
-    with SQLite(DB) as cur:
-        cur.execute('SELECT * FROM ingredient')
         return cur_to_dicts(cur)
 
 

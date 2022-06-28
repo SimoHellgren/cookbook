@@ -1,17 +1,17 @@
 from flask import Blueprint, jsonify, request
-import backend.db as db
+from backend import crud
 bp = Blueprint('recipes', __name__, url_prefix='/recipes')
 
 
 @bp.get('/')
 def read_recipes():
-    return jsonify(db.get_recipes())
+    return jsonify(crud.recipe.get_all())
 
 
 @bp.post('/')
 def create_recipe():
     data = request.get_json()
-    db_recipe = db.create_recipe(
+    db_recipe = crud.recipe.create(
         name=data['name'],
         servings=data['servings'],
         method=data['method'],
@@ -23,18 +23,18 @@ def create_recipe():
 
 @bp.get('/<id>')
 def read_recipe(id):
-    return jsonify(db.get_recipe_by_id(id))
+    return jsonify(crud.recipe.get(id))
 
 
 @bp.get('/<id>/ingredients')
 def read_recipe_ingredients(id):
-    return jsonify(db.get_recipe_ingredients_by_recipe_id(id))
+    return jsonify(crud.recipe.get_ingredients(id))
 
 
 @bp.post('/<id>/ingredients')
 def create_recipe_ingredient(id):
     data = request.get_json()
-    return db.create_recipe_ingredient(
+    return crud.recipe.add_ingredient(
         recipe_id=id,
         ingredient_id=data['ingredient_id'],
         quantity=data['quantity'],

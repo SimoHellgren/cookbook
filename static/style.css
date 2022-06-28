@@ -64,18 +64,38 @@ body {
 
 .basic-grid {
     padding-left: 1rem;
-    margin-left: 10rem;
+    margin-left: 14rem;
     display: grid;
     gap: 1rem;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr))
 }
 
+.tag-grid {
+    padding-top: 1rem;
+    margin-left: 1rem;
+    display: grid;
+    gap: 0.5rem;
+    grid-template-columns: repeat(auto-fill, minmax(5rem, 1fr))
+}
+
+.tag-grid .tag {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+}
+
 .sidebar {
     background-color: #d9d9d4;
-    width: 10rem;
+    width: 14rem;
     height: 100vh;
     position: fixed;
     transition: width 200ms ease;
+    text-align: center;
+}
+
+.sidebar input {
+    width: 80%;
 }
 
 p, li {

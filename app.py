@@ -6,7 +6,7 @@ import requests
 
 from flask import Flask, render_template, request
 
-from backend import api
+from backend.api import api
 
 template_dir = os.path.abspath('./frontend/templates')
 app = Flask(__name__, template_folder=template_dir)

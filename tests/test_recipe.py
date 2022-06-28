@@ -1,5 +1,5 @@
 import os
-import db
+import backend.db as db
 
 
 def test_create_recipe():

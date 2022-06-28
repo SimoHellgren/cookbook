@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify
-import db
+import backend.db as db
 bp = Blueprint('recipe_ingredients', __name__, url_prefix='/recipe_ingredients')
 
 

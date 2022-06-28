@@ -1,3 +1,4 @@
+import os
 from itertools import chain, groupby
 
 from flask import Flask, render_template, request
@@ -6,7 +7,8 @@ from db import create_ingredient, create_mealplan, create_recipe, create_recipe_
 
 from backend import api
 
-app = Flask(__name__)
+template_dir = os.path.abspath('./frontend/templates')
+app = Flask(__name__, template_folder=template_dir)
 
 app.register_blueprint(api.bp)
 

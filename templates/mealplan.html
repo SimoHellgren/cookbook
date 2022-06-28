@@ -8,7 +8,7 @@
         <label for="date">Date</label>
         <input name="date" id="date" type="date" required/>
 
-        <label for="meals">Meals (1 per row, <i>name;portions</i>)</label>
+        <label for="meals">Meals (1 per row, <i>name;servings</i>)</label>
         <textarea name="meals" id="meals" required>lunch;2
 dinner;2</textarea>
 
@@ -16,6 +16,6 @@ dinner;2</textarea>
 
     </form>
     {% for meal in mealplan%}
-        <p>{{ meal['date'] }} - {{meal['name']}}: {{ meal['servings'] }} portions</p>
+        <p>{{ meal['date'] }} - {{meal['name']}}: {{ meal['servings'] }} servings</p>
     {% endfor %}
 {% endblock %}

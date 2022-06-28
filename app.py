@@ -42,7 +42,7 @@ def recipes():
 def recipe_from_form(form):
     name = form["name"]
 
-    servings = form["portions"]
+    servings = form["servings"]
 
     ingredient_list = (i.split(";") for i in form["ingredients"].split("\r\n"))
     cols = ("name", "quantity", "measure")

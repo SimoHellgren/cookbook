@@ -6,8 +6,6 @@ import requests
 
 from flask import Flask, render_template, request
 
-from db import create_mealplan, get_mealplans
-
 from backend import api
 
 template_dir = os.path.abspath('./frontend/templates')
@@ -119,7 +117,7 @@ def add_recipe():
 
 @app.route("/mealplan", methods=("GET", "POST"))
 def mealplan():
-    mp = get_mealplans()
+    mp = get('/mealplans').json()
     if request.method == "POST":
         date = request.form["date"]
 
@@ -128,10 +126,9 @@ def mealplan():
 
         meals = [dict(zip(cols, row.split(";")), date=date) for row in form_meals]
 
-        for meal in meals:
-            create_mealplan(**meal)
+        db_meals = [post('/mealplans', json=meal).json() for meal in meals]
 
-        mp = [*meals, *mp]  # mutation :|
+        mp = [*db_meals, *mp]  # mutation :|
 
     return render_template(
         "mealplan.html", mealplan=sorted(mp, key=lambda x: x["date"], reverse=True)

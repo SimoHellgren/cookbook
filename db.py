@@ -141,3 +141,7 @@ def get_mealplans():
 def create_mealplan(date, name, servings):
     with SQLite(DB) as cur:
         cur.execute('INSERT INTO mealplan(date, name, servings) VALUES (?,?,?)', (date, name, servings))
+
+        cur.execute('SELECT * FROM mealplan WHERE date = ? AND name = ?', (date, name))
+
+        return cur_to_dicts(cur)[0]

@@ -11,6 +11,7 @@ from backend import crud
 
 template_dir = os.path.abspath('./frontend/templates')
 app = Flask(__name__, template_folder=template_dir)
+app.config['TEMPLATES_AUTO_RELOAD'] = True
 
 app.register_blueprint(api.bp)
 
@@ -51,27 +52,6 @@ def recipes():
     )
 
 
-def recipe_from_form(form):
-    name = form["name"]
-
-    servings = form["servings"]
-
-    ingredient_list = (i.split(";") for i in form["ingredients"].split("\r\n"))
-    cols = ("name", "quantity", "measure")
-    ingredients = [dict(zip(cols, row)) for row in ingredient_list]
-
-    method = form["method"]
-
-    tags = form["tags"].strip()
-
-    return {
-        "name": name,
-        "servings": servings,
-        "method": method,
-        "tags": tags,
-    }, ingredients
-
-
 @app.route("/recipes/<id>", methods=("GET", "POST"))
 def get_recipe(id):
     # recipe = get(f'/recipes/{id}').json()
@@ -82,6 +62,29 @@ def get_recipe(id):
     return render_template(
         "recipe.html", recipe=recipe, ingredients=ingredients
     )
+
+
+def recipe_from_form(form):
+    name = form["name"]
+    servings = form["servings"]
+    method = form["method"]
+    tags = form["tags"].strip()
+
+    ingredient_keys = sorted(k for k in form if k.startswith('ingredient'))
+    quantity_keys = sorted(k for k in form if k.startswith('quantity'))
+    measure_keys = sorted(k for k in form if k.startswith('measure'))
+
+    ingredients = [
+        {'name': form[k1], 'quantity': form[k2], 'measure': form[k3]}
+        for k1, k2, k3 in zip(ingredient_keys, quantity_keys, measure_keys)
+    ]
+
+    return {
+        "name": name,
+        "servings": servings,
+        "method": method,
+        "tags": tags,
+    }, ingredients
 
 
 @app.route("/add_recipe", methods=("GET", "POST"))

@@ -103,7 +103,7 @@ def add_recipe():
                 'measure': ingredient['measure']
             }
 
-            post(f"/recipes/{db_recipe['id']}/ingeredients", json=recipe_ingredient_data)
+            post(f"/recipes/{db_recipe['id']}/ingredients", json=recipe_ingredient_data)
 
     return render_template("add_recipe.html")
 

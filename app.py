@@ -74,19 +74,6 @@ def get_recipe(id):
     recipe = get(f'/recipes/{id}').json()
     ingredients = get(f'/recipes/{id}/ingredients').json()
 
-    if request.method == "POST":
-        recipe, ingredients = recipe_from_form(request.form)  # mutation :|
-        db_recipe = post('/recipes', json=recipe).json()
-
-        for ingredient in ingredients:
-            db_ingredient = post('/ingredients', json=ingredient).json()
-            recipe_ingredient_data = {
-                'ingredient_id': db_ingredient['id'],
-                'quantity': ingredient['quantity'],
-                'measure': ingredient['measure']
-            }
-            post(f"/recipe/{db_recipe['id']}/ingeredients", json=recipe_ingredient_data)
-
     return render_template(
         "recipe.html", recipe=recipe, ingredients=ingredients
     )

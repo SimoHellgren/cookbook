@@ -7,6 +7,7 @@ import requests
 from flask import Flask, render_template, request
 
 from backend.api import api
+from backend import crud
 
 template_dir = os.path.abspath('./frontend/templates')
 app = Flask(__name__, template_folder=template_dir)
@@ -23,8 +24,10 @@ post = partial(apirequest, 'POST')
 @app.route("/")
 @app.route("/recipes")
 def recipes():
-    recipes = get('/recipes').json()
-    ingredients = get('/recipe_ingredients').json()
+    # recipes = get('/recipes').json()
+    # ingredients = get('/recipe_ingredients').json()
+    recipes = crud.recipe.get_all()
+    ingredients = crud.ingredient.get_all()
 
     filters = request.args.get("tags")
 
@@ -71,8 +74,10 @@ def recipe_from_form(form):
 
 @app.route("/recipes/<id>", methods=("GET", "POST"))
 def get_recipe(id):
-    recipe = get(f'/recipes/{id}').json()
-    ingredients = get(f'/recipes/{id}/ingredients').json()
+    # recipe = get(f'/recipes/{id}').json()
+    # ingredients = get(f'/recipes/{id}/ingredients').json()
+    recipe = crud.recipe.get(id)
+    ingredients = crud.recipe.get_ingredients(id)
 
     return render_template(
         "recipe.html", recipe=recipe, ingredients=ingredients
@@ -102,7 +107,8 @@ def add_recipe():
 
 @app.route("/mealplan", methods=("GET", "POST"))
 def mealplan():
-    mp = get('/mealplans').json()
+    # mp = get('/mealplans').json()
+    mp = crud.mealplan.get_all()
     if request.method == "POST":
         date = request.form["date"]
 
@@ -122,7 +128,8 @@ def mealplan():
 
 @app.route("/shoppinglist", methods=("GET", "POST"))
 def shopping_list():
-    all_recipes = get('/recipes').json()
+    # all_recipes = get('/recipes').json()
+    all_recipes = crud.recipe.get_all()
     items = []
     if request.method == "POST":
         choices = request.form.getlist("recipes")

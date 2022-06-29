@@ -87,11 +87,8 @@ def get_recipe(id):
             }
             post(f"/recipe/{db_recipe['id']}/ingeredients", json=recipe_ingredient_data)
 
-    ingredientstring = "\r\n".join(
-        f"{i['name']};{i['quantity']};{i['measure']}" for i in ingredients
-    )
     return render_template(
-        "recipe.html", recipe=recipe, ingredientstring=ingredientstring
+        "recipe.html", recipe=recipe, ingredients=ingredients
     )
 
 

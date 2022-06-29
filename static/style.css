@@ -103,6 +103,41 @@ body {
     width: 80%;
 }
 
+.ingredientlist {
+    background-color: #d9d9d4;
+    width: 20rem;
+    height: 100vh;
+    position: fixed;
+    transition: width 200ms ease;
+    text-align: center;
+}
+
+.ingredientlist li {
+    font-size: 12px;
+    list-style: none;
+    text-align: left;
+}
+
+.recipe-header {
+    margin-left: 20rem;
+    padding-left: 1rem;
+    border: 2px dashed #B0B0B0;
+}
+
+.method {
+    margin-left: 20rem;
+    padding-left: 1rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border: 2px dashed #B0B0B0;
+}
+
+.method li {
+    font-size: 12px;
+    list-style: none;
+    text-align: left;
+}
+
 p, li {
     font-size: 16px;
     line-height: 2;

@@ -4,24 +4,40 @@
 
 {% block content%}
 
-<h1>Edit recipe</h1>
-<form method="post">
-    <label for="name">Recipe name</label>
-    <input name="name" id="name" value="{{ recipe['name'] }}" required>
-    
-    <label for="tags">Tags (comma-separated)</label>
-    <input name="tags" id="tags" value="{{ recipe['tags'] }}">
+<section class="ingredientlist">
+    <h2>Ingredients</h2>
+    <ul>
+        {% for ingredient in ingredients %}
+        <li>
+            <input type="checkbox">
+                {{ ingredient['name'] }} {{ ingredient['quantity'] }}{{ ingredient['measure'] }}
+            </input>
+        </li>
+        {% endfor %}
 
-    <label for="servings">Servings</label>
-    <input name="servings" id="servings" value="{{ recipe['servings'] }}">
+    </ul>
+</section>
 
-    <label for="ingredients">Ingredients (one per row)</label>
-    <textarea name="ingredients" id="ingredients"required>{{ ingredientstring }}</textarea>
+<section class="recipe-header">
+    <h1>{{ recipe['name'] }}</h1>
+    <p>{{ recipe['servings'] }} servings</p>
+    <div class="tag-grid">
+        {% for tag in recipe['tags'].split(',') %}
+            <div class="tag">{{ tag }}</div>
+        {% endfor %}
+    </div>
+    </section>
+<section class="method">
+    <h2>Method</h2>
+    <ul>
+        {% for line in recipe['method'].split('\r\n') %}
+        <li>
+            <input type="checkbox">
+                {{ line }}
+            </input>
+        </li>
+        {% endfor %}
+    </ul>
+</section>
 
-    <label for="method">Method</label>
-    <textarea name="method" id="method">{{ recipe['method'] }}</textarea>
-
-    <input type="submit" value="Save">
-
-</form>
 {% endblock %}

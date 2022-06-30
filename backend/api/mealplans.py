@@ -24,3 +24,11 @@ def create_mealplan():
     )
 
     return jsonify(db_mealplan)
+
+
+@bp.put('/<id>')
+def update_mealplan(id):
+    data = request.get_json()
+    db_mealplan = crud.mealplan.update(**data)
+
+    return db_mealplan

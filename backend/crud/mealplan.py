@@ -26,9 +26,9 @@ def update(id, date, name, servings, recipe_id):
     with SQLite(DB) as cur:
         cur.execute(
             'UPDATE mealplan SET '
-            'date = ? '
-            'name = ? '
-            'servings = ? '
+            'date = ?,'
+            'name = ?,'
+            'servings = ?,'
             'recipe_id = ? '
             'WHERE id = ?',
             (date, name, servings, recipe_id, id)

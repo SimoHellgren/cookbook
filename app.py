@@ -1,6 +1,7 @@
 from functools import partial
 import os
-from itertools import chain, groupby
+from itertools import chain, groupby, count
+from datetime import datetime, timedelta
 
 import requests
 
@@ -20,6 +21,17 @@ API_BASE_URL = 'http://localhost:5000/api'
 apirequest = lambda method, endpoint, *args, **kwargs: requests.request(method, API_BASE_URL + endpoint, *args, **kwargs)  # noqa E731
 get = partial(apirequest, 'GET')
 post = partial(apirequest, 'POST')
+
+
+def datetime_range(start: datetime, end: datetime, step=timedelta(days=1)):
+    """like range, but for datetimes and you must always specify both start and end."""
+    deltas = (step * i for i in count(0))
+
+    for delta in deltas:
+        if start + delta >= end:
+            return
+
+        yield start + delta
 
 
 @app.route("/")
@@ -111,6 +123,29 @@ def add_recipe():
 @app.route("/mealplan", methods=("GET", "POST"))
 def mealplan():
     return render_template("mealplan.html")
+
+
+@app.route("/add_mealplans", methods=("GET", "POST"))
+def add_mealplans():
+    mps = crud.mealplan.get_all()
+
+    if request.method == "POST":
+        start = request.form['start_date']
+        end = request.form.get('end_date') or start  # default to start date
+
+        start_dt = datetime.strptime(start, "%Y-%m-%d")
+        end_dt = datetime.strptime(end, "%Y-%m-%d")
+
+        meals = [dict(zip(('name', 'servings'), row.split(';'))) for row in request.form['meals'].splitlines()]
+
+        for date in datetime_range(start_dt, end_dt + timedelta(days=1)):
+            for meal in meals:
+                crud.mealplan.create(
+                    date=date.date(),
+                    **meal
+                )
+
+    return render_template('add_mealplans.html', mealplans=mps)
 
 
 @app.route("/shoppinglist", methods=("GET", "POST"))

@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}Mealplan{% endblock %}
+
+{% block content%}
+<form method="post">
+    <label>
+        Start date
+        <input type="date" name="start_date">
+    </label>
+    <label>
+        End date (leave empty for single date)
+        <input type="date" name="end_date">
+    </label>
+    <label>
+        Meals (name;servings)
+        <textarea name="meals">lunch;2
+dinner;2</textarea>
+    </label>
+    <button type="submit">Create mealplans</button>
+</form>
+
+{% endblock %}

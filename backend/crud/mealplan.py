@@ -14,3 +14,8 @@ def create(date, name, servings):
         cur.execute('SELECT * FROM mealplan WHERE date = ? AND name = ?', (date, name))
 
         return cur_to_dicts(cur)[0]
+
+
+def delete(id):
+    with SQLite(DB) as cur:
+        cur.execute('DELETE FROM mealplan WHERE id = ?', (id,))

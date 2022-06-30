@@ -3,19 +3,80 @@
 {% block title %}Mealplan{% endblock %}
 
 {% block content%}
-    <h1>Initialize mealplan</h1>
-    <form method="post">
-        <label for="date">Date</label>
-        <input name="date" id="date" type="date" required/>
+    <div>
+        <label for="start_date">Start date</label>
+        <input type="date" id="start_date">
+        <label for="end_date">End date</label>
+        <input type="date" id="end_date">
+    </div>
 
-        <label for="meals">Meals (1 per row, <i>name;servings</i>)</label>
-        <textarea name="meals" id="meals" required>lunch;2
-dinner;2</textarea>
 
-        <input type="submit">
+    <div id="mealpan-container"></div>
+    
+    <script>
+        const container = document.getElementById("mealpan-container")
+        
+        // event listener for dates
+        const start_date = document.getElementById('start_date');
+        const end_date = document.getElementById('end_date');
 
-    </form>
-    {% for meal in mealplan%}
-        <p>{{ meal['date'] }} - {{meal['name']}}: {{ meal['servings'] }} servings</p>
-    {% endfor %}
+        plans = [];
+        recipes = [];
+
+        /**
+         * function for creating individual mealcards which allow you to choose a recipe for said meal
+        */
+        const createMealCard = (data) => {
+            let element = document.createElement('div')
+            element.setAttribute('class', 'mealcard')
+            element.setAttribute('data-date', data.date) // date stored as attr for later filtering
+            
+            let header = document.createElement('div')
+            header.setAttribute('class', 'mealcard-header')
+            header.textContent = `${data.date} ${data.name}`
+            
+            let selector = document.createElement('select')
+            selector.append(
+                new Option("", null, true), // empty selection as the default
+                ...recipes.map(r => new Option(r.name, r.id, false, false))
+                )
+                element.append(header, selector)
+                
+                return element
+        }
+
+
+        const renderPlans = () => {
+            const start = start_date.value
+            const end = end_date.value
+            
+            // hide plans if not between start and end dates
+            container.childNodes.forEach(plan => {
+                date = plan.getAttribute('data-date')
+                plan.style.display = ((start ? date >= start : true) && (end ? date <= end : true)) ? "block" : "none" 
+            })
+        }
+
+        // event listeners to trigger rendering of mealplans whenver date range changes
+        start_date.addEventListener('change', renderPlans);
+        end_date.addEventListener('change', renderPlans);
+
+
+        const getPlans = async () => {
+            const response = await fetch('http://localhost:5000/api/mealplans');
+            plans = await response.json();
+            
+            const elements = plans.sort(p => p.date).map(createMealCard)
+            container.append(...elements)
+        }
+        
+        const getRecipes = async () => {
+            const response = await fetch('http://localhost:5000/api/recipes');
+            recipes = await response.json(); 
+        }
+        
+        getRecipes();
+        getPlans();
+</script>
+
 {% endblock %}

@@ -119,13 +119,13 @@ body {
 }
 
 .recipe-header {
-    margin-left: 20rem;
+    margin-left: 21rem;
     padding-left: 1rem;
     border: 2px dashed #B0B0B0;
 }
 
 .method {
-    margin-left: 20rem;
+    margin-left: 21rem;
     padding-left: 1rem;
     margin-top: 1rem;
     padding-top: 1rem;
@@ -136,6 +136,16 @@ body {
     font-size: 12px;
     list-style: none;
     text-align: left;
+}
+
+.mealcard {
+    border: 2px solid #B0B0B0;
+    margin-top: 1rem;
+    width: fit-content;
+}
+
+.mealcard-header {
+    font-size: 16px;
 }
 
 p, li {

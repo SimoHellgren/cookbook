@@ -22,6 +22,14 @@ def create(name, servings, method, tags=None):
         return cur_to_dicts(cur)[0]
 
 
+def delete(id):
+    '''deletes recipe and associated recipe_ingredients'''
+    with SQLite(DB) as cur:
+        cur.execute('DELETE FROM recipe WHERE id = ?', (id,))
+
+        cur.execute('DELETE FROM recipe_ingredient WHERE recipe_id = ?', (id,))
+
+
 def get_ingredients(id):
     with SQLite(DB) as cur:
         cur.execute(

@@ -9,6 +9,11 @@ def read_mealpans():
     return jsonify(crud.mealplan.get_all())
 
 
+@bp.get('/<id>')
+def read_mealplan(id):
+    return jsonify(crud.mealplan.get(id))
+
+
 @bp.post('/')
 def create_mealplan():
     data = request.get_json()

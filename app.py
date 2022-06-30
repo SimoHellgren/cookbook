@@ -110,23 +110,7 @@ def add_recipe():
 
 @app.route("/mealplan", methods=("GET", "POST"))
 def mealplan():
-    # mp = get('/mealplans').json()
-    mp = crud.mealplan.get_all()
-    if request.method == "POST":
-        date = request.form["date"]
-
-        form_meals = filter(None, request.form["meals"].split("\r\n"))
-        cols = ("name", "servings")
-
-        meals = [dict(zip(cols, row.split(";")), date=date) for row in form_meals]
-
-        db_meals = [post('/mealplans', json=meal).json() for meal in meals]
-
-        mp = [*db_meals, *mp]  # mutation :|
-
-    return render_template(
-        "mealplan.html", mealplan=sorted(mp, key=lambda x: x["date"], reverse=True)
-    )
+    return render_template("mealplan.html")
 
 
 @app.route("/shoppinglist", methods=("GET", "POST"))

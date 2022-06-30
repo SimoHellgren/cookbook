@@ -51,7 +51,9 @@ def init_db(db):
             'id integer primary key,'
             'date date,'
             'name text,'
-            'servings numeric'
+            'servings numeric,'
+            'recipe_id,'
+            'FOREIGN KEY(recipe_id) REFERENCES recipe(id)'
             ')'
         )
 

@@ -68,8 +68,8 @@
         const getPlans = async () => {
             const response = await fetch('http://localhost:5000/api/mealplans');
             plans = await response.json();
-            
-            const elements = plans.sort(p => p.date).map(createMealCard)
+
+            const elements = plans.sort((a,b) => b.date > a.date ? -1 : 1).map(createMealCard)
             container.append(...elements)
         }
         
@@ -77,7 +77,7 @@
             const response = await fetch('http://localhost:5000/api/recipes');
             recipes = await response.json(); 
         }
-        
+
         getRecipes();
         getPlans();
 </script>

@@ -10,4 +10,4 @@ class Mealplan(Base):
     servings = Column(Numeric)
     recipe_id = Column(Integer, ForeignKey("recipe.id"))
 
-    recipe = relationship('Recipe', back_populates="mealplans")
+    recipe = relationship("Recipe", back_populates="mealplans")

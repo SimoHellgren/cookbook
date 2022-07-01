@@ -1,7 +1,7 @@
 from contextlib import contextmanager
 import sqlite3
 
-DB = 'test.db'
+DB = "test.db"
 
 
 @contextmanager
@@ -19,42 +19,42 @@ def SQLite(db):
 def init_db(db):
     with SQLite(db) as cur:
         cur.execute(
-            'CREATE TABLE recipe('
-            'id integer primary key,'
-            'name text unique not null,'
-            'servings numeric,'
-            'method text,'
-            'tags text'
-            ')'
+            "CREATE TABLE recipe("
+            "id integer primary key,"
+            "name text unique not null,"
+            "servings numeric,"
+            "method text,"
+            "tags text"
+            ")"
         )
 
         cur.execute(
-            'CREATE TABLE ingredient('
-            'id integer primary key,'
-            'name text unique not null'
-            ')'
+            "CREATE TABLE ingredient("
+            "id integer primary key,"
+            "name text unique not null"
+            ")"
         )
 
         cur.execute(
-            'CREATE TABLE recipe_ingredient('
-            'recipe_id integer,'
-            'ingredient_id integer,'
-            'quantity numeric,'
-            'measure text,'
-            'FOREIGN KEY(recipe_id) REFERENCES recipe(id),'
-            'FOREIGN KEY(ingredient_id) REFERENCES ingredient(id)'
-            ')'
+            "CREATE TABLE recipe_ingredient("
+            "recipe_id integer,"
+            "ingredient_id integer,"
+            "quantity numeric,"
+            "measure text,"
+            "FOREIGN KEY(recipe_id) REFERENCES recipe(id),"
+            "FOREIGN KEY(ingredient_id) REFERENCES ingredient(id)"
+            ")"
         )
 
         cur.execute(
-            'CREATE TABLE mealplan('
-            'id integer primary key,'
-            'date date,'
-            'name text,'
-            'servings numeric,'
-            'recipe_id,'
-            'FOREIGN KEY(recipe_id) REFERENCES recipe(id)'
-            ')'
+            "CREATE TABLE mealplan("
+            "id integer primary key,"
+            "date date,"
+            "name text,"
+            "servings numeric,"
+            "recipe_id,"
+            "FOREIGN KEY(recipe_id) REFERENCES recipe(id)"
+            ")"
         )
 
 

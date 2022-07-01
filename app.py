@@ -10,17 +10,19 @@ from flask import Flask, render_template, request
 from backend.api import api
 from backend import crud
 
-template_dir = os.path.abspath('./frontend/templates')
+template_dir = os.path.abspath("./frontend/templates")
 app = Flask(__name__, template_folder=template_dir)
-app.config['TEMPLATES_AUTO_RELOAD'] = True
+app.config["TEMPLATES_AUTO_RELOAD"] = True
 
 app.register_blueprint(api.bp)
 
-API_BASE_URL = 'http://localhost:5000/api'
+API_BASE_URL = "http://localhost:5000/api"
 
-apirequest = lambda method, endpoint, *args, **kwargs: requests.request(method, API_BASE_URL + endpoint, *args, **kwargs)  # noqa E731
-get = partial(apirequest, 'GET')
-post = partial(apirequest, 'POST')
+apirequest = lambda method, endpoint, *args, **kwargs: requests.request(
+    method, API_BASE_URL + endpoint, *args, **kwargs
+)  # noqa E731
+get = partial(apirequest, "GET")
+post = partial(apirequest, "POST")
 
 
 def datetime_range(start: datetime, end: datetime, step=timedelta(days=1)):
@@ -56,11 +58,14 @@ def recipes():
     recipes_to_show = list(filter_by_search)
 
     available_tags = sorted(
-        set(chain.from_iterable(r["tags"].split(',') for r in recipes_to_show))
+        set(chain.from_iterable(r["tags"].split(",") for r in recipes_to_show))
     )
 
     return render_template(
-        "recipes.html", recipes=recipes_to_show, ingredients=ingredients, tags=available_tags
+        "recipes.html",
+        recipes=recipes_to_show,
+        ingredients=ingredients,
+        tags=available_tags,
     )
 
 
@@ -71,9 +76,7 @@ def get_recipe(id):
     recipe = crud.recipe.get(id)
     ingredients = crud.recipe.get_ingredients(id)
 
-    return render_template(
-        "recipe.html", recipe=recipe, ingredients=ingredients
-    )
+    return render_template("recipe.html", recipe=recipe, ingredients=ingredients)
 
 
 def recipe_from_form(form):
@@ -82,12 +85,12 @@ def recipe_from_form(form):
     method = form["method"]
     tags = form["tags"].strip()
 
-    ingredient_keys = sorted(k for k in form if k.startswith('ingredient'))
-    quantity_keys = sorted(k for k in form if k.startswith('quantity'))
-    measure_keys = sorted(k for k in form if k.startswith('measure'))
+    ingredient_keys = sorted(k for k in form if k.startswith("ingredient"))
+    quantity_keys = sorted(k for k in form if k.startswith("quantity"))
+    measure_keys = sorted(k for k in form if k.startswith("measure"))
 
     ingredients = [
-        {'name': form[k1], 'quantity': form[k2], 'measure': form[k3]}
+        {"name": form[k1], "quantity": form[k2], "measure": form[k3]}
         for k1, k2, k3 in zip(ingredient_keys, quantity_keys, measure_keys)
     ]
 
@@ -105,14 +108,14 @@ def add_recipe():
 
         recipe, ingredients = recipe_from_form(request.form)
 
-        db_recipe = post('/recipes', json=recipe).json()
+        db_recipe = post("/recipes", json=recipe).json()
 
         for ingredient in ingredients:
-            db_ingredient = post('/ingredients', json=ingredient).json()
+            db_ingredient = post("/ingredients", json=ingredient).json()
             recipe_ingredient_data = {
-                'ingredient_id': db_ingredient['id'],
-                'quantity': ingredient['quantity'],
-                'measure': ingredient['measure']
+                "ingredient_id": db_ingredient["id"],
+                "quantity": ingredient["quantity"],
+                "measure": ingredient["measure"],
             }
 
             post(f"/recipes/{db_recipe['id']}/ingredients", json=recipe_ingredient_data)
@@ -130,53 +133,62 @@ def add_mealplans():
     mps = crud.mealplan.get_all()
 
     if request.method == "POST":
-        start = request.form['start_date']
-        end = request.form.get('end_date') or start  # default to start date
+        start = request.form["start_date"]
+        end = request.form.get("end_date") or start  # default to start date
 
         start_dt = datetime.strptime(start, "%Y-%m-%d")
         end_dt = datetime.strptime(end, "%Y-%m-%d")
 
-        meals = [dict(zip(('name', 'servings'), row.split(';'))) for row in request.form['meals'].splitlines()]
+        meals = [
+            dict(zip(("name", "servings"), row.split(";")))
+            for row in request.form["meals"].splitlines()
+        ]
 
         for date in datetime_range(start_dt, end_dt + timedelta(days=1)):
             for meal in meals:
-                crud.mealplan.create(
-                    date=date.date(),
-                    **meal
-                )
+                crud.mealplan.create(date=date.date(), **meal)
 
-    return render_template('add_mealplans.html', mealplans=mps)
+    return render_template("add_mealplans.html", mealplans=mps)
 
 
 @app.route("/shoppinglist", methods=("GET", "POST"))
 def shopping_list():
     items = []
     if request.method == "POST":
-        start = request.form['start_date']
-        end = request.form['end_date']
+        start = request.form["start_date"]
+        end = request.form["end_date"]
 
         mps = crud.mealplan.get_all()
 
-        chosen_mps = filter(lambda mp: start <= mp['date'] <= end, mps)
+        chosen_mps = filter(lambda mp: start <= mp["date"] <= end, mps)
 
         # calculate how many servings are needed per recipe
         kf = lambda x: x["recipe_id"]  # noqa: E731
         gb = groupby(sorted(chosen_mps, key=kf), key=kf)
-        needed_servings = {recipe_id: sum(row['servings'] for row in rows) for recipe_id, rows in gb}
+        needed_servings = {
+            recipe_id: sum(row["servings"] for row in rows) for recipe_id, rows in gb
+        }
 
         # get recipes and their ingredients
         data = [
-            {'recipe': crud.recipe.get(i), 'ingredients': crud.recipe.get_ingredients(i), 'servings': servings}
+            {
+                "recipe": crud.recipe.get(i),
+                "ingredients": crud.recipe.get_ingredients(i),
+                "servings": servings,
+            }
             for i, servings in needed_servings.items()
         ]
 
         for d in data:
-            scaling_factor = d['servings'] / d['recipe']['servings']
+            scaling_factor = d["servings"] / d["recipe"]["servings"]
 
             items.append(
                 {
-                    'recipe': f"{d['recipe']['name']} ({d['servings']})",
-                    'ingredients': [{**ing, 'quantity': scaling_factor * ing['quantity']} for ing in d['ingredients']]
+                    "recipe": f"{d['recipe']['name']} ({d['servings']})",
+                    "ingredients": [
+                        {**ing, "quantity": scaling_factor * ing["quantity"]}
+                        for ing in d["ingredients"]
+                    ],
                 }
             )
 

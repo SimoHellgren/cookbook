@@ -9,10 +9,10 @@ def test_create_recipe():
         "portions": 5,
         "ingredients": [{"name": "Test ingredient", "quantity": 1, "measure": "kpl"}],
         "method": "Put the thing in the place",
-        "tags": ["tagge"]
+        "tags": ["tagge"],
     }
     db.create_recipe(filename=filename, **data)
 
-    assert os.path.exists(f'./recipes/{filename}')
+    assert os.path.exists(f"./recipes/{filename}")
 
-    os.remove(f'./recipes/{filename}')  # this leaves a file behind if the test fails
+    os.remove(f"./recipes/{filename}")  # this leaves a file behind if the test fails

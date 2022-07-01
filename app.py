@@ -150,25 +150,34 @@ def add_mealplans():
 
 @app.route("/shoppinglist", methods=("GET", "POST"))
 def shopping_list():
-    # all_recipes = get('/recipes').json()
-    all_recipes = crud.recipe.get_all()
     items = []
     if request.method == "POST":
-        choices = request.form.getlist("recipes")
-        ingredients = chain.from_iterable(
-            get(f"/recipes/{r['id']}/ingredients").json() for r in all_recipes if r["name"] in choices
-        )
+        start = request.form['start_date']
+        end = request.form['end_date']
 
-        kf = lambda x: (x["name"], x["measure"])  # noqa: E731
-        gb = groupby(sorted(ingredients, key=kf), key=kf)
+        mps = crud.mealplan.get_all()
 
-        items = [
-            {
-                "name": name,
-                "measure": measure,
-                "quantity": sum(float(row["quantity"]) for row in rows),
-            }
-            for (name, measure), rows in gb
+        chosen_mps = filter(lambda mp: start <= mp['date'] <= end, mps)
+
+        # calculate how many servings are needed per recipe
+        kf = lambda x: x["recipe_id"]  # noqa: E731
+        gb = groupby(sorted(chosen_mps, key=kf), key=kf)
+        needed_servings = {recipe_id: sum(row['servings'] for row in rows) for recipe_id, rows in gb}
+
+        # get recipes and their ingredients
+        data = [
+            {'recipe': crud.recipe.get(i), 'ingredients': crud.recipe.get_ingredients(i), 'servings': servings}
+            for i, servings in needed_servings.items()
         ]
 
-    return render_template("shoppinglist.html", recipes=all_recipes, items=items)
+        for d in data:
+            scaling_factor = d['servings'] / d['recipe']['servings']
+
+            items.append(
+                {
+                    'recipe': f"{d['recipe']['name']} ({d['servings']})",
+                    'ingredients': [{**ing, 'quantity': scaling_factor * ing['quantity']} for ing in d['ingredients']]
+                }
+            )
+
+    return render_template("shoppinglist.html", items=items)

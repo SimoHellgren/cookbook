@@ -4,16 +4,20 @@
 
 {% block content%}
 <form method="post">
-    <select name="recipes" multiple>
-        {% for recipe in recipes %}
-            <option value="{{ recipe['name']}}">{{ recipe['name'] }}</option>
-        {% endfor %}
-    </select>
+    <label for="start_date">Start date</label>
+    <input id="start_date" type="date" name="start_date">
+    <label for="end_date">End date</label>
+    <input id="end_date" type="date" name="end_date">
     <input type="submit">
     <h1>Shopping list</h1>
     <ul>
-        {% for item in items %}
-            <li>{{ item['name'] }}: {{ item['quantity'] }}{{ item['measure'] }}</li>
+        {% for recipe in items %}
+            <li>{{ recipe['recipe'] }}</li>
+            <ul>
+                {% for ingredient in recipe['ingredients'] %}
+                <li>{{ ingredient['name'] }} {{ ingredient['quantity'] }}{{ingredient['measure']}}</li>
+                {% endfor %}
+            </ul>
         {% endfor %}
     </ul>
 </form>

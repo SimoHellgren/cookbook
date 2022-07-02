@@ -1,13 +1,6 @@
-from backend.db import SQLite, cur_to_dicts, DB
+from sqlalchemy.orm import Session
+from backend import models
 
 
-def get_all():
-    with SQLite(DB) as cur:
-        cur.execute(
-            "SELECT "
-            "ingredient.name name,"
-            "recipe_ingredient.* "
-            "FROM ingredient "
-            "JOIN recipe_ingredient ON recipe_ingredient.ingredient_id = ingredient.id "
-        )
-        return cur_to_dicts(cur)
+def get_all(db: Session):
+    return db.query(models.RecipeIngredient).all()

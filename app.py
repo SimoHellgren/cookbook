@@ -9,18 +9,25 @@ from flask import Flask, render_template, request
 
 from backend.api import api
 from backend import crud
+from backend.dependencies import get_db, close_db
 
 template_dir = os.path.abspath("./frontend/templates")
 app = Flask(__name__, template_folder=template_dir)
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 
+# init DB
+with app.app_context():
+    get_db()
+
+app.teardown_appcontext(close_db)
+
 app.register_blueprint(api.bp)
 
 API_BASE_URL = "http://localhost:5000/api"
 
-apirequest = lambda method, endpoint, *args, **kwargs: requests.request(
+apirequest = lambda method, endpoint, *args, **kwargs: requests.request(  # noqa: E731
     method, API_BASE_URL + endpoint, *args, **kwargs
-)  # noqa E731
+)
 get = partial(apirequest, "GET")
 post = partial(apirequest, "POST")
 
@@ -41,8 +48,9 @@ def datetime_range(start: datetime, end: datetime, step=timedelta(days=1)):
 def recipes():
     # recipes = get('/recipes').json()
     # ingredients = get('/recipe_ingredients').json()
-    recipes = crud.recipe.get_all()
-    ingredients = crud.ingredient.get_all()
+    db = get_db()
+    recipes = crud.recipe.get_all(db)
+    ingredients = crud.ingredient.get_all(db)
 
     filters = request.args.get("tags")
 
@@ -53,12 +61,12 @@ def recipes():
     )
 
     search = request.args.get("search", "").lower()
-    filter_by_search = (r for r in filtered_by_tags if search in r["name"].lower())
+    filter_by_search = (r for r in filtered_by_tags if search in r.name.lower())
 
     recipes_to_show = list(filter_by_search)
 
     available_tags = sorted(
-        set(chain.from_iterable(r["tags"].split(",") for r in recipes_to_show))
+        set(chain.from_iterable(r.tags.split(",") for r in recipes_to_show))
     )
 
     return render_template(
@@ -73,8 +81,9 @@ def recipes():
 def get_recipe(id):
     # recipe = get(f'/recipes/{id}').json()
     # ingredients = get(f'/recipes/{id}/ingredients').json()
-    recipe = crud.recipe.get(id)
-    ingredients = crud.recipe.get_ingredients(id)
+    db = get_db()
+    recipe = crud.recipe.get(db, id)
+    ingredients = recipe.ingredients
 
     return render_template("recipe.html", recipe=recipe, ingredients=ingredients)
 
@@ -105,20 +114,23 @@ def recipe_from_form(form):
 @app.route("/add_recipe", methods=("GET", "POST"))
 def add_recipe():
     if request.method == "POST":
-
+        db = get_db()
         recipe, ingredients = recipe_from_form(request.form)
 
-        db_recipe = post("/recipes", json=recipe).json()
+        # db_recipe = post("/recipes", json=recipe).json()
+        db_recipe = crud.recipe.create(db=db, **recipe)
 
         for ingredient in ingredients:
-            db_ingredient = post("/ingredients", json=ingredient).json()
+            # db_ingredient = post("/ingredients", json=ingredient).json()
+            db_ingredient = crud.ingredient.create(db, name=ingredient['name'])
             recipe_ingredient_data = {
-                "ingredient_id": db_ingredient["id"],
+                "ingredient_id": db_ingredient.id,
                 "quantity": ingredient["quantity"],
                 "measure": ingredient["measure"],
             }
 
-            post(f"/recipes/{db_recipe['id']}/ingredients", json=recipe_ingredient_data)
+            # post(f"/recipes/{db_recipe['id']}/ingredients", json=recipe_ingredient_data)
+            crud.recipe.add_ingredient(db, recipe_id=db_recipe.id, **recipe_ingredient_data)
 
     return render_template("add_recipe.html")
 

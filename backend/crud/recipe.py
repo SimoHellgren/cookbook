@@ -1,62 +1,45 @@
-from backend.db import SQLite, cur_to_dicts, DB
+from sqlalchemy.orm import Session
+from backend import models
 
 
-def get_all():
-    with SQLite(DB) as cur:
-        cur.execute("select * from recipe")
-        return cur_to_dicts(cur)
+def get_all(db: Session):
+    return db.query(models.Recipe).all()
 
 
-def get(id):
-    with SQLite(DB) as cur:
-        cur.execute("select * from recipe where id = ?", (id,))
-        return cur_to_dicts(cur)[0]
+def get(db: Session, id: int):
+    return db.query(models.Recipe).get(id)
 
 
-def create(name, servings, method, tags=None):
-    with SQLite(DB) as cur:
-        cur.execute(
-            "INSERT OR IGNORE INTO recipe(name, servings, method, tags) values (?,?,?,?)",
-            (name, servings, method, tags),
-        )
-
-        # SQLite doesn't support RETURNING, so we query for the new record separately
-        cur.execute("SELECT * FROM recipe where name == ?", (name,))
-        return cur_to_dicts(cur)[0]
+def create(db: Session, name: str, servings: float, method: str, tags: str = None):
+    db_obj = models.Recipe(name=name, servings=servings, method=method, tags=tags)
+    db.add(db_obj)
+    db.commit()
+    db.refresh(db_obj)
+    return db_obj
 
 
-def delete(id):
-    """deletes recipe and associated recipe_ingredients"""
-    with SQLite(DB) as cur:
-        cur.execute("DELETE FROM recipe WHERE id = ?", (id,))
-
-        cur.execute("DELETE FROM recipe_ingredient WHERE recipe_id = ?", (id,))
-
-
-def get_ingredients(id):
-    with SQLite(DB) as cur:
-        cur.execute(
-            "SELECT "
-            "ingredient.name name,"
-            "recipe_ingredient.* "
-            "FROM ingredient "
-            "JOIN recipe_ingredient ON recipe_ingredient.ingredient_id = ingredient.id "
-            "WHERE recipe_ingredient.recipe_id = ?",
-            (id,),
-        )
-        return cur_to_dicts(cur)
+def delete(db: Session, id: int):
+    db_obj = db.query(models.Recipe).get(id)
+    db.delete(db_obj)
+    db.commit()
+    return db_obj
 
 
-def add_ingredient(recipe_id, ingredient_id, quantity, measure):
-    with SQLite(DB) as cur:
-        cur.execute(
-            "INSERT OR IGNORE INTO recipe_ingredient(recipe_id, ingredient_id, quantity, measure) values (?,?,?,?)",
-            (recipe_id, ingredient_id, quantity, measure),
-        )
+def get_ingredients(db: Session, id: int):
+    db.query(models.Recipe).get(id).ingredients
 
-        # SQLite doesn't support RETURNING, so we query for the new record separately
-        cur.execute(
-            "SELECT * FROM recipe_ingredient where recipe_id = ? AND ingredient_id = ?",
-            (recipe_id, ingredient_id),
-        )
-        return cur_to_dicts(cur)[0]
+
+def add_ingredient(
+    db: Session, recipe_id: int, ingredient_id: int, quantity: float, measure: str
+):
+    db_obj = models.RecipeIngredient(
+        recipe_id=recipe_id,
+        ingredient_id=ingredient_id,
+        quantity=quantity,
+        measure=measure,
+    )
+
+    db.add(db_obj)
+    db.commit()
+    db.refresh(db_obj)
+    return db_obj

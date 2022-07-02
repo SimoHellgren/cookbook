@@ -1,16 +1,21 @@
-from backend.db import SQLite, cur_to_dicts, DB
+from typing import List
+from sqlalchemy.orm import Session
+from backend import models
 
 
-def get_all():
-    with SQLite(DB) as cur:
-        cur.execute("SELECT * FROM ingredient")
-        return cur_to_dicts(cur)
+def get_all(db: Session) -> List[models.Ingredient]:
+    return db.query(models.Ingredient).all()
 
 
-def create(name):
-    with SQLite(DB) as cur:
-        cur.execute("INSERT OR IGNORE INTO ingredient(name) values (?)", (name,))
+def create(db: Session, name: str) -> models.Ingredient:
+    # try to return existing value
+    db_obj = db.query(models.Ingredient).filter_by(name=name).first()
+    if db_obj:
+        return db_obj
 
-        # SQLite doesn't support RETURNING, so we query for the new record separately
-        cur.execute("SELECT * FROM ingredient where name == ?", (name,))
-        return cur_to_dicts(cur)[0]
+    db_obj = models.Ingredient(name=name)
+
+    db.add(db_obj)
+    db.commit()
+    db.refresh(db_obj)
+    return db_obj

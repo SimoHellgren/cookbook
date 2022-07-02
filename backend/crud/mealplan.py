@@ -1,46 +1,41 @@
-from backend.db import SQLite, cur_to_dicts, DB
+from sqlalchemy.orm import Session
+from backend import models
 
 
-def get_all():
-    with SQLite(DB) as cur:
-        cur.execute("select * from mealplan")
-        return cur_to_dicts(cur)
+def get_all(db: Session):
+    return db.query(models.Mealplan).all()
 
 
-def get(id):
-    with SQLite(DB) as cur:
-        cur.execute("SELECT * FROM mealplan WHERE id = ?", (id,))
-        return cur_to_dicts(cur)[0]
+def get(db: Session, id: int):
+    return db.query(models.Mealplan).get(id)
 
 
-def create(date, name, servings):
-    with SQLite(DB) as cur:
-        cur.execute(
-            "INSERT INTO mealplan(date, name, servings) VALUES (?,?,?)",
-            (date, name, servings),
-        )
+def create(db: Session, date: str, name: str, servings: float):
+    db_obj = models.Mealplan(date=date, name=name, servings=servings)
 
-        cur.execute("SELECT * FROM mealplan WHERE date = ? AND name = ?", (date, name))
-
-        return cur_to_dicts(cur)[0]
+    db.add(db_obj)
+    db.commit()
+    db.refresh(db_obj)
+    return db_obj
 
 
-def update(id, date, name, servings, recipe_id):
-    with SQLite(DB) as cur:
-        cur.execute(
-            "UPDATE mealplan SET "
-            "date = ?,"
-            "name = ?,"
-            "servings = ?,"
-            "recipe_id = ? "
-            "WHERE id = ?",
-            (date, name, servings, recipe_id, id),
-        )
+def update(db: Session, id: int, date: str, name: str, servings: float, recipe_id: int):
+    db_obj = db.query(models.Mealplan).get(id)
 
-        cur.execute("SELECT * FROM mealplan WHERE id = ?", (id,))
-        return cur_to_dicts(cur)[0]
+    db_obj.date = date
+    db_obj.name = name
+    db_obj.servings = servings
+    db_obj.recipe_id = recipe_id
+
+    db.add(db_obj)
+    db.commit()
+    db.refresh(db_obj)
+    return db_obj
 
 
-def delete(id):
-    with SQLite(DB) as cur:
-        cur.execute("DELETE FROM mealplan WHERE id = ?", (id,))
+def delete(db: Session, id: int):
+    db_obj = db.query(models.Mealplan).get(id)
+
+    db.delete(db_obj)
+    db.commit()
+    return db_obj

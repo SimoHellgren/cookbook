@@ -1,9 +1,11 @@
 from flask import Blueprint, jsonify
 from backend import crud
+from backend.dependencies import get_db
 
 bp = Blueprint("recipe_ingredients", __name__, url_prefix="/recipe_ingredients")
 
 
 @bp.get("/")
 def read_recipe_ingredients():
-    return jsonify(crud.recipe_ingredient.get_all())
+    db = get_db()
+    return jsonify([x.as_dict() for x in crud.recipe_ingredient.get_all(db)])

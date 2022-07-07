@@ -122,7 +122,7 @@ def add_recipe():
 
         for ingredient in ingredients:
             # db_ingredient = post("/ingredients", json=ingredient).json()
-            db_ingredient = crud.ingredient.create(db, name=ingredient['name'])
+            db_ingredient = crud.ingredient.create(db, name=ingredient["name"])
             recipe_ingredient_data = {
                 "ingredient_id": db_ingredient.id,
                 "quantity": ingredient["quantity"],
@@ -130,7 +130,9 @@ def add_recipe():
             }
 
             # post(f"/recipes/{db_recipe['id']}/ingredients", json=recipe_ingredient_data)
-            crud.recipe.add_ingredient(db, recipe_id=db_recipe.id, **recipe_ingredient_data)
+            crud.recipe.add_ingredient(
+                db, recipe_id=db_recipe.id, **recipe_ingredient_data
+            )
 
     return render_template("add_recipe.html")
 
@@ -142,7 +144,8 @@ def mealplan():
 
 @app.route("/add_mealplans", methods=("GET", "POST"))
 def add_mealplans():
-    mps = crud.mealplan.get_all()
+    db = get_db()
+    mps = crud.mealplan.get_all(db)
 
     if request.method == "POST":
         start = request.form["start_date"]
@@ -158,7 +161,7 @@ def add_mealplans():
 
         for date in datetime_range(start_dt, end_dt + timedelta(days=1)):
             for meal in meals:
-                crud.mealplan.create(date=date.date(), **meal)
+                crud.mealplan.create(db, date=date.date(), **meal)
 
     return render_template("add_mealplans.html", mealplans=mps)
 
@@ -167,38 +170,45 @@ def add_mealplans():
 def shopping_list():
     items = []
     if request.method == "POST":
+        db = get_db()
+
         start = request.form["start_date"]
         end = request.form["end_date"]
+        start_dt = datetime.strptime(start, "%Y-%m-%d").date()
+        end_dt = datetime.strptime(end, "%Y-%m-%d").date()
 
-        mps = crud.mealplan.get_all()
+        mps = crud.mealplan.get_all(db)
 
-        chosen_mps = filter(lambda mp: start <= mp["date"] <= end, mps)
+        chosen_mps = filter(lambda mp: start_dt <= mp.date <= end_dt, mps)
 
         # calculate how many servings are needed per recipe
-        kf = lambda x: x["recipe_id"]  # noqa: E731
+        kf = lambda x: x.recipe_id or 0  # noqa: E731
         gb = groupby(sorted(chosen_mps, key=kf), key=kf)
         needed_servings = {
-            recipe_id: sum(row["servings"] for row in rows) for recipe_id, rows in gb
+            recipe_id: sum(row.servings for row in rows) for recipe_id, rows in gb
         }
 
         # get recipes and their ingredients
         data = [
             {
-                "recipe": crud.recipe.get(i),
-                "ingredients": crud.recipe.get_ingredients(i),
+                "recipe": crud.recipe.get(db, i),
+                "ingredients": crud.recipe.get_ingredients(db, i),
                 "servings": servings,
             }
             for i, servings in needed_servings.items()
         ]
 
         for d in data:
-            scaling_factor = d["servings"] / d["recipe"]["servings"]
+            if not d["recipe"]:
+                continue
+
+            scaling_factor = d["servings"] / d["recipe"].servings
 
             items.append(
                 {
-                    "recipe": f"{d['recipe']['name']} ({d['servings']})",
+                    "recipe": f"{d['recipe'].name} ({d['servings']})",
                     "ingredients": [
-                        {**ing, "quantity": scaling_factor * ing["quantity"]}
+                        {**ing.as_dict(), "quantity": scaling_factor * ing.quantity}
                         for ing in d["ingredients"]
                     ],
                 }

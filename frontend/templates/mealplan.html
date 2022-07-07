@@ -40,7 +40,8 @@
             
             let header = document.createElement('div')
             header.setAttribute('class', 'mealcard-header')
-            header.textContent = `${data.date} ${data.name} (${data.servings})`
+            const servings = parseFloat(data.servings).toPrecision(1)
+            header.textContent = `${data.date} ${data.name} (${servings})`
             
             let selector = document.createElement('select')
             selector.append(

@@ -10,7 +10,7 @@
         {% for ingredient in ingredients %}
         <li>
             <input type="checkbox">
-                {{ ingredient['name'] }} {{ ingredient['quantity'] }}{{ ingredient['measure'] }}
+                {{ ingredient['name'] }} {{ "%g"|format(ingredient['quantity']) }}{{ ingredient['measure'] }}
             </input>
         </li>
         {% endfor %}
@@ -20,7 +20,7 @@
 
 <section class="recipe-header">
     <h1>{{ recipe['name'] }}</h1>
-    <p>{{ recipe['servings'] }} servings</p>
+    <p>{{ "%g"|format(recipe['servings']) }} servings</p>
     <div class="tag-grid">
         {% for tag in recipe['tags'].split(',') %}
             <div class="tag">{{ tag }}</div>

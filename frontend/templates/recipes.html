@@ -19,7 +19,7 @@
     <section class="basic-grid">
     {% for recipe in recipes %}
     <div class="card">
-        <h2 id="{{recipe['name']}}"><a href="{{ url_for('get_recipe', id=recipe['id'])}}">{{recipe['name']}} ({{ recipe['servings'] }} servings)</a></h2>
+        <h2 id="{{recipe['name']}}"><a href="{{ url_for('get_recipe', id=recipe['id'])}}">{{recipe['name']}} ({{ "%g"|format(recipe['servings']) }} servings)</a></h2>
         <div class="tag-grid">
             {% for tag in recipe['tags'].split(',')%}
                 <div class="tag">{{ tag }}</div>

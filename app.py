@@ -1,7 +1,8 @@
 from functools import partial
 import os
 from itertools import chain, groupby, count
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
+from flask import json
 
 import requests
 
@@ -14,6 +15,18 @@ from backend.dependencies import get_db, close_db
 template_dir = os.path.abspath("./frontend/templates")
 app = Flask(__name__, template_folder=template_dir)
 app.config["TEMPLATES_AUTO_RELOAD"] = True
+
+
+class JSONEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, (date, datetime)):
+            return str(obj)
+
+        return super().default(obj)
+
+
+app.json_encoder = JSONEncoder
+
 
 # init DB
 with app.app_context():

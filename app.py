@@ -8,9 +8,9 @@ import requests
 
 from flask import Flask, render_template, request
 
-from backend.api import api
-from backend import crud
-from backend.dependencies import get_db, close_db
+from backend.app.api import api
+from backend.app import crud
+from backend.app.dependencies import get_db, close_db
 
 template_dir = os.path.abspath("./frontend/templates")
 app = Flask(__name__, template_folder=template_dir)

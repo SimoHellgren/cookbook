@@ -1,5 +1,5 @@
 from sqlalchemy import Column, ForeignKey, Integer, Numeric, String
-from backend.db.base_class import Base
+from backend.app.db.base_class import Base
 
 
 class RecipeIngredient(Base):

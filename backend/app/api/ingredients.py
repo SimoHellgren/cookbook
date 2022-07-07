@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
-from backend import crud
-from backend.dependencies import get_db
+from backend.app import crud
+from backend.app.dependencies import get_db
 
 bp = Blueprint("ingredients", __name__, url_prefix="/ingredients")
 

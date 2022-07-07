@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
 from backend import crud
 from backend.dependencies import get_db
+from datetime import datetime
 
 bp = Blueprint("mealplans", __name__, url_prefix="/mealplans")
 
@@ -32,6 +33,7 @@ def create_mealplan():
 def update_mealplan(id):
     db = get_db()
     data = request.get_json()
-    db_mealplan = crud.mealplan.update(db, **data)
+    date = datetime.strptime(data['date'], '%Y-%m-%d').date()
+    db_mealplan = crud.mealplan.update(db, **{**data, 'date': date})
 
     return db_mealplan.as_dict()

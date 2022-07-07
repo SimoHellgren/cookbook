@@ -172,9 +172,9 @@ def add_mealplans():
             for row in request.form["meals"].splitlines()
         ]
 
-        for date in datetime_range(start_dt, end_dt + timedelta(days=1)):
+        for d in datetime_range(start_dt, end_dt + timedelta(days=1)):
             for meal in meals:
-                crud.mealplan.create(db, date=date.date(), **meal)
+                crud.mealplan.create(db, date=d.date(), **meal)
 
     return render_template("add_mealplans.html", mealplans=mps)
 

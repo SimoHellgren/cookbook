@@ -219,7 +219,7 @@ def shopping_list():
 
             items.append(
                 {
-                    "recipe": f"{d['recipe'].name} ({d['servings']})",
+                    "recipe": f"{d['recipe'].name} ({float(d['servings']):g})",
                     "ingredients": [
                         {**ing.as_dict(), "quantity": scaling_factor * ing.quantity}
                         for ing in d["ingredients"]

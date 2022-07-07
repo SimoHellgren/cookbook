@@ -83,7 +83,7 @@ def get_recipe(id):
     # ingredients = get(f'/recipes/{id}/ingredients').json()
     db = get_db()
     recipe = crud.recipe.get(db, id)
-    ingredients = recipe.ingredients
+    ingredients = crud.recipe.get_ingredients(db, id)
 
     return render_template("recipe.html", recipe=recipe, ingredients=ingredients)
 

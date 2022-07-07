@@ -26,7 +26,7 @@ def delete(db: Session, id: int):
 
 
 def get_ingredients(db: Session, id: int):
-    db.query(models.Recipe).get(id).ingredients
+    return db.query(models.RecipeIngredient).filter_by(recipe_id=id).all()
 
 
 def add_ingredient(

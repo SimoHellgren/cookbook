@@ -7,6 +7,4 @@ class Ingredient(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String, unique=True, nullable=False)
 
-    recipes = relationship(
-        "Recipe", secondary="recipe_ingredient", back_populates="ingredients"
-    )
+    recipes = relationship("RecipeIngredient", back_populates="ingredient")

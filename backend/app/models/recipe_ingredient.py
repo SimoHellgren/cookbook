@@ -1,4 +1,5 @@
 from sqlalchemy import Column, ForeignKey, Integer, Numeric, String
+from sqlalchemy.orm import relationship
 from backend.app.db.base_class import Base
 
 
@@ -9,3 +10,6 @@ class RecipeIngredient(Base):
     ingredient_id = Column(Integer, ForeignKey("ingredient.id"), primary_key=True)
     quantity = Column(Numeric)
     measure = Column(String)
+
+    recipe = relationship("Recipe", back_populates="ingredients")
+    ingredient = relationship("Ingredient", back_populates="recipes")

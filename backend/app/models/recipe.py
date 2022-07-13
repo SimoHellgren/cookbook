@@ -10,7 +10,5 @@ class Recipe(Base):
     method = Column(String)
     tags = Column(String)
 
-    ingredients = relationship(
-        "Ingredient", secondary="recipe_ingredient", back_populates="recipes"
-    )
+    ingredients = relationship("RecipeIngredient", back_populates="recipe")
     mealplans = relationship("Mealplan", back_populates="recipe")

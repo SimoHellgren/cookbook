@@ -110,10 +110,18 @@ def recipe_from_form(form):
     ingredient_keys = sorted(k for k in form if k.startswith("ingredient"))
     quantity_keys = sorted(k for k in form if k.startswith("quantity"))
     measure_keys = sorted(k for k in form if k.startswith("measure"))
+    optional_keys = sorted(set(k for k in form if k.startswith("optional")))
 
     ingredients = [
-        {"name": form[k1], "quantity": form[k2], "measure": form[k3]}
-        for k1, k2, k3 in zip(ingredient_keys, quantity_keys, measure_keys)
+        {
+            "name": form[k1],
+            "quantity": form[k2],
+            "measure": form[k3],
+            "optional": "on" in form.getlist(k4),
+        }
+        for k1, k2, k3, k4 in zip(
+            ingredient_keys, quantity_keys, measure_keys, optional_keys
+        )
     ]
 
     return {
@@ -140,6 +148,7 @@ def add_recipe():
                 "ingredient_id": db_ingredient.id,
                 "quantity": ingredient["quantity"],
                 "measure": ingredient["measure"],
+                "optional": ingredient["optional"],
             }
 
             # post(f"/recipes/{db_recipe['id']}/ingredients", json=recipe_ingredient_data)
@@ -221,7 +230,12 @@ def shopping_list():
                 {
                     "recipe": f"{d['recipe'].name} ({float(d['servings']):g})",
                     "ingredients": [
-                        {**ing.as_dict(), "quantity": scaling_factor * ing.quantity}
+                        {
+                            "name": ing.ingredient.name,
+                            "measure": ing.measure,
+                            "quantity": scaling_factor * ing.quantity,
+                            "optional": ing.optional,
+                        }
                         for ing in d["ingredients"]
                     ],
                 }

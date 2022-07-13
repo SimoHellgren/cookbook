@@ -28,6 +28,9 @@
             <input name="ingredient_0" id="ingredient_0" placeholder="Ingredient">
             <input name="quantity_0" id="quantity_0" placeholder="Quantity">
             <input name="measure_0" id="measure_0" placeholder="Measure">
+            <input hidden="true" name="optional_0">
+            <label for="optional_0">Optional</label>
+            <input name="optional_0", id="optional_0" type="checkbox">
         </fieldset>
     </div>
     <script>
@@ -38,8 +41,9 @@
             return first.toUpperCase() + rest.join('');
         }
 
-        makefield = (name, i) => {
+        makefield = (type, name, i) => {
             var field = document.createElement("input");
+            field.setAttribute("type", type);
             field.setAttribute("id", `${name}_${i}`);
             field.setAttribute("name", `${name}_${i}`);
             field.setAttribute("placeholder", capitalize(name));
@@ -50,14 +54,27 @@
         add_ingredient_row = (event) => {
             const i = container.children.length;
 
-            var ingredient = makefield("ingredient", i);
-            var quantity = makefield("quantity", i);
-            var measure = makefield("measure", i);
+            var ingredient = makefield("text", "ingredient", i);
+            var quantity = makefield("text", "quantity", i);
+            var measure = makefield("text", "measure", i);
+
+            var optional = makefield("checkbox", "optional", i);
+            var label = document.createElement("label")
+            label.setAttribute("for", `optional_${i}`)
+            label.textContent = "Optional"
+            // hidden input for sending value when checkbox unchecked
+            var hidden = document.createElement("input")
+            hidden.setAttribute("name", `optional_${i}`)
+            hidden.setAttribute("hidden", "true")
+
 
             var fieldset = document.createElement("fieldset");
             fieldset.append(ingredient);
             fieldset.append(quantity);
             fieldset.append(measure);
+            fieldset.append(hidden);
+            fieldset.append(label);
+            fieldset.append(optional);
 
             container.appendChild(fieldset);
         }

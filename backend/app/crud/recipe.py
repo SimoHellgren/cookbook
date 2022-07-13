@@ -30,13 +30,19 @@ def get_ingredients(db: Session, id: int):
 
 
 def add_ingredient(
-    db: Session, recipe_id: int, ingredient_id: int, quantity: float, measure: str
+    db: Session,
+    recipe_id: int,
+    ingredient_id: int,
+    quantity: float,
+    measure: str,
+    optional: bool,
 ):
     db_obj = models.RecipeIngredient(
         recipe_id=recipe_id,
         ingredient_id=ingredient_id,
         quantity=quantity,
         measure=measure,
+        optional=optional,
     )
 
     db.add(db_obj)

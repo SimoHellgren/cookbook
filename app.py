@@ -230,7 +230,11 @@ def shopping_list():
                 {
                     "recipe": f"{d['recipe'].name} ({float(d['servings']):g})",
                     "ingredients": [
-                        {**ing.as_dict(), "quantity": scaling_factor * ing.quantity}
+                        {
+                            "name": ing.ingredient.name,
+                            "measure": ing.measure,
+                            "quantity": scaling_factor * ing.quantity,
+                        }
                         for ing in d["ingredients"]
                     ],
                 }

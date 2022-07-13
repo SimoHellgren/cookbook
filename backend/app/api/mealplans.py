@@ -33,7 +33,7 @@ def create_mealplan():
 def update_mealplan(id):
     db = get_db()
     data = request.get_json()
-    date = datetime.strptime(data['date'], '%Y-%m-%d').date()
-    db_mealplan = crud.mealplan.update(db, **{**data, 'date': date})
+    date = datetime.strptime(data["date"], "%Y-%m-%d").date()
+    db_mealplan = crud.mealplan.update(db, **{**data, "date": date})
 
     return db_mealplan.as_dict()

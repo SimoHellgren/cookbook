@@ -1,5 +1,8 @@
+from datetime import datetime
+from typing import Optional
 from sqlalchemy.orm import Session
 from backend.app import models
+from backend.app.utils import float_to_decimal
 
 
 def get_all(db: Session):
@@ -11,7 +14,12 @@ def get(db: Session, id: int):
 
 
 def create(db: Session, date: str, name: str, servings: float):
-    db_obj = models.Mealplan(date=date, name=name, servings=servings)
+
+    db_obj = models.Mealplan(
+        date=datetime.strptime(date, "%Y-%m-%d").date(),
+        name=name,
+        servings=float_to_decimal(servings, 1),
+    )
 
     db.add(db_obj)
     db.commit()
@@ -19,12 +27,17 @@ def create(db: Session, date: str, name: str, servings: float):
     return db_obj
 
 
-def update(db: Session, id: int, date: str, name: str, servings: float, recipe_id: int):
+def update(
+    db: Session, id: int, date: str, name: str, servings: float, recipe_id: int
+) -> Optional[models.Mealplan]:
     db_obj = db.query(models.Mealplan).get(id)
 
-    db_obj.date = date
+    if not db_obj:
+        return None
+
+    db_obj.date = datetime.strptime(date, "%Y-%m-%d").date()
     db_obj.name = name
-    db_obj.servings = servings
+    db_obj.servings = float_to_decimal(servings, 1)
     db_obj.recipe_id = recipe_id
 
     db.add(db_obj)

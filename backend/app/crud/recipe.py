@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 from backend.app import models
+from backend.app.utils import float_to_decimal
 
 
 def get_all(db: Session):
@@ -11,7 +12,8 @@ def get(db: Session, id: int):
 
 
 def create(db: Session, name: str, servings: float, method: str, tags: str = None):
-    db_obj = models.Recipe(name=name, servings=servings, method=method, tags=tags)
+    servings_dec = float_to_decimal(servings, 1)
+    db_obj = models.Recipe(name=name, servings=servings_dec, method=method, tags=tags)
     db.add(db_obj)
     db.commit()
     db.refresh(db_obj)
@@ -40,7 +42,7 @@ def add_ingredient(
     db_obj = models.RecipeIngredient(
         recipe_id=recipe_id,
         ingredient_id=ingredient_id,
-        quantity=quantity,
+        quantity=float_to_decimal(quantity, 2),
         measure=measure,
         optional=optional,
     )

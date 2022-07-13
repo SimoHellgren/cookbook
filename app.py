@@ -234,6 +234,7 @@ def shopping_list():
                             "name": ing.ingredient.name,
                             "measure": ing.measure,
                             "quantity": scaling_factor * ing.quantity,
+                            "optional": ing.optional,
                         }
                         for ing in d["ingredients"]
                     ],

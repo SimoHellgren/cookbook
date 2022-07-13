@@ -1,6 +1,10 @@
 from sqlalchemy import Column, Date, ForeignKey, Integer, Numeric, String
 from sqlalchemy.orm import relationship
 from backend.app.db.base_class import Base
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from backend.app.models import Recipe  # noqa: 401
 
 
 class Mealplan(Base):

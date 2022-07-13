@@ -1,6 +1,10 @@
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, Numeric, String
 from sqlalchemy.orm import relationship
 from backend.app.db.base_class import Base
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from backend.app.models import Recipe, Ingredient  # noqa: F401
 
 
 class RecipeIngredient(Base):

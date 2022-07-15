@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, Response, abort, jsonify, request
 from backend.app import crud
 from backend.app.dependencies import get_db
 
@@ -6,14 +6,17 @@ bp = Blueprint("recipes", __name__, url_prefix="/recipes")
 
 
 @bp.get("/")
-def read_recipes():
+def read_recipes() -> Response:
     return jsonify([x.as_dict() for x in crud.recipe.get_all(get_db())])
 
 
 @bp.post("/")
-def create_recipe():
+def create_recipe() -> Response:
     db = get_db()
     data = request.get_json()
+    if not data:
+        return jsonify({})
+
     db_recipe = crud.recipe.create(
         db,
         name=data["name"],
@@ -26,25 +29,36 @@ def create_recipe():
 
 
 @bp.get("/<id>")
-def read_recipe(id):
+def read_recipe(id: int) -> Response:
     db = get_db()
-    return jsonify(crud.recipe.get(db, id).as_dict())
+    db_recipe = crud.recipe.get(db, id)
+    if db_recipe:
+        return jsonify(db_recipe.as_dict())
+
+    else:
+        abort(404)
 
 
 @bp.get("/<id>/ingredients")
-def read_recipe_ingredients(id):
+def read_recipe_ingredients(id: int) -> Response:
     db = get_db()
-    return jsonify(crud.recipe.get_ingredients(db, id).as_dict())
+    return jsonify([i.as_dict() for i in crud.recipe.get_ingredients(db, id)])
 
 
 @bp.post("/<id>/ingredients")
-def create_recipe_ingredient(id):
+def create_recipe_ingredient(id: int) -> Response:
     db = get_db()
     data = request.get_json()
-    return crud.recipe.add_ingredient(
-        db,
-        recipe_id=id,
-        ingredient_id=data["ingredient_id"],
-        quantity=data["quantity"],
-        measure=data["measure"],
-    ).as_dict()
+    if not data:
+        abort(404)
+
+    return jsonify(
+        crud.recipe.add_ingredient(
+            db,
+            recipe_id=id,
+            ingredient_id=data["ingredient_id"],
+            quantity=data["quantity"],
+            measure=data["measure"],
+            optional=data["optional"],
+        ).as_dict()
+    )

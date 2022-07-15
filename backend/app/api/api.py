@@ -13,5 +13,5 @@ bp.register_blueprint(mealplans.bp)
 
 
 @bp.get("/")
-def test():
+def test() -> str:
     return "hello there"

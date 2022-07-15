@@ -1,19 +1,21 @@
 from datetime import datetime
-from typing import Optional
+from typing import List, Optional
 from sqlalchemy.orm import Session
 from backend.app import models
 from backend.app.utils import float_to_decimal
 
 
-def get_all(db: Session):
+def get_all(db: Session) -> List[models.Mealplan]:
     return db.query(models.Mealplan).all()
 
 
-def get(db: Session, id: int):
+def get(db: Session, id: int) -> Optional[models.Mealplan]:
     return db.query(models.Mealplan).get(id)
 
 
-def create(db: Session, date: str, name: str, servings: float):
+def create(
+    db: Session, date: str, name: str, servings: float
+) -> Optional[models.Mealplan]:
 
     db_obj = models.Mealplan(
         date=datetime.strptime(date, "%Y-%m-%d").date(),
@@ -46,7 +48,7 @@ def update(
     return db_obj
 
 
-def delete(db: Session, id: int):
+def delete(db: Session, id: int) -> Optional[models.Mealplan]:
     db_obj = db.query(models.Mealplan).get(id)
 
     db.delete(db_obj)

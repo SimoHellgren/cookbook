@@ -8,7 +8,8 @@ if TYPE_CHECKING:
 
 
 class RecipeIngredient(Base):
-    __tablename__ = "recipe_ingredient"  # override default behavior due to _
+    # override default due to wanting the underscore
+    __tablename__ = "recipe_ingredient"  # type: ignore[assignment]
 
     recipe_id = Column(Integer, ForeignKey("recipe.id"), primary_key=True)
     ingredient_id = Column(Integer, ForeignKey("ingredient.id"), primary_key=True)

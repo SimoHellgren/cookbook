@@ -1,3 +1,4 @@
+from typing import Any, Dict
 from sqlalchemy.ext.declarative import as_declarative, declared_attr
 
 
@@ -5,8 +6,8 @@ from sqlalchemy.ext.declarative import as_declarative, declared_attr
 class Base:
     # generate tablename automatically
     @declared_attr
-    def __tablename__(cls):
-        return cls.__name__.lower()
+    def __tablename__(cls) -> str:
+        return cls.__name__.lower()  # type: ignore[attr-defined]
 
-    def as_dict(self):
-        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+    def as_dict(self) -> Dict[str, Any]:
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}  # type: ignore[attr-defined]

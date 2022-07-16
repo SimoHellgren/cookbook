@@ -10,10 +10,7 @@ class CRUDRecipe(CRUDBase[Recipe, RecipeCreate, RecipeUpdate]):
     def get_ingredients(self, db: Session, id: int) -> Optional[List[RecipeIngredient]]:
         db_obj = db.query(self.model).get(id)
 
-        if not db_obj:
-            return None
-
-        return db_obj.ingredients
+        return db_obj.ingredients if db_obj else None
 
     def add_ingredient(
         self,

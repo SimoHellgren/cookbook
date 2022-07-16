@@ -1,6 +1,7 @@
 import pytest
 import sqlalchemy
 from sqlalchemy.orm import Session
+from backend.app.schemas.ingredient import IngredientCreate
 from backend.app.schemas.recipe import RecipeCreate
 from backend.app.crud import recipe, ingredient
 
@@ -114,19 +115,20 @@ def test_add_ingredient(db: Session) -> None:
 
     db_recipe = recipe.create(db=db, obj_in=recipe_in)
 
-    ingredient_in = ingredient.create(db=db, name="Ingredient name")
+    obj_in = IngredientCreate(name="Warm milk")
+    db_ingredient = ingredient.create(db=db, obj_in=obj_in)
 
     recipe_ingredient = recipe.add_ingredient(
         db=db,
         recipe_id=db_recipe.id,
-        ingredient_id=ingredient_in.id,
+        ingredient_id=db_ingredient.id,
         quantity=10.0,
         measure="dl",
         optional=True,
     )
 
     assert recipe_ingredient.recipe_id == db_recipe.id
-    assert recipe_ingredient.ingredient_id == ingredient_in.id
+    assert recipe_ingredient.ingredient_id == db_ingredient.id
     assert recipe_ingredient.quantity == 10.0
     assert recipe_ingredient.measure == "dl"
     assert recipe_ingredient.optional
@@ -142,12 +144,13 @@ def test_get_recipe_ingredients(db: Session) -> None:
 
     db_recipe = recipe.create(db=db, obj_in=recipe_in)
 
-    ingredient_in = ingredient.create(db=db, name="Ingredient name")
+    obj_in = IngredientCreate(name="Warm milk")
+    db_ingredient = ingredient.create(db=db, obj_in=obj_in)
 
     recipe_ingredient_in = recipe.add_ingredient(
         db=db,
         recipe_id=db_recipe.id,
-        ingredient_id=ingredient_in.id,
+        ingredient_id=db_ingredient.id,
         quantity=10.0,
         measure="dl",
         optional=True,

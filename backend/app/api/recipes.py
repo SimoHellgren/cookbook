@@ -1,13 +1,14 @@
 from flask import Blueprint, Response, abort, jsonify, request
 from backend.app import crud
 from backend.app.dependencies import get_db
+from backend.app.schemas.recipe import RecipeCreate
 
 bp = Blueprint("recipes", __name__, url_prefix="/recipes")
 
 
 @bp.get("/")
 def read_recipes() -> Response:
-    return jsonify([x.as_dict() for x in crud.recipe.get_all(get_db())])
+    return jsonify([x.as_dict() for x in crud.recipe.get_many(get_db())])
 
 
 @bp.post("/")
@@ -17,13 +18,14 @@ def create_recipe() -> Response:
     if not data:
         return jsonify({})
 
-    db_recipe = crud.recipe.create(
-        db,
+    data_in = RecipeCreate(
         name=data["name"],
         servings=data["servings"],
         method=data["method"],
         tags=data.get("tags", ""),
     )
+
+    db_recipe = crud.recipe.create(db=db, obj_in=data_in)
 
     return jsonify(db_recipe.as_dict())
 
@@ -42,7 +44,8 @@ def read_recipe(id: int) -> Response:
 @bp.get("/<id>/ingredients")
 def read_recipe_ingredients(id: int) -> Response:
     db = get_db()
-    return jsonify([i.as_dict() for i in crud.recipe.get_ingredients(db, id)])
+    ingredients = crud.recipe.get_ingredients(db, id) or []
+    return jsonify([i.as_dict() for i in ingredients])
 
 
 @bp.post("/<id>/ingredients")

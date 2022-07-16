@@ -26,7 +26,7 @@ def test_get_many(db: Session) -> None:
         db, db_recipe.id, db_ingredient_2.id, 2.0, "dl", True
     )
 
-    db_rows = recipe_ingredient.get_all(db)
+    db_rows = recipe_ingredient.get_many(db)
 
     assert db_rows
     assert len(db_rows) == 2

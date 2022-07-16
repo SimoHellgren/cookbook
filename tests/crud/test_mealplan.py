@@ -25,6 +25,8 @@ def test_get(db: Session) -> None:
         servings=2.0,
     )
 
+    assert mealplan_in is not None
+
     db_obj = mealplan.get(db, mealplan_in.id)
 
     assert db_obj
@@ -72,6 +74,8 @@ def test_delete(db: Session) -> None:
         servings=2.0,
     )
 
+    assert mealplan_in is not None
+
     deleted_mealplan = mealplan.delete(db, mealplan_in.id)
 
     assert mealplan.get(db, mealplan_in.id) is None
@@ -94,13 +98,15 @@ def test_update(db: Session) -> None:
         servings=2.0,
     )
 
+    assert mealplan_in is not None
+
     mealplan_updated = mealplan.update(
         db=db,
         id=mealplan_in.id,
         date="2022-02-02",
         name="second lunch",
         servings=3.0,
-        recipe_id=recipe_in.id
+        recipe_id=recipe_in.id,
     )
 
     assert mealplan_updated is mealplan_in

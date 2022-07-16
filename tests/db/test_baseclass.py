@@ -1,10 +1,11 @@
 from backend.app.models import Recipe
+from decimal import Decimal
 
 
-def test_as_dict():
+def test_as_dict() -> None:
     r = Recipe(
         name="Test recipe",
-        servings=2.0,
+        servings=Decimal("2.0"),
         method="Do the thing with the ingredients",
         tags="japan,食べ物",
     )

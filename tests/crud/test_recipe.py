@@ -99,6 +99,7 @@ def test_delete_recipe(db: Session) -> None:
     )
 
     deleted_obj = recipe.delete(db, obj_in.id)
+    assert deleted_obj is not None
 
     assert recipe.get(db, obj_in.id) is None
     assert obj_in.id == deleted_obj.id
@@ -113,10 +114,7 @@ def test_add_ingredient(db: Session) -> None:
         tags="japan,食べ物",
     )
 
-    ingredient_in = ingredient.create(
-        db=db,
-        name="Ingredient name"
-    )
+    ingredient_in = ingredient.create(db=db, name="Ingredient name")
 
     recipe_ingredient = recipe.add_ingredient(
         db=db,
@@ -143,10 +141,7 @@ def test_get_recipe_ingredients(db: Session) -> None:
         tags="japan,食べ物",
     )
 
-    ingredient_in = ingredient.create(
-        db=db,
-        name="Ingredient name"
-    )
+    ingredient_in = ingredient.create(db=db, name="Ingredient name")
 
     recipe_ingredient_in = recipe.add_ingredient(
         db=db,

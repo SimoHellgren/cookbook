@@ -1,40 +1,44 @@
+from datetime import date
 from sqlalchemy.orm import Session
 from backend.app.crud import mealplan, recipe
+from backend.app.schemas.mealplan import MealplanCreate, MealplanUpdate
 from backend.app.schemas.recipe import RecipeCreate
 
 
 def test_create(db: Session) -> None:
-    mealplan_in = mealplan.create(
-        db=db,
+    obj_in = MealplanCreate(
         date="2022-01-01",
         name="lunch",
         servings=2.0,
     )
 
-    assert mealplan_in
-    assert mealplan_in.id
-    assert mealplan_in.date.strftime("%Y-%m-%d") == "2022-01-01"
-    assert mealplan_in.name == "lunch"
-    assert mealplan_in.recipe_id is None
+    db_obj = mealplan.create(db=db, obj_in=obj_in)
+
+    assert db_obj
+    assert db_obj.id
+    assert db_obj.date == date(2022, 1, 1)
+    assert db_obj.name == "lunch"
+    assert db_obj.recipe_id is None
 
 
 def test_get(db: Session) -> None:
-    mealplan_in = mealplan.create(
-        db=db,
+    obj_in = MealplanCreate(
         date="2022-01-01",
         name="lunch",
         servings=2.0,
     )
 
-    assert mealplan_in is not None
+    db_obj = mealplan.create(db=db, obj_in=obj_in)
 
-    db_obj = mealplan.get(db, mealplan_in.id)
+    assert db_obj is not None
 
-    assert db_obj
-    assert db_obj.id == mealplan_in.id
-    assert db_obj.name == mealplan_in.name
-    assert db_obj.date == mealplan_in.date
-    assert db_obj.servings == mealplan_in.servings
+    get_obj = mealplan.get(db, db_obj.id)
+
+    assert get_obj
+    assert get_obj.id == db_obj.id
+    assert get_obj.name == db_obj.name
+    assert get_obj.date == db_obj.date
+    assert get_obj.servings == db_obj.servings
 
 
 def test_get_nonexistent(db: Session) -> None:
@@ -43,44 +47,49 @@ def test_get_nonexistent(db: Session) -> None:
     assert db_obj is None
 
 
-def test_get_all(db: Session) -> None:
-    mealplan_1 = mealplan.create(
+def test_get_many(db: Session) -> None:
+    obj_in_1 = MealplanCreate(
         db=db,
         date="2022-01-01",
         name="lunch",
         servings=2.0,
     )
 
-    mealplan_2 = mealplan.create(
+    obj_in_2 = MealplanCreate(
         db=db,
         date="2022-01-01",
         name="dinner",
         servings=2.0,
     )
 
-    db_rows = mealplan.get_all(db)
+    db_obj_1 = mealplan.create(db=db, obj_in=obj_in_1)
+    db_obj_2 = mealplan.create(db=db, obj_in=obj_in_2)
+
+    db_rows = mealplan.get_many(db)
 
     assert db_rows
     assert len(db_rows) == 2
 
-    assert mealplan_1 in db_rows
-    assert mealplan_2 in db_rows
+    assert db_obj_1 in db_rows
+    assert db_obj_2 in db_rows
 
 
 def test_delete(db: Session) -> None:
-    mealplan_in = mealplan.create(
+    obj_in = MealplanCreate(
         db=db,
         date="2022-01-01",
         name="lunch",
         servings=2.0,
     )
 
-    assert mealplan_in is not None
+    db_obj = mealplan.create(db=db, obj_in=obj_in)
 
-    deleted_mealplan = mealplan.delete(db, mealplan_in.id)
+    assert db_obj is not None
 
-    assert mealplan.get(db, mealplan_in.id) is None
-    assert mealplan_in is deleted_mealplan
+    deleted_mealplan = mealplan.remove(db, db_obj.id)
+
+    assert mealplan.get(db, db_obj.id) is None
+    assert db_obj is deleted_mealplan
 
 
 def test_update(db: Session) -> None:
@@ -93,39 +102,28 @@ def test_update(db: Session) -> None:
 
     db_recipe = recipe.create(db=db, obj_in=recipe_in)
 
-    mealplan_in = mealplan.create(
+    mealplan_in = MealplanCreate(
         db=db,
         date="2022-01-01",
         name="lunch",
         servings=2.0,
     )
 
-    assert mealplan_in is not None
+    db_mealplan = mealplan.create(db=db, obj_in=mealplan_in)
 
-    mealplan_updated = mealplan.update(
-        db=db,
-        id=mealplan_in.id,
+    assert db_mealplan is not None
+    update_data = MealplanUpdate(
+        id=db_mealplan.id,
+        recipe_id=db_recipe.id,
         date="2022-02-02",
         name="second lunch",
         servings=3.0,
-        recipe_id=db_recipe.id,
     )
 
-    assert mealplan_updated is mealplan_in
+    mealplan_updated = mealplan.update(db=db, db_obj=db_mealplan, obj_in=update_data)
+
+    assert mealplan_updated is db_mealplan
     assert mealplan_updated.recipe is db_recipe
-    assert mealplan_updated.date.strftime("%Y-%m-%d") == "2022-02-02"
+    assert mealplan_updated.date == date(2022, 2, 2)
     assert mealplan_updated.name == "second lunch"
     assert mealplan_updated.servings == 3.0
-
-
-def test_update_nonexistent(db: Session) -> None:
-    db_obj = mealplan.update(
-        db=db,
-        id=1,
-        date="2022-01-01",
-        name="lunch",
-        servings=2.0,
-        recipe_id=1,
-    )
-
-    assert db_obj is None

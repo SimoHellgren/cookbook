@@ -138,3 +138,4 @@ def test_get_recipe_ingredients(db: Session) -> None:
 
     db_recipe_ingredients = recipe.get_ingredients(db, recipe_in.id)
     assert recipe_ingredient_in in db_recipe_ingredients
+    assert [recipe_ingredient_in] == db_recipe_ingredients

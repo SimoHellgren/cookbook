@@ -1,3 +1,5 @@
+import pytest
+import sqlalchemy
 from sqlalchemy.orm import Session
 from backend.app.crud import recipe, ingredient
 
@@ -16,6 +18,25 @@ def test_create_recipe(db: Session) -> None:
     assert obj.servings == 2.0
     assert obj.method == "Do the thing with the ingredients"
     assert obj.tags == "japan,食べ物"
+
+
+def test_create_recipe_twice_fails(db: Session) -> None:
+    recipe.create(
+        db=db,
+        name="Test recipe",
+        servings=2.0,
+        method="Do the thing with the ingredients",
+        tags="japan,食べ物",
+    )
+
+    with pytest.raises(sqlalchemy.exc.IntegrityError):
+        recipe.create(
+            db=db,
+            name="Test recipe",
+            servings=2.0,
+            method="Do the thing with the ingredients",
+            tags="japan,食べ物",
+        )
 
 
 def test_get_recipe(db: Session) -> None:

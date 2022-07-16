@@ -16,7 +16,7 @@ class CRUDRecipeIngredient(
     ) -> Optional[RecipeIngredient]:
         return (
             db.query(RecipeIngredient)
-            .filter(recipe_id=recipe_id, ingredient_id=ingredient_id)
+            .filter_by(recipe_id=recipe_id, ingredient_id=ingredient_id)
             .first()
         )
 

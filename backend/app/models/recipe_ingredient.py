@@ -1,10 +1,7 @@
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, Numeric, String
 from sqlalchemy.orm import relationship
 from backend.app.db.base_class import Base
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from backend.app.models import Recipe, Ingredient  # noqa: F401
+from backend.app.models import Recipe, Ingredient
 
 
 class RecipeIngredient(Base):
@@ -17,5 +14,5 @@ class RecipeIngredient(Base):
     measure = Column(String)
     optional = Column(Boolean, nullable=False, default=False)
 
-    recipe = relationship("Recipe", back_populates="ingredients")
-    ingredient = relationship("Ingredient", back_populates="recipes")
+    recipe: Recipe = relationship(Recipe, back_populates="ingredients", uselist=False)
+    ingredient: Ingredient = relationship(Ingredient, back_populates="recipes", uselist=False)

@@ -37,6 +37,11 @@ def test_get_recipe(db: Session) -> None:
     assert db_obj.tags == obj_in.tags
 
 
+def test_get_nonexistent_recipe(db: Session) -> None:
+    obj = recipe.get(db, 1)
+    assert obj is None
+
+
 def test_get_many_recipes(db: Session) -> None:
     obj_1 = recipe.create(
         db=db,
@@ -62,3 +67,18 @@ def test_get_many_recipes(db: Session) -> None:
     db_ids = [row.id for row in db_rows]
     assert obj_1.id in db_ids
     assert obj_2.id in db_ids
+
+
+def test_delete_recipe(db: Session) -> None:
+    obj_in = recipe.create(
+        db=db,
+        name="Test recipe",
+        servings=2.0,
+        method="Do the thing with the ingredients",
+        tags="japan,食べ物",
+    )
+
+    deleted_obj = recipe.delete(db, obj_in.id)
+
+    assert recipe.get(db, obj_in.id) is None
+    assert obj_in.id == deleted_obj.id

@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 from backend.app.crud import mealplan, recipe
+from backend.app.schemas.recipe import RecipeCreate
 
 
 def test_create(db: Session) -> None:
@@ -83,13 +84,14 @@ def test_delete(db: Session) -> None:
 
 
 def test_update(db: Session) -> None:
-    recipe_in = recipe.create(
-        db=db,
+    recipe_in = RecipeCreate(
         name="Test recipe",
         servings=2.0,
         method="Do the thing with the ingredients",
         tags="japan,食べ物",
     )
+
+    db_recipe = recipe.create(db=db, obj_in=recipe_in)
 
     mealplan_in = mealplan.create(
         db=db,
@@ -106,11 +108,11 @@ def test_update(db: Session) -> None:
         date="2022-02-02",
         name="second lunch",
         servings=3.0,
-        recipe_id=recipe_in.id,
+        recipe_id=db_recipe.id,
     )
 
     assert mealplan_updated is mealplan_in
-    assert mealplan_updated.recipe is recipe_in
+    assert mealplan_updated.recipe is db_recipe
     assert mealplan_updated.date.strftime("%Y-%m-%d") == "2022-02-02"
     assert mealplan_updated.name == "second lunch"
     assert mealplan_updated.servings == 3.0

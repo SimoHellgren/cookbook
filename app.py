@@ -13,7 +13,10 @@ from flask import Flask, render_template, request
 from backend.app.api import api
 from backend.app import crud
 from backend.app.dependencies import get_db, close_db
+from backend.app.schemas.ingredient import IngredientCreate
+from backend.app.schemas.mealplan import MealplanCreate
 from backend.app.schemas.recipe import RecipeCreate
+from backend.app.schemas.recipe_ingredient import RecipeIngredientCreate
 
 template_dir = os.path.abspath("./frontend/templates")
 app = Flask(__name__, template_folder=template_dir)
@@ -76,18 +79,18 @@ def recipes() -> str:
     filters = request.args.get("tags")
 
     filtered_by_tags = (
-        filter(lambda r: all(tag in r.tags for tag in filters.split(",")), recipes)  # type: ignore[arg-type]
+        filter(lambda r: all(tag in r.tags for tag in filters.split(",")), recipes)  # type: ignore[arg-type,operator]
         if filters
         else recipes
     )
 
     search = request.args.get("search", "").lower()
-    filter_by_search = (r for r in filtered_by_tags if search in r.name.lower())
+    filter_by_search = (r for r in filtered_by_tags if search in r.name.lower())  # type: ignore[attr-defined]
 
     recipes_to_show = list(filter_by_search)
 
     available_tags = sorted(
-        set(chain.from_iterable(r.tags.split(",") for r in recipes_to_show))
+        set(chain.from_iterable(r.tags.split(",") for r in recipes_to_show))  # type: ignore[attr-defined]
     )
 
     return render_template(
@@ -152,29 +155,32 @@ def add_recipe() -> str:
 
         for ingredient in ingredients:
             # db_ingredient = post("/ingredients", json=ingredient).json()
-            db_ingredient = crud.ingredient.create(db, name=ingredient["name"])
-            recipe_ingredient_data = {
-                "ingredient_id": db_ingredient.id,
-                "quantity": ingredient["quantity"],
-                "measure": ingredient["measure"],
-                "optional": ingredient["optional"],
-            }
+            ingredient_in = IngredientCreate(name=ingredient["name"])
+            db_ingredient = crud.ingredient.create(db, obj_in=ingredient_in)
+
+            if not (db_recipe.id and db_ingredient.id):
+                abort(404)
 
             # post(f"/recipes/{db_recipe['id']}/ingredients", json=recipe_ingredient_data)
             crud.recipe.add_ingredient(
-                db, recipe_id=db_recipe.id, **recipe_ingredient_data
+                db=db,
+                recipe_id=db_recipe.id,
+                ingredient_id=db_ingredient.id,
+                quantity=ingredient["quantity"],
+                measure=ingredient["measure"],
+                optional=ingredient["optional"],
             )
 
     return render_template("add_recipe.html")
 
 
 @app.route("/mealplan", methods=("GET", "POST"))
-def mealplan():
+def mealplan() -> str:
     return render_template("mealplan.html")
 
 
 @app.route("/add_mealplans", methods=("GET", "POST"))
-def add_mealplans():
+def add_mealplans() -> str:
     db = get_db()
     mps = crud.mealplan.get_many(db)
 
@@ -192,13 +198,14 @@ def add_mealplans():
 
         for d in datetime_range(start_dt, end_dt + timedelta(days=1)):
             for meal in meals:
-                crud.mealplan.create(db, date=d.date(), **meal)
+                mealplan_in = MealplanCreate(date=d.date(), **meal)
+                crud.mealplan.create(db=db, obj_in=mealplan_in)
 
     return render_template("add_mealplans.html", mealplans=mps)
 
 
 @app.route("/shoppinglist", methods=("GET", "POST"))
-def shopping_list():
+def shopping_list() -> str:
     items = []
     if request.method == "POST":
         db = get_db()
@@ -210,13 +217,13 @@ def shopping_list():
 
         mps = crud.mealplan.get_many(db)
 
-        chosen_mps = filter(lambda mp: start_dt <= mp.date <= end_dt, mps)
+        chosen_mps = filter(lambda mp: start_dt <= mp.date <= end_dt, mps)  # type: ignore[arg-type,operator]
 
         # calculate how many servings are needed per recipe
         kf = lambda x: x.recipe_id or 0  # noqa: E731
         gb = groupby(sorted(chosen_mps, key=kf), key=kf)
         needed_servings = {
-            recipe_id: sum(row.servings for row in rows) for recipe_id, rows in gb
+            recipe_id: sum(row.servings for row in rows) for recipe_id, rows in gb  # type: ignore[attr-defined]
         }
 
         # get recipes and their ingredients
@@ -230,22 +237,22 @@ def shopping_list():
         ]
 
         for d in data:
-            if not d["recipe"]:
+            if not (d["recipe"] and d["ingredients"]):
                 continue
 
-            scaling_factor = d["servings"] / d["recipe"].servings
+            scaling_factor = d["servings"] / d["recipe"].servings  # type: ignore[operator,union-attr]
 
             items.append(
                 {
-                    "recipe": f"{d['recipe'].name} ({float(d['servings']):g})",
+                    "recipe": f"{d['recipe'].name} ({float(d['servings']):g})",  # type: ignore[union-attr, arg-type]
                     "ingredients": [
                         {
                             "name": ing.ingredient.name,
                             "measure": ing.measure,
-                            "quantity": scaling_factor * ing.quantity,
+                            "quantity": scaling_factor * ing.quantity,  # type: ignore[operator]
                             "optional": ing.optional,
                         }
-                        for ing in d["ingredients"]
+                        for ing in d["ingredients"]  # type: ignore[union-attr]
                     ],
                 }
             )

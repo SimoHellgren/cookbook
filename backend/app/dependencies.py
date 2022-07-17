@@ -11,7 +11,7 @@ def get_db() -> Session:
     return g.db
 
 
-def close_db(e: Optional[Exception] = None) -> None:
+def close_db(e: Optional[BaseException] = None) -> None:
     db = g.pop("db", None)
 
     if db:

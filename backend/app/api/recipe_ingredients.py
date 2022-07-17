@@ -8,4 +8,4 @@ bp = Blueprint("recipe_ingredients", __name__, url_prefix="/recipe_ingredients")
 @bp.get("/")
 def read_recipe_ingredients() -> Response:
     db = get_db()
-    return jsonify([x.as_dict() for x in crud.recipe_ingredient.get_all(db)])
+    return jsonify([x.as_dict() for x in crud.recipe_ingredient.get_many(db)])

@@ -2,7 +2,9 @@ from functools import partial
 import os
 from itertools import chain, groupby, count
 from datetime import date, datetime, timedelta
-from flask import json
+from typing import Any, Iterator, Tuple
+from flask import abort, json
+from werkzeug.datastructures import ImmutableMultiDict
 
 import requests
 
@@ -11,6 +13,9 @@ from flask import Flask, render_template, request
 from backend.app.api import api
 from backend.app import crud
 from backend.app.dependencies import get_db, close_db
+from backend.app.schemas.ingredient import IngredientCreate
+from backend.app.schemas.mealplan import MealplanCreate
+from backend.app.schemas.recipe import RecipeCreate
 
 template_dir = os.path.abspath("./frontend/templates")
 app = Flask(__name__, template_folder=template_dir)
@@ -18,7 +23,7 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 
 
 class JSONEncoder(json.JSONEncoder):
-    def default(self, obj):
+    def default(self, obj: Any) -> Any:
         if isinstance(obj, (date, datetime)):
             return str(obj)
 
@@ -45,7 +50,9 @@ get = partial(apirequest, "GET")
 post = partial(apirequest, "POST")
 
 
-def datetime_range(start: datetime, end: datetime, step=timedelta(days=1)):
+def datetime_range(
+    start: datetime, end: datetime, step: timedelta = timedelta(days=1)
+) -> Iterator[datetime]:
     """like range, but for datetimes and you must always specify both start and end."""
     deltas = (step * i for i in count(0))
 
@@ -58,28 +65,31 @@ def datetime_range(start: datetime, end: datetime, step=timedelta(days=1)):
 
 @app.route("/")
 @app.route("/recipes")
-def recipes():
+def recipes() -> str:
     # recipes = get('/recipes').json()
     # ingredients = get('/recipe_ingredients').json()
     db = get_db()
-    recipes = crud.recipe.get_all(db)
-    ingredients = crud.ingredient.get_all(db)
+    recipes = crud.recipe.get_many(db)
+    ingredients = crud.ingredient.get_many(db)
+
+    if not recipes:
+        abort(404)
 
     filters = request.args.get("tags")
 
     filtered_by_tags = (
-        filter(lambda r: all(tag in r["tags"] for tag in filters.split(",")), recipes)
+        filter(lambda r: all(tag in r.tags for tag in filters.split(",")), recipes)  # type: ignore[arg-type,operator]
         if filters
         else recipes
     )
 
     search = request.args.get("search", "").lower()
-    filter_by_search = (r for r in filtered_by_tags if search in r.name.lower())
+    filter_by_search = (r for r in filtered_by_tags if search in r.name.lower())  # type: ignore[attr-defined]
 
     recipes_to_show = list(filter_by_search)
 
     available_tags = sorted(
-        set(chain.from_iterable(r.tags.split(",") for r in recipes_to_show))
+        set(chain.from_iterable(r.tags.split(",") for r in recipes_to_show))  # type: ignore[attr-defined]
     )
 
     return render_template(
@@ -91,7 +101,7 @@ def recipes():
 
 
 @app.route("/recipes/<id>", methods=("GET", "POST"))
-def get_recipe(id):
+def get_recipe(id: int) -> str:
     # recipe = get(f'/recipes/{id}').json()
     # ingredients = get(f'/recipes/{id}/ingredients').json()
     db = get_db()
@@ -101,7 +111,7 @@ def get_recipe(id):
     return render_template("recipe.html", recipe=recipe, ingredients=ingredients)
 
 
-def recipe_from_form(form):
+def recipe_from_form(form: ImmutableMultiDict) -> Tuple[dict, list]:
     name = form["name"]
     servings = form["servings"]
     method = form["method"]
@@ -133,41 +143,45 @@ def recipe_from_form(form):
 
 
 @app.route("/add_recipe", methods=("GET", "POST"))
-def add_recipe():
+def add_recipe() -> str:
     if request.method == "POST":
         db = get_db()
         recipe, ingredients = recipe_from_form(request.form)
 
         # db_recipe = post("/recipes", json=recipe).json()
-        db_recipe = crud.recipe.create(db=db, **recipe)
+        recipe_in = RecipeCreate(**recipe)
+        db_recipe = crud.recipe.create(db=db, obj_in=recipe_in)
 
         for ingredient in ingredients:
             # db_ingredient = post("/ingredients", json=ingredient).json()
-            db_ingredient = crud.ingredient.create(db, name=ingredient["name"])
-            recipe_ingredient_data = {
-                "ingredient_id": db_ingredient.id,
-                "quantity": ingredient["quantity"],
-                "measure": ingredient["measure"],
-                "optional": ingredient["optional"],
-            }
+            ingredient_in = IngredientCreate(name=ingredient["name"])
+            db_ingredient = crud.ingredient.create(db, obj_in=ingredient_in)
+
+            if not (db_recipe.id and db_ingredient.id):
+                abort(404)
 
             # post(f"/recipes/{db_recipe['id']}/ingredients", json=recipe_ingredient_data)
             crud.recipe.add_ingredient(
-                db, recipe_id=db_recipe.id, **recipe_ingredient_data
+                db=db,
+                recipe_id=db_recipe.id,
+                ingredient_id=db_ingredient.id,
+                quantity=ingredient["quantity"],
+                measure=ingredient["measure"],
+                optional=ingredient["optional"],
             )
 
     return render_template("add_recipe.html")
 
 
 @app.route("/mealplan", methods=("GET", "POST"))
-def mealplan():
+def mealplan() -> str:
     return render_template("mealplan.html")
 
 
 @app.route("/add_mealplans", methods=("GET", "POST"))
-def add_mealplans():
+def add_mealplans() -> str:
     db = get_db()
-    mps = crud.mealplan.get_all(db)
+    mps = crud.mealplan.get_many(db)
 
     if request.method == "POST":
         start = request.form["start_date"]
@@ -183,13 +197,14 @@ def add_mealplans():
 
         for d in datetime_range(start_dt, end_dt + timedelta(days=1)):
             for meal in meals:
-                crud.mealplan.create(db, date=d.date(), **meal)
+                mealplan_in = MealplanCreate(date=d.date(), **meal)
+                crud.mealplan.create(db=db, obj_in=mealplan_in)
 
     return render_template("add_mealplans.html", mealplans=mps)
 
 
 @app.route("/shoppinglist", methods=("GET", "POST"))
-def shopping_list():
+def shopping_list() -> str:
     items = []
     if request.method == "POST":
         db = get_db()
@@ -199,15 +214,15 @@ def shopping_list():
         start_dt = datetime.strptime(start, "%Y-%m-%d").date()
         end_dt = datetime.strptime(end, "%Y-%m-%d").date()
 
-        mps = crud.mealplan.get_all(db)
+        mps = crud.mealplan.get_many(db)
 
-        chosen_mps = filter(lambda mp: start_dt <= mp.date <= end_dt, mps)
+        chosen_mps = filter(lambda mp: start_dt <= mp.date <= end_dt, mps)  # type: ignore[arg-type,operator]
 
         # calculate how many servings are needed per recipe
         kf = lambda x: x.recipe_id or 0  # noqa: E731
         gb = groupby(sorted(chosen_mps, key=kf), key=kf)
         needed_servings = {
-            recipe_id: sum(row.servings for row in rows) for recipe_id, rows in gb
+            recipe_id: sum(row.servings for row in rows) for recipe_id, rows in gb  # type: ignore[attr-defined]
         }
 
         # get recipes and their ingredients
@@ -221,22 +236,22 @@ def shopping_list():
         ]
 
         for d in data:
-            if not d["recipe"]:
+            if not (d["recipe"] and d["ingredients"]):
                 continue
 
-            scaling_factor = d["servings"] / d["recipe"].servings
+            scaling_factor = d["servings"] / d["recipe"].servings  # type: ignore[operator,union-attr]
 
             items.append(
                 {
-                    "recipe": f"{d['recipe'].name} ({float(d['servings']):g})",
+                    "recipe": f"{d['recipe'].name} ({float(d['servings']):g})",  # type: ignore[union-attr, arg-type]
                     "ingredients": [
                         {
                             "name": ing.ingredient.name,
                             "measure": ing.measure,
-                            "quantity": scaling_factor * ing.quantity,
+                            "quantity": scaling_factor * ing.quantity,  # type: ignore[operator]
                             "optional": ing.optional,
                         }
-                        for ing in d["ingredients"]
+                        for ing in d["ingredients"]  # type: ignore[union-attr]
                     ],
                 }
             )

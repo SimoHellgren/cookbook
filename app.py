@@ -16,7 +16,6 @@ from backend.app.dependencies import get_db, close_db
 from backend.app.schemas.ingredient import IngredientCreate
 from backend.app.schemas.mealplan import MealplanCreate
 from backend.app.schemas.recipe import RecipeCreate
-from backend.app.schemas.recipe_ingredient import RecipeIngredientCreate
 
 template_dir = os.path.abspath("./frontend/templates")
 app = Flask(__name__, template_folder=template_dir)

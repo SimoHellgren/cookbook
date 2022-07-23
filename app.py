@@ -49,18 +49,18 @@ def recipes() -> str:
     filters = request.args.get("tags")
 
     filtered_by_tags = (
-        filter(lambda r: all(tag in r.tags for tag in filters.split(",")), recipes)  # type: ignore[arg-type,operator]
+        filter(lambda r: all(tag in r.tags for tag in filters.split(",")), recipes)  # type: ignore[arg-type]
         if filters
         else recipes
     )
 
     search = request.args.get("search", "").lower()
-    filter_by_search = (r for r in filtered_by_tags if search in r["name"].lower())  # type: ignore[attr-defined]
+    filter_by_search = (r for r in filtered_by_tags if search in r["name"].lower())
 
     recipes_to_show = list(filter_by_search)
 
     available_tags = sorted(
-        set(chain.from_iterable(r["tags"].split(",") for r in recipes_to_show))  # type: ignore[attr-defined]
+        set(chain.from_iterable(r["tags"].split(",") for r in recipes_to_show))
     )
 
     return render_template(
@@ -172,13 +172,13 @@ def shopping_list() -> str:
 
         mps = get("/mealplans").json()
 
-        chosen_mps = filter(lambda mp: start <= mp["date"] <= end, mps)  # type: ignore[arg-type,operator]
+        chosen_mps = filter(lambda mp: start <= mp["date"] <= end, mps)
 
         # calculate how many servings are needed per recipe
         kf = lambda x: x["recipe_id"] or 0  # noqa: E731
         gb = groupby(sorted(chosen_mps, key=kf), key=kf)
         needed_servings = {
-            recipe_id: sum(row["servings"] for row in rows) for recipe_id, rows in gb  # type: ignore[attr-defined]
+            recipe_id: sum(row["servings"] for row in rows) for recipe_id, rows in gb
         }
 
         # get recipes and their ingredients
@@ -195,19 +195,19 @@ def shopping_list() -> str:
             if not (d["recipe"] and d["ingredients"]):
                 continue
 
-            scaling_factor = d["servings"] / d["recipe"]["servings"]  # type: ignore[operator,union-attr]
+            scaling_factor = d["servings"] / d["recipe"]["servings"]
 
             items.append(
                 {
-                    "recipe": f"{d['recipe']['name']} ({float(d['servings']):g})",  # type: ignore[union-attr, arg-type]
+                    "recipe": f"{d['recipe']['name']} ({float(d['servings']):g})",
                     "ingredients": [
                         {
                             "name": ing["ingredient"]["name"],
                             "measure": ing["measure"],
-                            "quantity": scaling_factor * ing["quantity"],  # type: ignore[operator]
+                            "quantity": scaling_factor * ing["quantity"],
                             "optional": ing["optional"],
                         }
-                        for ing in d["ingredients"]  # type: ignore[union-attr]
+                        for ing in d["ingredients"]
                     ],
                 }
             )

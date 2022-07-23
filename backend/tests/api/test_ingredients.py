@@ -1,6 +1,7 @@
 from backend.app import crud
 from backend.app.schemas.ingredient import IngredientCreate
 
+
 def test_get_all(test_db, client):
     obj_1 = crud.ingredient.create(test_db, IngredientCreate(name="Warm Milk"))
     obj_2 = crud.ingredient.create(test_db, IngredientCreate(name="Cold Milk"))

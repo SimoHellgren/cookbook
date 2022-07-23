@@ -11,4 +11,6 @@ class Ingredient(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String, unique=True, nullable=False)
 
-    recipes: List["RecipeIngredient"] = relationship("RecipeIngredient", back_populates="ingredient", uselist=True)
+    recipes: List["RecipeIngredient"] = relationship(
+        "RecipeIngredient", back_populates="ingredient", uselist=True
+    )

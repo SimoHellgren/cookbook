@@ -14,5 +14,9 @@ class Recipe(Base):
     method = Column(String)
     tags = Column(String)
 
-    ingredients: List["RecipeIngredient"] = relationship("RecipeIngredient", back_populates="recipe", uselist=True)
-    mealplans: List["Mealplan"] = relationship("Mealplan", back_populates="recipe", uselist=True)
+    ingredients: List["RecipeIngredient"] = relationship(
+        "RecipeIngredient", back_populates="recipe", uselist=True
+    )
+    mealplans: List["Mealplan"] = relationship(
+        "Mealplan", back_populates="recipe", uselist=True
+    )

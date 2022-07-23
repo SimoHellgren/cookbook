@@ -4,11 +4,12 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from backend.app import crud
 from backend.app.schemas.recipe import Recipe, RecipeCreate, RecipeUpdate
 from backend.app.dependencies import get_db
-from backend.app.schemas.recipe_ingredient import RecipeIngredient, RecipeIngredientCreate
-
-router = APIRouter(
-    prefix="/recipes"
+from backend.app.schemas.recipe_ingredient import (
+    RecipeIngredient,
+    RecipeIngredientCreate,
 )
+
+router = APIRouter(prefix="/recipes")
 
 
 @router.get("/", response_model=List[Recipe])
@@ -52,5 +53,17 @@ def get_ingredients(recipe_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/{recipe_id}/ingredients", response_model=RecipeIngredient)
-def add_ingredient(recipe_id: int, ingredient_id: int, recipe_ingredient: RecipeIngredientCreate, db: Session = Depends(get_db)):
-    return crud.recipe.add_ingredient(db, recipe_id, ingredient_id, recipe_ingredient.quantity, recipe_ingredient.measure, recipe_ingredient.optional)
+def add_ingredient(
+    recipe_id: int,
+    ingredient_id: int,
+    recipe_ingredient: RecipeIngredientCreate,
+    db: Session = Depends(get_db),
+):
+    return crud.recipe.add_ingredient(
+        db,
+        recipe_id,
+        ingredient_id,
+        recipe_ingredient.quantity,
+        recipe_ingredient.measure,
+        recipe_ingredient.optional,
+    )

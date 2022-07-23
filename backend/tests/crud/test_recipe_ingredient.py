@@ -21,7 +21,9 @@ def test_get(db: Session):
         db, db_recipe.id, db_ingredient.id, 1.0, "dl", False
     )
 
-    get_obj = recipe_ingredient.get(db=db, recipe_id=db_recipe.id, ingredient_id=db_ingredient.id)
+    get_obj = recipe_ingredient.get(
+        db=db, recipe_id=db_recipe.id, ingredient_id=db_ingredient.id
+    )
 
     assert get_obj
     assert get_obj.recipe_id == recipe_ingredient_in.recipe_id

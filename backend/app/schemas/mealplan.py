@@ -17,3 +17,10 @@ class MealplanCreate(MealplanBase):
 class MealplanUpdate(MealplanBase):
     id: int
     recipe_id: Optional[int]
+
+
+class Mealplan(MealplanBase):
+    """For use as API response model"""
+
+    class Config:
+        orm_mode = True

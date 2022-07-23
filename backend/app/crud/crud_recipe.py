@@ -1,9 +1,9 @@
+from decimal import Decimal
 from typing import List, Optional
 from sqlalchemy.orm import Session
 from backend.app.models import Recipe, RecipeIngredient
 from backend.app.schemas.recipe import RecipeCreate, RecipeUpdate
 from backend.app.crud.base import CRUDBase
-from backend.app.utils import float_to_decimal
 
 
 class CRUDRecipe(CRUDBase[Recipe, RecipeCreate, RecipeUpdate]):
@@ -17,7 +17,7 @@ class CRUDRecipe(CRUDBase[Recipe, RecipeCreate, RecipeUpdate]):
         db: Session,
         recipe_id: int,
         ingredient_id: int,
-        quantity: float,
+        quantity: Decimal,
         measure: str,
         optional: bool,
     ) -> RecipeIngredient:
@@ -25,7 +25,7 @@ class CRUDRecipe(CRUDBase[Recipe, RecipeCreate, RecipeUpdate]):
         db_obj = RecipeIngredient(
             recipe_id=recipe_id,
             ingredient_id=ingredient_id,
-            quantity=float_to_decimal(quantity, 2),
+            quantity=quantity,
             measure=measure,
             optional=optional,
         )

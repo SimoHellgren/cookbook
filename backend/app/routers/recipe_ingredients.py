@@ -1,4 +1,4 @@
-from typing import List
+from typing import Any, List
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends
 from backend.app import crud
@@ -9,5 +9,5 @@ router = APIRouter(prefix="/recipe_ingredients")
 
 
 @router.get("/", response_model=List[RecipeIngredient])
-def get_many(db: Session = Depends(get_db)):
+def get_many(db: Session = Depends(get_db)) -> Any:
     return crud.recipe_ingredient.get_many(db)

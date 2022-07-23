@@ -52,17 +52,20 @@ def get_ingredients(recipe_id: int, db: Session = Depends(get_db)) -> Any:
     return crud.recipe.get_ingredients(db, recipe_id)
 
 
-@router.post("/{recipe_id}/ingredients", response_model=RecipeIngredient)
+@router.post(
+    "/{recipe_id}/ingredients",
+    response_model=RecipeIngredient,
+    status_code=status.HTTP_201_CREATED,
+)
 def add_ingredient(
     recipe_id: int,
-    ingredient_id: int,
     recipe_ingredient: RecipeIngredientCreate,
     db: Session = Depends(get_db),
 ) -> Any:
     return crud.recipe.add_ingredient(
         db,
         recipe_id,
-        ingredient_id,
+        recipe_ingredient.ingredient_id,
         recipe_ingredient.quantity,
         recipe_ingredient.measure,
         recipe_ingredient.optional,

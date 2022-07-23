@@ -16,3 +16,10 @@ class RecipeIngredientCreate(RecipeIngredientBase):
 
 class RecipeIngredientUpdate(RecipeIngredientBase):
     pass
+
+
+class RecipeIngredient(RecipeIngredientBase):
+    """For use as API response model"""
+
+    class Config:
+        orm_mode = True

@@ -21,6 +21,7 @@ class RecipeIngredientUpdate(RecipeIngredientBase):
 
 class RecipeIngredient(RecipeIngredientBase):
     """For use as API response model"""
+
     ingredient: Ingredient
 
     class Config:

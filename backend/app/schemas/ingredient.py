@@ -15,6 +15,7 @@ class IngredientUpdate(IngredientBase):
 
 class Ingredient(IngredientBase):
     """For use as API response model"""
+
     id: int
 
     class Config:

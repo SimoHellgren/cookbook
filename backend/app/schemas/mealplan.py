@@ -21,6 +21,7 @@ class MealplanUpdate(MealplanBase):
 
 class Mealplan(MealplanBase):
     """For use as API response model"""
+
     id: int
     recipe_id: Optional[int]
 

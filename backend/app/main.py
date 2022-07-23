@@ -7,11 +7,7 @@ from backend.app.routers import mealplans
 
 app = FastAPI()
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins='*',
-    allow_methods=['*']
-)
+app.add_middleware(CORSMiddleware, allow_origins="*", allow_methods=["*"])
 
 app.include_router(recipes.router)
 app.include_router(recipe_ingredients.router)

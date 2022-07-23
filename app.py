@@ -41,7 +41,7 @@ def datetime_range(
 @app.route("/")
 @app.route("/recipes")
 def recipes() -> str:
-    recipes = get('/recipes').json()
+    recipes = get("/recipes").json()
 
     if not recipes:
         abort(404)
@@ -72,8 +72,8 @@ def recipes() -> str:
 
 @app.route("/recipes/<id>", methods=("GET", "POST"))
 def get_recipe(id: int) -> str:
-    recipe = get(f'/recipes/{id}').json()
-    ingredients = get(f'/recipes/{id}/ingredients').json()
+    recipe = get(f"/recipes/{id}").json()
+    ingredients = get(f"/recipes/{id}/ingredients").json()
 
     return render_template("recipe.html", recipe=recipe, ingredients=ingredients)
 
@@ -142,7 +142,7 @@ def mealplan() -> str:
 
 @app.route("/add_mealplans", methods=("GET", "POST"))
 def add_mealplans() -> str:
-    mps = get('/mealplans').json()
+    mps = get("/mealplans").json()
 
     if request.method == "POST":
         start = request.form["start_date"]
@@ -170,9 +170,9 @@ def shopping_list() -> str:
         start = request.form["start_date"]
         end = request.form["end_date"]
 
-        mps = get('/mealplans').json()
+        mps = get("/mealplans").json()
 
-        chosen_mps = filter(lambda mp: start <= mp['date'] <= end, mps)  # type: ignore[arg-type,operator]
+        chosen_mps = filter(lambda mp: start <= mp["date"] <= end, mps)  # type: ignore[arg-type,operator]
 
         # calculate how many servings are needed per recipe
         kf = lambda x: x["recipe_id"] or 0  # noqa: E731

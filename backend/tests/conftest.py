@@ -7,32 +7,29 @@ from backend.app.dependencies import get_db
 from backend.app.db.base import Base
 
 
-def get_test_db() -> Session:
-    engine = create_engine("sqlite://")
-    Base.metadata.create_all(bind=engine)
-
-    test_db = Session(bind=engine)
-
-    try:
-        yield test_db
-
-    finally:
-        test_db.close()
+engine = create_engine("sqlite://", connect_args={"check_same_thread": False})
+Base.metadata.drop_all(bind=engine)
+Base.metadata.create_all(bind=engine)
 
 
 @pytest.fixture
 def test_db():
-    yield from get_test_db()
+    try:
+        connection = engine.connect()
+        connection.begin()
+        db = Session(bind=connection)
+        yield db
+
+    finally:
+        db.rollback()
+        connection.close()
 
 
-@pytest.fixture(scope="session", autouse=True)
-def db_for_api():
-    app.dependency_overrides[get_db] = get_test_db
+@pytest.fixture
+def client(test_db):
+    def override_get_db():
+        yield test_db
 
-    yield
-
-
-@pytest.fixture(scope="module")
-def client():
+    app.dependency_overrides[get_db] = override_get_db
     with TestClient(app) as c:
         yield c

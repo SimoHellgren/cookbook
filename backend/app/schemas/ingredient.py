@@ -11,3 +11,10 @@ class IngredientCreate(IngredientBase):
 
 class IngredientUpdate(IngredientBase):
     id: int
+
+
+class Ingredient(IngredientBase):
+    """For use as API response model"""
+
+    class Config:
+        orm_mode = True

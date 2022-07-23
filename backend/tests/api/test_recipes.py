@@ -7,6 +7,24 @@ from backend.app.schemas.ingredient import IngredientCreate
 from backend.tests.utils import create_random_recipe, random_decimal, random_string
 
 
+def test_get_all(test_db, client):
+    obj_1 = create_random_recipe(test_db)
+    obj_2 = create_random_recipe(test_db)
+
+    res = client.get("/recipes")
+
+    assert res.status_code == 200
+
+    data = res.json()
+
+    assert len(data) == 2
+
+    ids = {d["id"] for d in data}
+
+    assert obj_1.id in ids
+    assert obj_2.id in ids
+
+
 def test_get_all_when_empty(client):
     res = client.get("/recipes").json()
     assert len(res) == 0

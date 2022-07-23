@@ -30,7 +30,9 @@ def create(mealplan: MealplanCreate, db: Session = Depends(get_db)) -> Any:
 
 
 @router.put("/{mealplan_id}", response_model=Mealplan, status_code=status.HTTP_200_OK)
-def update(mealplan_id: int, mealplan: MealplanUpdate, db: Session = Depends(get_db)) -> Any:
+def update(
+    mealplan_id: int, mealplan: MealplanUpdate, db: Session = Depends(get_db)
+) -> Any:
     db_mealplan = crud.mealplan.get(db, mealplan_id)
 
     if not db_mealplan:

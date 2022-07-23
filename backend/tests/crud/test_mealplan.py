@@ -120,7 +120,9 @@ def test_update(test_db: Session) -> None:
         servings=3.0,
     )
 
-    mealplan_updated = mealplan.update(db=test_db, db_obj=db_mealplan, obj_in=update_data)
+    mealplan_updated = mealplan.update(
+        db=test_db, db_obj=db_mealplan, obj_in=update_data
+    )
 
     assert mealplan_updated is db_mealplan
     assert mealplan_updated.recipe is db_recipe

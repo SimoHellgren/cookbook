@@ -20,7 +20,7 @@ def create_random_recipe(db: Session) -> models.Recipe:
         name=random_string(),
         method=random_string(),
         servings=random_decimal(),
-        tags=f"{random_string()},{random_string()}"
+        tags=f"{random_string()},{random_string()}",
     )
 
     return crud.recipe.create(db, recipe_in)

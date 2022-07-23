@@ -15,3 +15,10 @@ class RecipeCreate(RecipeBase):
 
 class RecipeUpdate(RecipeBase):
     id: int
+
+
+class Recipe(RecipeBase):
+    """For use as API response model"""
+
+    class Config:
+        orm_mode = True

@@ -67,7 +67,7 @@ fetchRecipes()
   .then(_ => {
     // set search tags
     let container = D.getElementById("search-tags")
-    alltags = state.recipes.map(r => r.tags.split(",")).flat().filter(e => e !== "")
+    alltags = new Set(state.recipes.map(r => r.tags.split(",")).flat().filter(e => e !== ""))
 
     alltags.forEach(t => {
       let e = D.createElement("div")

@@ -1,9 +1,12 @@
 from decimal import Decimal
+from datetime import date
 import random
 import string
+from typing import Optional
 from sqlalchemy.orm import Session
 from backend.app import models
 from backend.app.schemas.recipe import RecipeCreate
+from backend.app.models import Mealplan
 from backend.app import crud
 
 
@@ -24,3 +27,17 @@ def create_random_recipe(db: Session) -> models.Recipe:
     )
 
     return crud.recipe.create(db, recipe_in)
+
+
+def create_random_mealplan(db: Session, recipe_id: Optional[int] = None):
+    mealplan = Mealplan(
+        date=date(2022, 6, 15),
+        name=random_string(),
+        servings=random_decimal(),
+        recipe_id=recipe_id,
+    )
+
+    db.add(mealplan)
+    db.commit()
+    db.refresh(mealplan)
+    return mealplan

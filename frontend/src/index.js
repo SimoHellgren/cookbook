@@ -27,7 +27,7 @@ const createRecipeGridCard = ({ id, name, servings, tags }) => {
 
   let h2 = D.createElement("h2")
   h2.textContent = `${name} (${servings})`
-  h2.onclick = () => fetchRecipe(id).then(r => alert(r.method))
+  h2.onclick = () => window.open(`recipe.html?recipe=${id}`)
   card.appendChild(h2)
 
   let taggrid = D.createElement("div")

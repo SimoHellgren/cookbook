@@ -6,7 +6,7 @@ from backend.app.schemas.recipe import RecipeCreate
 from backend.app.crud import recipe, ingredient
 
 
-def test_create(db: Session) -> None:
+def test_create(test_db: Session) -> None:
     obj_in = RecipeCreate(
         name="Test recipe",
         servings=2.0,
@@ -14,7 +14,7 @@ def test_create(db: Session) -> None:
         tags="japan,食べ物",
     )
 
-    obj = recipe.create(db=db, obj_in=obj_in)
+    obj = recipe.create(db=test_db, obj_in=obj_in)
 
     assert obj.id
     assert obj.name == "Test recipe"
@@ -23,7 +23,7 @@ def test_create(db: Session) -> None:
     assert obj.tags == "japan,食べ物"
 
 
-def test_create_twice_fails(db: Session) -> None:
+def test_create_twice_fails(test_db: Session) -> None:
     obj_in = RecipeCreate(
         name="Test recipe",
         servings=2.0,
@@ -31,13 +31,13 @@ def test_create_twice_fails(db: Session) -> None:
         tags="japan,食べ物",
     )
 
-    recipe.create(db=db, obj_in=obj_in)
+    recipe.create(db=test_db, obj_in=obj_in)
 
     with pytest.raises(sqlalchemy.exc.IntegrityError):
-        recipe.create(db=db, obj_in=obj_in)
+        recipe.create(db=test_db, obj_in=obj_in)
 
 
-def test_get(db: Session) -> None:
+def test_get(test_db: Session) -> None:
     obj_in = RecipeCreate(
         name="Test recipe",
         servings=2.0,
@@ -45,8 +45,8 @@ def test_get(db: Session) -> None:
         tags="japan,食べ物",
     )
 
-    db_obj = recipe.create(db=db, obj_in=obj_in)
-    get_obj = recipe.get(db, db_obj.id)
+    db_obj = recipe.create(db=test_db, obj_in=obj_in)
+    get_obj = recipe.get(test_db, db_obj.id)
 
     assert get_obj
     assert get_obj.id == db_obj.id
@@ -56,12 +56,12 @@ def test_get(db: Session) -> None:
     assert get_obj.tags == db_obj.tags
 
 
-def test_get_nonexistent(db: Session) -> None:
-    obj = recipe.get(db, 1)
+def test_get_nonexistent(test_db: Session) -> None:
+    obj = recipe.get(test_db, 1)
     assert obj is None
 
 
-def test_get_many(db: Session) -> None:
+def test_get_many(test_db: Session) -> None:
     obj_in_1 = RecipeCreate(
         name="Test recipe",
         servings=2.0,
@@ -76,10 +76,10 @@ def test_get_many(db: Session) -> None:
         tags="Spain,fish",
     )
 
-    db_obj_1 = recipe.create(db=db, obj_in=obj_in_1)
-    db_obj_2 = recipe.create(db=db, obj_in=obj_in_2)
+    db_obj_1 = recipe.create(db=test_db, obj_in=obj_in_1)
+    db_obj_2 = recipe.create(db=test_db, obj_in=obj_in_2)
 
-    db_rows = recipe.get_many(db)
+    db_rows = recipe.get_many(test_db)
 
     assert db_rows
     assert len(db_rows) == 2
@@ -88,7 +88,7 @@ def test_get_many(db: Session) -> None:
     assert db_obj_2 in db_rows
 
 
-def test_delete(db: Session) -> None:
+def test_delete(test_db: Session) -> None:
     obj_in = RecipeCreate(
         name="Test recipe",
         servings=2.0,
@@ -96,16 +96,16 @@ def test_delete(db: Session) -> None:
         tags="japan,食べ物",
     )
 
-    db_obj = recipe.create(db=db, obj_in=obj_in)
+    db_obj = recipe.create(db=test_db, obj_in=obj_in)
 
-    deleted_obj = recipe.remove(db, db_obj.id)
+    deleted_obj = recipe.remove(test_db, db_obj.id)
     assert deleted_obj is not None
 
-    assert recipe.get(db, db_obj.id) is None
+    assert recipe.get(test_db, db_obj.id) is None
     assert db_obj.id == deleted_obj.id
 
 
-def test_add_ingredient(db: Session) -> None:
+def test_add_ingredient(test_db: Session) -> None:
     recipe_in = RecipeCreate(
         name="Test recipe",
         servings=2.0,
@@ -113,13 +113,13 @@ def test_add_ingredient(db: Session) -> None:
         tags="japan,食べ物",
     )
 
-    db_recipe = recipe.create(db=db, obj_in=recipe_in)
+    db_recipe = recipe.create(db=test_db, obj_in=recipe_in)
 
     obj_in = IngredientCreate(name="Warm milk")
-    db_ingredient = ingredient.create(db=db, obj_in=obj_in)
+    db_ingredient = ingredient.create(db=test_db, obj_in=obj_in)
 
     recipe_ingredient = recipe.add_ingredient(
-        db=db,
+        db=test_db,
         recipe_id=db_recipe.id,
         ingredient_id=db_ingredient.id,
         quantity=10.0,
@@ -134,7 +134,7 @@ def test_add_ingredient(db: Session) -> None:
     assert recipe_ingredient.optional
 
 
-def test_get_recipe_ingredients(db: Session) -> None:
+def test_get_recipe_ingredients(test_db: Session) -> None:
     recipe_in = RecipeCreate(
         name="Test recipe",
         servings=2.0,
@@ -142,13 +142,13 @@ def test_get_recipe_ingredients(db: Session) -> None:
         tags="japan,食べ物",
     )
 
-    db_recipe = recipe.create(db=db, obj_in=recipe_in)
+    db_recipe = recipe.create(db=test_db, obj_in=recipe_in)
 
     obj_in = IngredientCreate(name="Warm milk")
-    db_ingredient = ingredient.create(db=db, obj_in=obj_in)
+    db_ingredient = ingredient.create(db=test_db, obj_in=obj_in)
 
     recipe_ingredient_in = recipe.add_ingredient(
-        db=db,
+        db=test_db,
         recipe_id=db_recipe.id,
         ingredient_id=db_ingredient.id,
         quantity=10.0,
@@ -156,6 +156,6 @@ def test_get_recipe_ingredients(db: Session) -> None:
         optional=True,
     )
 
-    db_recipe_ingredients = recipe.get_ingredients(db, db_recipe.id)
+    db_recipe_ingredients = recipe.get_ingredients(test_db, db_recipe.id)
     assert recipe_ingredient_in in db_recipe_ingredients
     assert [recipe_ingredient_in] == db_recipe_ingredients

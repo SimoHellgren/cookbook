@@ -15,4 +15,6 @@ class RecipeIngredient(Base):
     optional = Column(Boolean, nullable=False, default=False)
 
     recipe: Recipe = relationship(Recipe, back_populates="ingredients", uselist=False)
-    ingredient: Ingredient = relationship(Ingredient, back_populates="recipes", uselist=False)
+    ingredient: Ingredient = relationship(
+        Ingredient, back_populates="recipes", uselist=False
+    )

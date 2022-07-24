@@ -1,18 +1,11 @@
-from typing import Optional
+from typing import Generator
 from backend.app.db.session import SessionLocal
 from sqlalchemy.orm import Session
-from flask import g
 
 
-def get_db() -> Session:
-    if "db" not in g:
-        g.db = SessionLocal()
-
-    return g.db
-
-
-def close_db(e: Optional[BaseException] = None) -> None:
-    db = g.pop("db", None)
-
-    if db:
+def get_db() -> Generator[Session, None, None]:
+    try:
+        db = SessionLocal()
+        yield db
+    finally:
         db.close()

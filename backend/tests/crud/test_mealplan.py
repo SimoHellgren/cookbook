@@ -5,14 +5,14 @@ from backend.app.schemas.mealplan import MealplanCreate, MealplanUpdate
 from backend.app.schemas.recipe import RecipeCreate
 
 
-def test_create(db: Session) -> None:
+def test_create(test_db: Session) -> None:
     obj_in = MealplanCreate(
         date="2022-01-01",
         name="lunch",
         servings=2.0,
     )
 
-    db_obj = mealplan.create(db=db, obj_in=obj_in)
+    db_obj = mealplan.create(db=test_db, obj_in=obj_in)
 
     assert db_obj
     assert db_obj.id
@@ -21,18 +21,18 @@ def test_create(db: Session) -> None:
     assert db_obj.recipe_id is None
 
 
-def test_get(db: Session) -> None:
+def test_get(test_db: Session) -> None:
     obj_in = MealplanCreate(
         date="2022-01-01",
         name="lunch",
         servings=2.0,
     )
 
-    db_obj = mealplan.create(db=db, obj_in=obj_in)
+    db_obj = mealplan.create(db=test_db, obj_in=obj_in)
 
     assert db_obj is not None
 
-    get_obj = mealplan.get(db, db_obj.id)
+    get_obj = mealplan.get(test_db, db_obj.id)
 
     assert get_obj
     assert get_obj.id == db_obj.id
@@ -41,31 +41,31 @@ def test_get(db: Session) -> None:
     assert get_obj.servings == db_obj.servings
 
 
-def test_get_nonexistent(db: Session) -> None:
-    db_obj = mealplan.get(db, 1)
+def test_get_nonexistent(test_db: Session) -> None:
+    db_obj = mealplan.get(test_db, 1)
 
     assert db_obj is None
 
 
-def test_get_many(db: Session) -> None:
+def test_get_many(test_db: Session) -> None:
     obj_in_1 = MealplanCreate(
-        db=db,
+        db=test_db,
         date="2022-01-01",
         name="lunch",
         servings=2.0,
     )
 
     obj_in_2 = MealplanCreate(
-        db=db,
+        db=test_db,
         date="2022-01-01",
         name="dinner",
         servings=2.0,
     )
 
-    db_obj_1 = mealplan.create(db=db, obj_in=obj_in_1)
-    db_obj_2 = mealplan.create(db=db, obj_in=obj_in_2)
+    db_obj_1 = mealplan.create(db=test_db, obj_in=obj_in_1)
+    db_obj_2 = mealplan.create(db=test_db, obj_in=obj_in_2)
 
-    db_rows = mealplan.get_many(db)
+    db_rows = mealplan.get_many(test_db)
 
     assert db_rows
     assert len(db_rows) == 2
@@ -74,25 +74,25 @@ def test_get_many(db: Session) -> None:
     assert db_obj_2 in db_rows
 
 
-def test_delete(db: Session) -> None:
+def test_delete(test_db: Session) -> None:
     obj_in = MealplanCreate(
-        db=db,
+        db=test_db,
         date="2022-01-01",
         name="lunch",
         servings=2.0,
     )
 
-    db_obj = mealplan.create(db=db, obj_in=obj_in)
+    db_obj = mealplan.create(db=test_db, obj_in=obj_in)
 
     assert db_obj is not None
 
-    deleted_mealplan = mealplan.remove(db, db_obj.id)
+    deleted_mealplan = mealplan.remove(test_db, db_obj.id)
 
-    assert mealplan.get(db, db_obj.id) is None
+    assert mealplan.get(test_db, db_obj.id) is None
     assert db_obj is deleted_mealplan
 
 
-def test_update(db: Session) -> None:
+def test_update(test_db: Session) -> None:
     recipe_in = RecipeCreate(
         name="Test recipe",
         servings=2.0,
@@ -100,16 +100,16 @@ def test_update(db: Session) -> None:
         tags="japan,食べ物",
     )
 
-    db_recipe = recipe.create(db=db, obj_in=recipe_in)
+    db_recipe = recipe.create(db=test_db, obj_in=recipe_in)
 
     mealplan_in = MealplanCreate(
-        db=db,
+        db=test_db,
         date="2022-01-01",
         name="lunch",
         servings=2.0,
     )
 
-    db_mealplan = mealplan.create(db=db, obj_in=mealplan_in)
+    db_mealplan = mealplan.create(db=test_db, obj_in=mealplan_in)
 
     assert db_mealplan is not None
     update_data = MealplanUpdate(
@@ -120,7 +120,9 @@ def test_update(db: Session) -> None:
         servings=3.0,
     )
 
-    mealplan_updated = mealplan.update(db=db, db_obj=db_mealplan, obj_in=update_data)
+    mealplan_updated = mealplan.update(
+        db=test_db, db_obj=db_mealplan, obj_in=update_data
+    )
 
     assert mealplan_updated is db_mealplan
     assert mealplan_updated.recipe is db_recipe

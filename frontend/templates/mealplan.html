@@ -73,7 +73,7 @@
 
 
         const getPlans = async () => {
-            const response = await fetch('http://localhost:5000/api/mealplans');
+            const response = await fetch('http://localhost:8000/mealplans');
             plans = await response.json();
 
             const elements = plans.sort((a,b) => b.date > a.date ? -1 : 1).map(createMealCard)
@@ -81,16 +81,21 @@
         }
         
         const getRecipes = async () => {
-            const response = await fetch('http://localhost:5000/api/recipes');
+            const response = await fetch('http://localhost:8000/recipes');
             recipes = await response.json(); 
         }
 
-        getRecipes();
-        getPlans();
+
+        const initData = async () => {
+            await getRecipes();
+            await getPlans();
+        }
+
+        initData();
 
         const putPlan = async (data) => {
             const response = await fetch(
-                `http://localhost:5000/api/mealplans/${data.id}`,
+                `http://localhost:8000/mealplans/${data.id}`,
                 {
                     method: "PUT",
                     headers: {

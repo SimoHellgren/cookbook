@@ -10,9 +10,9 @@
         {% for ingredient in ingredients %}
         <li>
             <input type="checkbox">
-                {{ '(' if ingredient.optional }}
-                {{ ingredient.ingredient.name }} {{ "%g"|format(ingredient['quantity']) }}{{ ingredient['measure'] }}
-                {{ ')' if ingredient.optional }}
+                {{ '(' if ingredient["optional"] }}
+                {{ ingredient["ingredient"]["name"] }} {{ "%g"|format(ingredient['quantity']) }}{{ ingredient['measure'] }}
+                {{ ')' if ingredient["optional"] }}
             </input>
         </li>
         {% endfor %}

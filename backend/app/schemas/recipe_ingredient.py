@@ -1,5 +1,6 @@
 from decimal import Decimal
 from pydantic import BaseModel
+from backend.app.schemas.ingredient import Ingredient
 
 
 class RecipeIngredientBase(BaseModel):
@@ -16,3 +17,12 @@ class RecipeIngredientCreate(RecipeIngredientBase):
 
 class RecipeIngredientUpdate(RecipeIngredientBase):
     pass
+
+
+class RecipeIngredient(RecipeIngredientBase):
+    """For use as API response model"""
+
+    ingredient: Ingredient
+
+    class Config:
+        orm_mode = True

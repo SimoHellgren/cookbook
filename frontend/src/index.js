@@ -18,6 +18,8 @@ const fetchRecipe = async (id) => {
 // DOM manipulation
 let D = document
 let $recipegrid = D.getElementById("recipe-grid")
+let $searchform = D.getElementById("search")
+let $searchvalue = D.getElementById("search-value")
 
 const createRecipeGridCard = ({ id, name, servings, tags }) => {
   let card = D.createElement("div")
@@ -40,17 +42,23 @@ const createRecipeGridCard = ({ id, name, servings, tags }) => {
   return card;
 }
 
-const drawRecipeGrid = () => {
-  state.recipes.forEach(r => {
-    let card = createRecipeGridCard(r)
-    $recipegrid.appendChild(card)
-  })
+const drawRecipeGrid = (recipes) => {
+  let cards = recipes.map(createRecipeGridCard)
+  $recipegrid.replaceChildren(...cards)
 }
 
+//Event handlers
+const onSearchSubmit = (event) => {
+  //consider hiding cards instead of destroying and recreating the elements
+  event.preventDefault()
+  drawRecipeGrid(state.recipes.filter(r => r.name.toLowerCase().includes($searchvalue.value.toLowerCase())))
+}
+
+$searchform.onsubmit = onSearchSubmit
 
 //Initial state
 fetchRecipes()
-  .then(drawRecipeGrid)
+  .then(() => drawRecipeGrid(state.recipes))
   .then(_ => {
     // set search tags
     let container = D.getElementById("search-tags")

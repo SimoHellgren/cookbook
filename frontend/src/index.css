@@ -74,3 +74,18 @@ nav li {
     text-align: center;
     width: fit-content;
 }
+
+.tag-grid {
+    padding-top: 1rem;
+    margin-left: 1rem;
+    display: grid;
+    gap: 0.5rem;
+    grid-template-columns: repeat(auto-fill, minmax(5rem, 1fr))
+}
+
+.tag-grid .tag {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+}

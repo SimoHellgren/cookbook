@@ -30,13 +30,18 @@ const createRecipeGridCard = ({ id, name, servings, tags }) => {
   h2.onclick = () => fetchRecipe(id).then(r => alert(r.method))
   card.appendChild(h2)
 
+  let taggrid = D.createElement("div")
+  taggrid.setAttribute("class", "tag-grid")
+
   if (tags !== "") {
     tags.split(",").forEach(t => {
       let e = D.createElement("div")
       e.setAttribute("class", "tag")
       e.textContent = t
-      card.appendChild(e)
+      taggrid.appendChild(e)
     })
+
+    card.appendChild(taggrid)
   }
 
   return card;

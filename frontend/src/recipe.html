@@ -45,7 +45,8 @@
 
         ingredients.forEach(i => {
           let li = document.createElement("li")
-          li.textContent = `${i.ingredient.name} ${i.quantity}${i.measure}`
+          let text = `${i.ingredient.name} ${i.quantity}${i.measure}`
+          li.textContent = i.optional ? `(${text})` : text
           ul.appendChild(li)
         })
 

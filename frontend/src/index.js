@@ -24,20 +24,24 @@ let $searchvalue = D.getElementById("search-value")
 const createRecipeGridCard = ({ id, name, servings, tags }) => {
   let card = D.createElement("div")
   card.setAttribute("class", "recipe-card")
+  card.onclick = () => window.open(`recipe.html?recipe=${id}`)
 
   let h2 = D.createElement("h2")
   h2.textContent = `${name} (${servings})`
-  h2.onclick = () => window.open(`recipe.html?recipe=${id}`)
   card.appendChild(h2)
 
   let taggrid = D.createElement("div")
   taggrid.setAttribute("class", "tag-grid")
 
   if (tags !== "") {
-    tags.split(",").forEach(t => {
+    tags.split(",").forEach(tag => {
       let e = D.createElement("div")
       e.setAttribute("class", "tag")
-      e.textContent = t
+      e.textContent = tag
+      e.onclick = (event) => {
+        event.stopPropagation()
+        alert(`You clicked on tag ${tag}`)
+      }
       taggrid.appendChild(e)
     })
 

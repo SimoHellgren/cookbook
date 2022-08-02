@@ -4,16 +4,32 @@ let state = {
   recipes: []
 }
 
-const fetchRecipes = () => fetch(`${APIURL}/recipes`)
-  .then(r => r.json())
-  .then(data => state.recipes = data)
+//api
+let api = (function() {
 
+  //default stuff
+  const endpoint = path => {
+    return {
+      get: () => fetch(APIURL + path).then(r => r.json()),
+      getId: id => fetch(APIURL + path + `/${id}`).then(r => r.json()),
+      post: data => fetch(APIURL + path, {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      }).then(r => r.json())
+    }
+  }
+  
+  //expose endpoints
+  return {
+      recipes: endpoint("/recipes"),
+      ingredients: endpoint("/ingredients")
+  }
+  
+})()
 
-const fetchRecipe = async (id) => {
-  const response = await fetch(`${APIURL}/recipes/${id}`)
-  recipe = await response.json()
-  return recipe
-}
 
 // DOM manipulation
 let D = document
@@ -66,7 +82,8 @@ const onSearchSubmit = (event) => {
 $searchform.onsubmit = onSearchSubmit
 
 //Initial state
-fetchRecipes()
+api.recipes.get()
+  .then(data => state.recipes = data)
   .then(() => drawRecipeGrid(state.recipes))
   .then(_ => {
     // set search tags

@@ -38,9 +38,11 @@
         <tbody></tbody>
       </table>
       
+      <datalist id="ingredient-list"></datalist>
+
       <template id="ingredientrow">
         <tr>
-          <td><input name="ingredient"></td>
+          <td><input name="ingredient" list="ingredient-list"></td>
           <td><input name="quantity" type="number" step="0.01"></td>
           <td><input name="measure" placeholder="e.g. dl"></td>
           <td><input name="optional" type="checkbox"></td>
@@ -64,6 +66,7 @@
       let $table = document.getElementById("ingredients")
       let $tablebody = $table.querySelector("tbody")
       let $template = document.getElementById("ingredientrow");
+      let $ingredientlist = document.getElementById("ingredient-list")
 
       const addRow = () => {
         let row = $template.content.cloneNode(true);
@@ -161,6 +164,14 @@
       api.get("/ingredients")
         .then(data => ingredients = data)
         .then(console.log("Ingredients fetched successfully"))
+        .then(() => {
+          ingredients.forEach(i => {
+            let opt = document.createElement("option")
+            opt.textContent = i.name
+            $ingredientlist.appendChild(opt)
+          })
+        }
+        )
 
 
     </script>

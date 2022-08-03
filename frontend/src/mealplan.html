@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Mealplan - Cookbook</title>
+    <link rel="stylesheet" href="index.css">
+  </head>
+
+  <body>
+    <div>
+      <form>
+      <label>
+        Start date
+        <input type="date" id="start_date">
+      </label>
+      <label>
+        End date
+        <input type="date" id="end_date">
+      </label>
+      <input type="submit" value="Create more">
+      </form>
+    </div>
+
+    <div id="mealpan-container"></div>
+    <div>
+      <button type="button" id="savebutton" onclick="savePlans()">Save</button>
+    </div>
+    
+    <script>
+      const container = document.getElementById("mealpan-container")
+
+      // event listener for dates
+      const start_date = document.getElementById('start_date');
+      const end_date = document.getElementById('end_date');
+
+      plans = [];
+      recipes = [];
+
+      /**
+       * function for creating individual mealcards which allow you to choose a recipe for said meal
+      */
+      const createMealCard = (data) => {
+        let element = document.createElement('div')
+        element.setAttribute('class', 'mealcard')
+        element.setAttribute('data-date', data.date) // date stored as attr for later filtering
+        element.setAttribute('id', data.id) // this is used in savePlans
+
+        let header = document.createElement('div')
+        header.setAttribute('class', 'mealcard-header')
+        const servings = parseFloat(data.servings).toPrecision(1)
+        header.textContent = `${data.date} ${data.name} (${servings})`
+
+        let selector = document.createElement('select')
+        selector.append(
+          new Option("", null, true), // empty selection as the default
+          ...recipes.map(r => new Option(r.name, r.id, false, false))
+        )
+        element.append(header, selector)
+
+        selector.value = data.recipe_id
+
+        return element
+      }
+
+
+      const renderPlans = () => {
+        const start = start_date.value
+        const end = end_date.value
+
+        // hide plans if not between start and end dates
+        container.childNodes.forEach(plan => {
+          date = plan.getAttribute('data-date')
+          plan.style.display = ((start ? date >= start : true) && (end ? date <= end : true)) ? "block" : "none"
+        })
+      }
+
+      // event listeners to trigger rendering of mealplans whenver date range changes
+      start_date.addEventListener('change', renderPlans);
+      end_date.addEventListener('change', renderPlans);
+
+
+      const getPlans = async () => {
+        const response = await fetch('http://localhost:8000/mealplans');
+        plans = await response.json();
+
+        const elements = plans.sort((a, b) => b.date > a.date ? -1 : 1).map(createMealCard)
+        container.append(...elements)
+      }
+
+      const getRecipes = async () => {
+        const response = await fetch('http://localhost:8000/recipes');
+        recipes = await response.json();
+      }
+
+
+      const initData = async () => {
+        await getRecipes();
+        await getPlans();
+      }
+
+      initData();
+
+      const putPlan = async (data) => {
+        const response = await fetch(
+          `http://localhost:8000/mealplans/${data.id}`,
+          {
+            method: "PUT",
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+          }
+        );
+
+        return response.json()
+      }
+
+      const savePlans = () => {
+        container.childNodes.forEach(p => {
+          const plan_id = parseInt(p.getAttribute("id")); // rely on the mealcard's id being the the plan id
+          const recipe_id = parseInt(p.getElementsByTagName("select").item(0).value);
+
+          const plan = plans.find(p => p.id === plan_id);
+
+          const new_plan = {
+            ...plan,
+            recipe_id: recipe_id
+          }
+
+          putPlan(new_plan)
+            .then(data => console.log(data));
+        })
+      }
+
+    </script>
+
+  </body>
+</html>

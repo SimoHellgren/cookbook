@@ -7,7 +7,7 @@
 
   <body>
     <div>
-      <form>
+      <h3>Filter dates</h3>
       <label>
         Start date
         <input type="date" id="start_date">
@@ -16,14 +16,65 @@
         End date
         <input type="date" id="end_date">
       </label>
-      <input type="submit" value="Create more">
+    </div>
+    <div>
+      <form>
+        <input type="button" value="Create more" onclick="openModalOverlay()">
       </form>
     </div>
+
+    <div class="modal" id="modal">
+      <div class="modal-header">
+        <div class="title">Create mealplans</div>
+        <button class="closebutton" onclick="closeModalOverlay()">&times</button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <label>
+              Start date
+              <input type="date" name="start_date">
+          </label>
+          <label>
+              End date (leave empty for single date)
+              <input type="date" name="end_date">
+          </label>
+          <label>
+              Meals (name;servings)
+              <textarea name="meals">lunch;2
+dinner;2</textarea>
+          </label>
+          <button type="submit">Create mealplans</button>
+        </form>
+      </div>
+    </div>
+    <div id="overlay"></div>
+
 
     <div id="mealpan-container"></div>
     <div>
       <button type="button" id="savebutton" onclick="savePlans()">Save</button>
     </div>
+
+    <script>
+      //overlay stuff
+
+      const openModalOverlay = () => {
+        let modal = document.getElementById("modal")
+        let overlay= document.getElementById("overlay")
+
+        modal.classList.add("active")
+        overlay.classList.add("active")
+      
+      }
+      const closeModalOverlay = () => {
+        let modal = document.getElementById("modal")
+        let overlay= document.getElementById("overlay")
+
+        modal.classList.remove("active")
+        overlay.classList.remove("active")
+      }
+
+    </script>
     
     <script>
       const container = document.getElementById("mealpan-container")

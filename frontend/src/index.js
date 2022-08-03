@@ -3,7 +3,7 @@ let state = {
   recipes: [],
   ingredients: [],
   recipe_ingredients: [],
-  mealplans: []
+  mealplans: [],
 }
 
 const APIURL = "http://localhost:8000"
@@ -29,7 +29,7 @@ let api = (function() {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(data)
-      })
+      }).then(r => r.json())
     }
   }
   
@@ -68,7 +68,7 @@ const Navbar = () => {
   })
 
   nav.append(ul)
-  
+
   // tbh not a huge fan of this
   $body.replaceChild(nav, $body.querySelector("nav"))
 }
@@ -163,7 +163,6 @@ const MealCard = (mealplan) => {
   let card = D.createElement("div")
   card.className = "mealcard"
   card.setAttribute("id", mealplan.id)
-  card.setAttribute("data-date", mealplan.date)
 
   let header = D.createElement("div")
   header.className = "mealcard-header"
@@ -183,7 +182,55 @@ const MealCard = (mealplan) => {
 }
 
 const Mealplan = (mealplans) => {
-  return mealplans.map(MealCard)
+  let container = D.createElement("div")
+  container.className = "mealplan-container"
+  
+  container.append(
+    ...mealplans.map(MealCard)
+  )
+
+  return container
+}
+
+const DateRangeFilter = () => {
+  let form = D.createElement("form")
+  let start = D.createElement("input")
+  let end = D.createElement("input")
+  start.setAttribute("type", "date")
+  end.setAttribute("type", "date")
+  start.id = "start_date"
+  end.id = "end_date"
+
+  let start_label = D.createElement("label") 
+  let end_label = D.createElement("label") 
+  start_label.setAttribute("for", start.id)
+  end_label.setAttribute("for", end.id)
+  start_label.textContent = "Start date"
+  end_label.textContent = "End date"
+
+  //eventhandlers for changes
+
+  //this will need a refactoring when shopping list is implemented
+  const callback = () => {
+    sd = start.value || "0000-00-00"
+    ed = end.value || "9999-99-99"
+
+    let show_data = state.mealplans.filter(mp => ((sd <= mp.date) && (mp.date <= ed)))
+
+    let container = D.querySelector(".mealplan-container")
+    container.replaceWith(Mealplan(show_data))
+  }
+
+  start.addEventListener("change", callback)
+  end.addEventListener("change", callback)
+
+  form.append(
+    start_label,
+    start,
+    end_label,
+    end,
+  )
+  return form
 }
 
 //pages
@@ -202,8 +249,32 @@ const RecipesPage = () => {
 }
 
 const MealplanPage = () => {
+  let save = D.createElement("button")
+  save.textContent = "Save"
+  
+  save.onclick = () => {
+    let container = D.querySelector(".mealplan-container")
+
+    container.childNodes.forEach(card => {
+      let plan_id = parseInt(card.getAttribute("id"))
+      let recipe_id = parseInt(card.getElementsByTagName("select").item(0).value)
+      
+      const plan = state.mealplans.find(mp => mp.id === plan_id)
+      const newPlan = {
+        ...plan,
+        recipe_id
+      }
+      
+      //this isn't very efficient put shall do for now
+      api.mealplans.put(plan_id, newPlan)
+        .then(data => state.mealplans = state.mealplans.map(mp => mp.id === data.id ? data : mp))
+    })
+  }
+
   return [
-    ...Mealplan(state.mealplans)
+    DateRangeFilter(),
+    Mealplan(state.mealplans),
+    save
   ]
 }
 
@@ -217,4 +288,4 @@ api.recipes.get()
   .then(render(RecipesPage))
 
 api.mealplans.get()
-  .then(data => state.mealplans = data)
+  .then(data => state.mealplans = data.sort((a,b) => b.date > a.date ? -1 : 1))

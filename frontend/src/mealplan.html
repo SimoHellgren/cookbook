@@ -62,8 +62,10 @@ dinner;2</textarea>
       const start_date = document.getElementById('start_date');
       const end_date = document.getElementById('end_date');
 
-      plans = [];
-      recipes = [];
+      state = {
+        plans: [],
+        recipes: []
+      }
 
       /**
        * function for creating individual mealcards which allow you to choose a recipe for said meal
@@ -82,7 +84,7 @@ dinner;2</textarea>
         let selector = document.createElement('select')
         selector.append(
           new Option("", null, true), // empty selection as the default
-          ...recipes.map(r => new Option(r.name, r.id, false, false))
+          ...state.recipes.map(r => new Option(r.name, r.id, false, false))
         )
         element.append(header, selector)
 
@@ -95,6 +97,11 @@ dinner;2</textarea>
       const renderPlans = () => {
         const start = start_date.value
         const end = end_date.value
+
+        //create elements
+        let mealcards = state.plans.map(createMealCard)
+
+        container.replaceChildren(...mealcards)
 
         // hide plans if not between start and end dates
         container.childNodes.forEach(plan => {
@@ -128,20 +135,19 @@ dinner;2</textarea>
       const getPlans = async () => {
         const response = await fetch('http://localhost:8000/mealplans');
         plans = await response.json();
-
-        const elements = plans.sort((a, b) => b.date > a.date ? -1 : 1).map(createMealCard)
-        container.append(...elements)
+        state.plans = plans.sort((a, b) => b.date > a.date ? -1 : 1)
       }
 
       const getRecipes = async () => {
         const response = await fetch('http://localhost:8000/recipes');
-        recipes = await response.json();
+        state.recipes = await response.json();
       }
 
 
       const initData = async () => {
         await getRecipes();
         await getPlans();
+        renderPlans();
       }
 
       initData();
@@ -225,7 +231,7 @@ dinner;2</textarea>
         }).flat()
 
         Promise.all(plans.map(postPlan))
-          .then(data => plans = plans.concat(data))
+          .then(data => state.plans = state.plans.concat(data).sort((a, b) => b.date > a.date ? -1 : 1))
           .then(renderPlans)
 
         closeModalOverlay() 

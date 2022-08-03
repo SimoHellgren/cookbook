@@ -29,7 +29,7 @@
         <button class="closebutton" onclick="closeModalOverlay()">&times</button>
       </div>
       <div class="modal-body">
-        <form>
+        <form id="new-mealplan-form">
           <label>
               Start date
               <input type="date" name="start_date">
@@ -43,7 +43,7 @@
               <textarea name="meals">lunch;2
 dinner;2</textarea>
           </label>
-          <button type="submit">Create mealplans</button>
+          <button type="button" onclick="createPlans()">Create mealplans</button>
         </form>
       </div>
     </div>
@@ -54,27 +54,6 @@ dinner;2</textarea>
     <div>
       <button type="button" id="savebutton" onclick="savePlans()">Save</button>
     </div>
-
-    <script>
-      //overlay stuff
-
-      const openModalOverlay = () => {
-        let modal = document.getElementById("modal")
-        let overlay= document.getElementById("overlay")
-
-        modal.classList.add("active")
-        overlay.classList.add("active")
-      
-      }
-      const closeModalOverlay = () => {
-        let modal = document.getElementById("modal")
-        let overlay= document.getElementById("overlay")
-
-        modal.classList.remove("active")
-        overlay.classList.remove("active")
-      }
-
-    </script>
     
     <script>
       const container = document.getElementById("mealpan-container")
@@ -128,6 +107,23 @@ dinner;2</textarea>
       start_date.addEventListener('change', renderPlans);
       end_date.addEventListener('change', renderPlans);
 
+      //overlay stuff
+      const openModalOverlay = () => {
+        let modal = document.getElementById("modal")
+        let overlay= document.getElementById("overlay")
+
+        modal.classList.add("active")
+        overlay.classList.add("active")
+      
+      }
+
+      const closeModalOverlay = () => {
+        let modal = document.getElementById("modal")
+        let overlay= document.getElementById("overlay")
+
+        modal.classList.remove("active")
+        overlay.classList.remove("active")
+      }
 
       const getPlans = async () => {
         const response = await fetch('http://localhost:8000/mealplans');
@@ -165,6 +161,21 @@ dinner;2</textarea>
         return response.json()
       }
 
+      const postPlan = async (data) => {
+        const response = await fetch(
+          `http://localhost:8000/mealplans/`,
+          {
+            method: "POST",
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+          }
+        );
+
+        return response.json()
+      }
+
       const savePlans = () => {
         container.childNodes.forEach(p => {
           const plan_id = parseInt(p.getAttribute("id")); // rely on the mealcard's id being the the plan id
@@ -180,6 +191,44 @@ dinner;2</textarea>
           putPlan(new_plan)
             .then(data => console.log(data));
         })
+      }
+
+      const dateRange = (start, end) => {
+        var arr = []
+        for (d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) arr.push(new Date(d))
+        return arr
+      }
+
+      const createPlans = () => {
+        let form = document.getElementById("new-mealplan-form")
+        let data = new FormData(form)
+        sd = new Date(data.get("start_date"))
+        ed = new Date(data.get("end_date"))
+        meals = data.get("meals").split("\n").map(e => e.split(";"))
+
+        if (isNaN(sd)) {
+          alert("Please provide a start date")
+          return
+        }
+
+        //default end date is start date
+        ed = isNaN(ed) ? sd : ed
+
+        let dates = dateRange(sd, ed).map(d => d.toISOString().slice(0,10))
+
+        let plans = dates.map(datestring => {
+          return meals.map(([meal, servings]) => ({
+            date: datestring,
+            name: meal,
+            servings: servings
+          }))
+        }).flat()
+
+        Promise.all(plans.map(postPlan))
+          .then(data => plans = plans.concat(data))
+          .then(renderPlans)
+
+        closeModalOverlay() 
       }
 
     </script>

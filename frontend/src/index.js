@@ -8,6 +8,13 @@ let state = {
 
 const APIURL = "http://localhost:8000"
 
+//utilities
+const daterange = (start, end) => {
+  var arr = []
+  for (var d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) arr.push(new Date(d))
+  return arr
+}
+
 //api
 let api = (function() {
 
@@ -233,6 +240,112 @@ const DateRangeFilter = () => {
   return form
 }
 
+const CreateMealpanForm = () => {
+  let form = D.createElement("form")
+  let start = D.createElement("input")
+  let end = D.createElement("input")
+  start.setAttribute("type", "date")
+  end.setAttribute("type", "date")
+  start.id = "start_date"
+  end.id = "end_date"
+  let start_label = D.createElement("label")
+  let end_label = D.createElement("label")
+  start_label.setAttribute("for", start.id)
+  end_label.setAttribute("for", end.id)
+  start_label.textContent = "Start date"
+  end_label.textContent = "End date"
+
+  //set end date to start by default
+  start.addEventListener("change", () => {
+    if (!end.value) end.value = start.value
+  }, {once: true}) 
+
+  let mealinput = D.createElement("textarea")
+  mealinput.id = "meals-input"
+  mealinput.textContent = "lunch;2\ndinner;2"
+  let meallabel = D.createElement("label")
+  meallabel.setAttribute("for", mealinput.id)
+  meallabel.textContent = "Meals"
+
+  let submit = D.createElement("button")
+  submit.textContent = "Create!"
+
+  form.onsubmit = (ev) => {
+    ev.preventDefault()
+
+    if (!start.value) {
+      alert("Please provide a start date")
+      ev.stopImmediatePropagation()
+      return
+    }
+
+    let sd = new Date(start.value)
+    let ed = new Date(end.value)
+    let meals = mealinput.value.split("\n").map(e => e.split(";"))
+    
+    let dates = daterange(sd, ed).map(d => d.toISOString().slice(0,10))
+
+    let plans = dates.map(date => meals.map(([name, servings]) => (
+      {
+        date,
+        name,
+        servings,
+      }  
+    ))).flat()
+    
+    Promise.all(plans.map(api.mealplans.post))
+      .then(data => state.mealplans = state.mealplans.concat(data).sort((a, b) => b.date > a.date ? -1 : 1))
+      .then(() => {
+        let container = D.querySelector(".mealplan-container")
+        container.replaceWith(Mealplan(state.mealplans))
+      })
+  }
+
+  form.append(start_label, start, end_label, end, meallabel, mealinput, submit)
+
+  return form
+}
+
+const CreateMealplans = () => {
+  let overlay = D.createElement("div")
+  overlay.id = "overlay"
+
+  let modal = D.createElement("div")
+  modal.className = "modal"
+
+  const closefunc = () => {
+    modal.classList.remove("active")
+    overlay.classList.remove("active")
+  }
+  
+  let header = D.createElement("div")
+  header.className = "modal-header"
+  
+  let headertext = D.createElement("div")
+  headertext.className = "title"
+  headertext.textContent = "Create mealplans"
+
+  let closebutton = D.createElement("button")
+  closebutton.className = "closebutton"
+  closebutton.textContent = "\u00D7" //multiplication symbol
+  closebutton.onclick = closefunc
+
+  header.append(headertext, closebutton)
+  
+  let body = D.createElement("div")
+  body.className = "modal-body"
+
+  form = CreateMealpanForm()
+
+  form.addEventListener("submit", closefunc)
+
+  body.append(form)
+
+  modal.append(header, body)
+
+  return [modal, overlay]
+}
+
 //pages
 const render = page => {
   return () => {
@@ -271,8 +384,21 @@ const MealplanPage = () => {
     })
   }
 
+  //modal stuff
+  [modal, overlay] = CreateMealplans()
+
+  let createbutton = D.createElement("button")
+  createbutton.textContent = "Create!"
+  createbutton.onclick = () => {
+    modal.classList.add("active")
+    overlay.classList.add("active")
+  }
+
   return [
     DateRangeFilter(),
+    createbutton,
+    modal, 
+    overlay,
     Mealplan(state.mealplans),
     save
   ]

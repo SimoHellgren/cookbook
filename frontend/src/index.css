@@ -1,10 +1,22 @@
+:root {
+
+    --background-color: #FFFFFF;
+
+    --surface-color: #f4f4f4;
+    --surface-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
+
+    --primary: #ebb5e6;
+    --primary-dark: #b885b4;
+    --primary-light: #ffe7ff;
+}
+
 main {
     margin-top: 5rem;
     padding: 1rem; 
 }
 
 nav {
-    background-color: #d9d9d4;
+    background-color: var(--surface-color);
     top: 0;
     width: 100vw;
     height: 5rem;
@@ -34,7 +46,7 @@ nav li {
 }
 
 .sidebar {
-    background-color: #d9d9d4;
+    background-color: var(--surface-color);
     width: 14rem;
     height: 100vh;
     position: fixed;
@@ -55,7 +67,8 @@ nav li {
 }
 
 .recipe-card {
-    background-color: #d9d9d4;
+    background-color: var(--surface-color);
+    box-shadow: var(--surface-shadow);
     justify-content: center;
     align-items: center;
     flex-direction: column;
@@ -63,8 +76,8 @@ nav li {
 }
 
 .tag {
-    background-color: #ebb5e6;
-    border:1px solid #bf93bb;
+    background-color: var(--primary);
+    border:1px solid var(--primary-dark);
     border-radius: 3px;
     margin: 1rem;
     padding: 0.5rem;
@@ -87,6 +100,18 @@ nav li {
     margin: 0;
 }
 
+.mealcard {
+    background-color: var(--surface-color);
+    box-shadow: var(--surface-shadow);
+    margin: 1rem;
+    padding: 0.5rem;
+    width: fit-content;
+}
+
+.mealcard-header {
+    font-size: 16px;
+}
+
 .modal {
     position: fixed;
     top: 50%;
@@ -96,7 +121,7 @@ nav li {
     border: 1px solid black;
     border-radius: 10px;
     z-index: 10;
-    background-color: white;
+    background-color: var(--surface-color);
     width: 500px;
     max-width: 80%;
 }

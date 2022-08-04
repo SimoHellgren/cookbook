@@ -42,7 +42,18 @@ let api = (function() {
   
   //expose endpoints
   return {
-      recipes: endpoint("/recipes"),
+      recipes: {
+        ...endpoint("/recipes"),
+        ingredients: {
+          add: (recipe_id, data) => fetch(`${APIURL}/recipes/${recipe_id}/ingredients`, {
+            method: "POST",
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+          }).then(r => r.json())
+        }
+      },
       ingredients: endpoint("/ingredients"),
       recipe_ingredients: endpoint("/recipe_ingredients"),
       mealplans: endpoint("/mealplans")
@@ -56,10 +67,29 @@ let $body = D.querySelector("body")
 let $app = D.getElementById("app")
 
 //components
+const Input = (params, label) => {
+  let inp = D.createElement("input")
+  Object.entries(params).forEach(([key, val]) => inp.setAttribute(key, val))
+
+  if (label) {
+    var lab = D.createElement("label")
+    lab.setAttribute("for", inp.id)
+    lab.textContent = label
+    return [lab, inp]
+  }
+
+  return [inp]
+}
+
 const Navbar = () => {
   const pages = [
     ["Recipes", render(RecipesPage)], 
-    ["Add recipe", () => alert("Not implemented :)")], 
+    ["Add recipe", () => {
+      let modal = D.querySelector(".modal")
+      let overlay = D.querySelector("#overlay")
+      modal.classList.add("active")
+      overlay.classList.add("active")
+    }], 
     ["Mealplan", render(MealplanPage)], 
     ["Shopping list", () => alert("Not implemented :)")]
   ]
@@ -346,6 +376,184 @@ const CreateMealplans = () => {
   return [modal, overlay]
 }
 
+
+const AddRecipe = () => {
+  let overlay = D.createElement("div")
+  overlay.id = "overlay"
+
+  let modal = D.createElement("div")
+  modal.className = "modal"
+
+  const closefunc = () => {
+    modal.classList.remove("active")
+    overlay.classList.remove("active")
+  }
+  
+  let header = D.createElement("div")
+  header.className = "modal-header"
+  
+  let headertext = D.createElement("div")
+  headertext.className = "title"
+  headertext.textContent = "Add recipe"
+
+  let closebutton = D.createElement("button")
+  closebutton.className = "closebutton"
+  closebutton.textContent = "\u00D7" //multiplication symbol
+  closebutton.onclick = closefunc
+
+  header.append(headertext, closebutton)
+  
+  let body = D.createElement("div")
+  body.className = "modal-body"
+
+  form = AddRecipeForm()
+
+  form.addEventListener("submit", closefunc)
+
+  body.append(form)
+
+  modal.append(header, body)
+
+  return [modal, overlay]
+}
+
+const TableRow = (data, header) => {
+  tag = header ? "th" : "td"
+
+  let row = D.createElement("tr")
+
+  let cells = data.map(x => {
+    let cell = D.createElement(tag)
+    cell.append(...x)
+    return cell
+  })
+
+  row.append(...cells)
+  return row
+}
+
+const AddRecipeForm = () => {
+  let form = D.createElement("form")
+
+  let name = Input({id: "name"}, "Recipe name")
+  let servings = Input({type: "number", id: "servings"}, "Servings")
+  let tags = Input({id: "tags"}, "Tags")
+
+  let method = D.createElement("textarea")
+  method.id = "method"
+
+  let methodlabel = D.createElement("label")
+  methodlabel.setAttribute("for", method.id)
+  methodlabel.textContent = "Method"
+
+  let table = D.createElement("table")
+  let tablehead = D.createElement("thead")
+  let colnames = ["Ingredient", "Quantity", "Measure", "Optional"]
+  let headrow = TableRow(colnames, true)
+  tablehead.append(headrow)
+  table.append(tablehead)
+
+  let tablebody = D.createElement("tbody")
+  table.append(tablebody)
+
+  const addRow = (i) => {
+    let ingredient = Input({id: "ingredient_" + i, list: "ingredientlist", autocomplete: "off"})
+    let quantity = Input({id: "quantity_" + i, type: "number", step: "0.01"})
+    let measure = Input({id: "measure_" + i, placeholder: "e.g dl"})
+    let optional = Input({id: "optional_" + i, type: "checkbox"})
+
+    let row = TableRow([ingredient, quantity, measure, optional])
+
+    tablebody.append(row)
+  }
+
+  addRow(0)
+
+  let addrowbutton = D.createElement("button")
+  addrowbutton.setAttribute("type", "button")
+  addrowbutton.textContent = "Add row"
+  addrowbutton.onclick = () => addRow(tablebody.children.length)
+
+  let savebutton = D.createElement("button")
+  savebutton.textContent = "Save"
+
+  form.onsubmit = async (ev) => {
+    ev.preventDefault()
+    ev.stopImmediatePropagation()
+
+    //prepare recipe
+    const recipe_data = {
+      name: name[1].value,
+      servings: servings[1].value,
+      tags: tags[1].value,
+      method: method.value,
+    }
+
+    //prepare ingredients
+    let rows = [...tablebody.children]
+    let recipeingredients = rows.map(row => {
+      [ingredient, quantity, measure, optional] = row.querySelectorAll("input")
+      
+      return {
+        ingredient: ingredient.value,
+        quantity: quantity.value,
+        measure: measure.value,
+        optional: optional.checked
+      }
+    })
+
+    //alert if recipe already exists
+    if (state.recipes.find(r => r.name === recipe_data.name)) alert(`Recipe with name "${recipe_data.name}" already exists`)
+
+    //missing ingredients
+    const missing = recipeingredients.filter(ri => !state.ingredients.map(i => i.name).includes(ri.ingredient)).map(x => ({name: x.ingredient}))
+    
+    
+    //create recipe and missing ingredients
+    const [recipe, _] = await Promise.all([
+      api.recipes.post(recipe_data),
+      Promise.all(missing.map(api.ingredients.post)).then(res => state.ingredients = state.ingredients.concat(...res))
+    ])
+
+    //create recipe ingredients
+    const ri_data = recipeingredients.map(ri => {
+      return {
+        recipe_id: recipe.id,
+        ingredient_id: state.ingredients.find(i => i.name === ri.ingredient).id,
+        quantity: ri.quantity,
+        measure: ri.measure,
+        optional: ri.optional
+      }
+    })
+
+    ri_data.forEach(ri => api.recipes.ingredients.add(ri.recipe_id, ri))
+
+    //reset the form
+    form.reset()
+    tablebody.innerHTML = ""
+    addRow(0)
+
+    //update state and re-render grid
+    state.recipes = state.recipes.concat(recipe)
+    let container = D.querySelector(".recipe-grid")
+    container.replaceWith(RecipeGrid(state.recipes))
+  }
+
+  form.append(
+    ...name,
+    ...servings,
+    ...tags,
+    methodlabel,
+    method,
+    table,
+    addrowbutton,
+    savebutton
+  )
+  
+  return form
+}
+
+
 //pages
 const render = page => {
   return () => {
@@ -357,7 +565,8 @@ const render = page => {
 const RecipesPage = () => {
   return [
     RecipeSearch(),
-    RecipeGrid(state.recipes)
+    RecipeGrid(state.recipes),
+    ...AddRecipe()
   ]
 }
 
@@ -412,6 +621,12 @@ const MealplanPage = () => {
 api.recipes.get()
   .then(data => state.recipes = data)
   .then(render(RecipesPage))
+
+api.ingredients.get()
+  .then(data => state.ingredients = data)
+
+api.recipe_ingredients.get()
+  .then(data => state.recipe_ingredients = data)
 
 api.mealplans.get()
   .then(data => state.mealplans = data.sort((a,b) => b.date > a.date ? -1 : 1))

@@ -337,47 +337,15 @@ const CreateMealpanForm = () => {
 }
 
 const CreateMealplans = () => {
-  let overlay = D.createElement("div")
-  overlay.id = "overlay"
-
-  let modal = D.createElement("div")
-  modal.className = "modal"
-
-  const closefunc = () => {
-    modal.classList.remove("active")
-    overlay.classList.remove("active")
-  }
-  
-  let header = D.createElement("div")
-  header.className = "modal-header"
-  
-  let headertext = D.createElement("div")
-  headertext.className = "title"
-  headertext.textContent = "Create mealplans"
-
-  let closebutton = D.createElement("button")
-  closebutton.className = "closebutton"
-  closebutton.textContent = "\u00D7" //multiplication symbol
-  closebutton.onclick = closefunc
-
-  header.append(headertext, closebutton)
-  
-  let body = D.createElement("div")
-  body.className = "modal-body"
-
   form = CreateMealpanForm()
-
+  let [modal, overlay, closefunc] = ModalOverlay("Create Mealplans", form)
+  
   form.addEventListener("submit", closefunc)
-
-  body.append(form)
-
-  modal.append(header, body)
-
+  
   return [modal, overlay]
 }
 
-
-const AddRecipe = () => {
+const ModalOverlay = (title, content) => {
   let overlay = D.createElement("div")
   overlay.id = "overlay"
 
@@ -388,13 +356,13 @@ const AddRecipe = () => {
     modal.classList.remove("active")
     overlay.classList.remove("active")
   }
-  
+
   let header = D.createElement("div")
   header.className = "modal-header"
   
   let headertext = D.createElement("div")
   headertext.className = "title"
-  headertext.textContent = "Add recipe"
+  headertext.textContent = title
 
   let closebutton = D.createElement("button")
   closebutton.className = "closebutton"
@@ -406,13 +374,18 @@ const AddRecipe = () => {
   let body = D.createElement("div")
   body.className = "modal-body"
 
-  form = AddRecipeForm()
-
-  form.addEventListener("submit", closefunc)
-
-  body.append(form)
+  body.append(content)
 
   modal.append(header, body)
+
+  return [modal, overlay, closefunc]
+}
+
+const AddRecipe = () => {
+  form = AddRecipeForm()
+  let [modal, overlay, closefunc] = ModalOverlay("Add Recipe", form)
+  
+  form.addEventListener("submit", closefunc)
 
   return [modal, overlay]
 }

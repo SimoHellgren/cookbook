@@ -85,13 +85,12 @@ const Navbar = () => {
   const pages = [
     ["Recipes", render(RecipesPage)], 
     ["Add recipe", () => {
-      let modal = D.querySelector(".modal")
+      let modal = D.getElementById("add-recipe-modal")
       let overlay = D.querySelector("#overlay")
       modal.classList.add("active")
       overlay.classList.add("active")
     }], 
-    ["Mealplan", render(MealplanPage)], 
-    ["Shopping list", () => alert("Not implemented :)")]
+    ["Mealplan", render(MealplanPage)],
   ]
   
   let nav = D.createElement("nav")
@@ -338,19 +337,20 @@ const CreateMealpanForm = () => {
 
 const CreateMealplans = () => {
   form = CreateMealpanForm()
-  let [modal, overlay, closefunc] = ModalOverlay("Create Mealplans", form)
+  let [modal, overlay, closefunc] = ModalOverlay("create-mealplans-modal", "Create Mealplans", form)
   
   form.addEventListener("submit", closefunc)
   
   return [modal, overlay]
 }
 
-const ModalOverlay = (title, content) => {
+const ModalOverlay = (id, title, content) => {
   let overlay = D.createElement("div")
   overlay.id = "overlay"
 
   let modal = D.createElement("div")
   modal.className = "modal"
+  modal.id = id
 
   const closefunc = () => {
     modal.classList.remove("active")
@@ -383,8 +383,7 @@ const ModalOverlay = (title, content) => {
 
 const AddRecipe = () => {
   form = AddRecipeForm()
-  let [modal, overlay, closefunc] = ModalOverlay("Add Recipe", form)
-  
+  let [modal, overlay, closefunc] = ModalOverlay("add-recipe-modal", "Add Recipe", form)
   form.addEventListener("submit", closefunc)
 
   return [modal, overlay]
@@ -527,6 +526,43 @@ const AddRecipeForm = () => {
 }
 
 
+const ShoppingList = () => {
+  let [modal, overlay, closefunc] = ModalOverlay("shoppinglist-modal", "Shopping list", "content")
+  return [modal, overlay]
+}
+
+const MealplansToShoppinglist = (mealplans) => {
+  let list = mealplans.map(meal => {
+    let li = document.createElement("li")
+    let recipe = state.recipes.find(r => r.id === meal.recipe_id)
+    if (!recipe) return
+
+    let ingredients = state.recipe_ingredients.filter(i => i.recipe_id === recipe.id)
+
+    const scale = meal.servings / recipe.servings
+    const scaled_ingredients = ingredients.map(ing => ({
+      ...ing, quantity: ing.quantity * scale
+    }))
+
+    li.textContent = `${recipe.name} (${meal.name} ${meal.date}, ${meal.servings} servings)`
+    
+    let ul = document.createElement("ul")
+
+    scaled_ingredients.forEach(ing => {
+      let li = document.createElement("li")
+      let text = `${ing.ingredient.name} ${ing.quantity}${ing.measure}`
+      if (ing.optional) {text = `(${text})`}
+      li.textContent = text
+      ul.appendChild(li)
+    })
+
+    li.appendChild(ul)
+    return li
+  })
+
+  return list
+} 
+
 //pages
 const render = page => {
   return () => {
@@ -567,22 +603,42 @@ const MealplanPage = () => {
   }
 
   //modal stuff
-  [modal, overlay] = CreateMealplans()
+  [mealplan_modal, mealplan_overlay] = CreateMealplans()
 
   let createbutton = D.createElement("button")
   createbutton.textContent = "Create!"
   createbutton.onclick = () => {
-    modal.classList.add("active")
-    overlay.classList.add("active")
+    mealplan_modal.classList.add("active")
+    mealplan_overlay.classList.add("active")
+  }
+
+  [shoppinglist_modal, shoppinglist_overlay] = ShoppingList()
+
+  let shoppinglistbutton = D.createElement("button")
+  shoppinglistbutton.textContent = "Shopping list"
+  shoppinglistbutton.onclick = () => {
+    let start = D.getElementById("start_date").value || "0000-00-00" 
+    let end = D.getElementById("end_date").value || "9999-99-99"
+  
+    let show_data = state.mealplans.filter(mp => start <= mp.date && mp.date <= end && mp.recipe_id)
+    let body = shoppinglist_modal.querySelector(".modal-body")
+    
+    body.replaceChildren(...MealplansToShoppinglist(show_data))
+
+    shoppinglist_modal.classList.add("active")
+    shoppinglist_overlay.classList.add("active")
   }
 
   return [
     DateRangeFilter(),
     createbutton,
-    modal, 
-    overlay,
+    mealplan_modal, 
+    mealplan_overlay,
+    shoppinglistbutton,
+    shoppinglist_modal,
+    shoppinglist_overlay,
     Mealplan(state.mealplans),
-    save
+    save,
   ]
 }
 

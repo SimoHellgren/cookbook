@@ -16,5 +16,5 @@ class RecipeIngredient(Base):
 
     recipe: Recipe = relationship(Recipe, back_populates="ingredients", uselist=False)
     ingredient: Ingredient = relationship(
-        Ingredient, back_populates="recipes", uselist=False
+        Ingredient, back_populates="recipes", uselist=False, lazy="subquery"
     )

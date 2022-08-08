@@ -37,7 +37,9 @@ let api = (function() {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(data)
-      }).then(r => r.json())
+      }).then(r => r.json()),
+      delete: id => fetch(APIURL + path + "/" + id, {method: "DELETE"})
+        .then(r => r.json())
     }
   }
   
@@ -56,7 +58,12 @@ let api = (function() {
         }
       },
       ingredients: endpoint("/ingredients"),
-      recipe_ingredients: endpoint("/recipe_ingredients"),
+      recipe_ingredients: {
+        ...endpoint("/recipe_ingredients"),
+        delete: (recipe_id, ingredient_id) => fetch(
+          `${APIURL}/recipe_ingredients/${recipe_id}:${ingredient_id}`, {method: "DELETE"}
+          ).then(r => r.json()),
+      },
       mealplans: endpoint("/mealplans")
   }
   
@@ -601,11 +608,71 @@ const RecipeView = (recipe) => {
   header.className = "recipe-header"
   header.textContent = `${recipe.name} (${recipe.servings} servings)`
 
+  let deletebutton = D.createElement("button")
+  deletebutton.className = "delete-button"
+  deletebutton.textContent = "DELETE"
+
+  let deletedialog = D.createElement("dialog")
+
+  let dialogtitle = D.createElement("div")
+  dialogtitle.textContent = `Are you sure?\nType in ${recipe.name} to delete it`
+
+  let deleteform = D.createElement("form")
+  deleteform.method = "dialog"
+
+  let [confirmdelete, _] = Input({id: "confirm-delete"})
+
+  let okbutton = D.createElement("button")
+  okbutton.setAttribute("type", "submit")
+  okbutton.setAttribute("value", "")
+  okbutton.textContent = "Delete"
+  okbutton.disabled = true
   
+  let cancelbutton = D.createElement("button")
+  cancelbutton.textContent = "Cancel"
+  cancelbutton.setAttribute("value", "cancel")
+
+  
+  deletedialog.onclose = () => {
+    console.log(deletedialog.returnValue)
+  }
+  
+  deleteform.append(confirmdelete, okbutton, cancelbutton)
+  
+  confirmdelete.oninput = (ev) => {
+    okbutton.value = ev.target.value
+    let disabled = ev.target.value === recipe.name ? false : true
+    okbutton.disabled = disabled
+  }
+
+  deletedialog.append(
+    dialogtitle,
+    deleteform,
+    )
+
+  deletedialog.onclose = () => {
+    if (!(deletedialog.returnValue === recipe.name)) return
+
+
+    let ris = state.recipe_ingredients.filter(ri => ri.recipe_id === recipe.id)  
+
+    Promise.all(ris.map(ri => api.recipe_ingredients.delete(ri.recipe_id, ri.ingredient_id)))
+      .then(() => api.recipes.delete(recipe.id))
+      .then(() => {
+        state.recipe_ingredients = state.recipe_ingredients.filter(ri => ri.recipe_id !== recipe.id)
+        state.recipes = state.recipes.filter(r => r.id !== recipe.id)
+      })
+      .then(render(RecipesPage))    
+  }
+  
+  deletebutton.onclick = () => deletedialog.showModal()
+  header.append(deletebutton, deletedialog)
+
   if (recipe.tags) {
     let taggrid = TagGrid(recipe.tags.split(","))
     header.appendChild(taggrid)
   }
+
   
   let method = D.createElement("div")
   method.className = "recipe-method"

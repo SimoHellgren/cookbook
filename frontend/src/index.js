@@ -4,6 +4,7 @@ let state = {
   ingredients: [],
   recipe_ingredients: [],
   mealplans: [],
+  selected_recipe: 1,
 }
 
 const APIURL = "http://localhost:8000"
@@ -134,7 +135,10 @@ const TagGrid = (tags) => {
 const RecipeCard = ({ id, name, servings, tags }) => {
   let card = D.createElement("div")
   card.setAttribute("class", "recipe-card")
-  card.onclick = () => window.open(`recipe.html?recipe=${id}`)
+  card.onclick = () => {
+    state.selected_recipe = id
+    render(RecipePage)()
+  }
 
   let h2 = D.createElement("h2")
   h2.textContent = `${name} (${servings})`
@@ -525,7 +529,6 @@ const AddRecipeForm = () => {
   return form
 }
 
-
 const ShoppingList = () => {
   let [modal, overlay, closefunc] = ModalOverlay("shoppinglist-modal", "Shopping list", "content")
   return [modal, overlay]
@@ -561,7 +564,69 @@ const MealplansToShoppinglist = (mealplans) => {
   })
 
   return list
+}
+
+const IngredientList = (ingredients) => {
+  let sidebar = D.createElement("div")
+  sidebar.className = "sidebar"
+
+  let p = D.createElement("h3")
+  p.textContent = "Ingredients"
+
+  let ul = D.createElement("ul")
+
+  ingredients.forEach(i => {
+    let li = D.createElement("li")
+    let text = `${i.ingredient.name} ${i.quantity}${i.measure}`
+    if (i.optional) {
+      text = "(" + text + ")"
+    }
+    li.textContent = text
+    ul.appendChild(li)
+  })
+
+  sidebar.append(
+    p,
+    ul
+  )
+
+  return sidebar
 } 
+
+const RecipeView = (recipe) => {
+  let container = D.createElement("div")
+  container.className = "recipe-container"
+
+  let header = D.createElement("div")
+  header.className = "recipe-header"
+  header.textContent = `${recipe.name} (${recipe.servings} servings)`
+
+  
+  if (recipe.tags) {
+    let taggrid = TagGrid(recipe.tags.split(","))
+    header.appendChild(taggrid)
+  }
+  
+  let method = D.createElement("div")
+  method.className = "recipe-method"
+  
+  let ul = D.createElement("ul")
+  recipe.method.split("\n").forEach(line => {
+    let li = D.createElement("li")
+    li.textContent = line
+    ul.appendChild(li)
+  }
+  )
+
+  method.appendChild(ul)
+
+  container.append(
+    header,
+    method
+  )
+
+  return container
+}
 
 //pages
 const render = page => {
@@ -578,6 +643,16 @@ const RecipesPage = () => {
     ...AddRecipe()
   ]
 }
+
+const RecipePage = () => {
+  let recipe = state.recipes.find(r => r.id === state.selected_recipe)
+  let ingredients = state.recipe_ingredients.filter(i => i.recipe_id === state.selected_recipe)
+
+  return [
+    IngredientList(ingredients),
+    RecipeView(recipe),
+  ]
+} 
 
 const MealplanPage = () => {
   let save = D.createElement("button")

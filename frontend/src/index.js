@@ -223,7 +223,13 @@ const MealCard = (mealplan) => {
 
   recipedropdown.value = mealplan.recipe_id
 
-  card.append(header, recipedropdown)
+  let statedropdown = D.createElement("select")
+  statedropdown.append(
+    ...["open", "bought", "done"].map(s => new Option(s, s, false, false))
+  )
+  statedropdown.value = mealplan.state
+
+  card.append(header, recipedropdown, statedropdown)
 
   return card
 }
@@ -239,43 +245,40 @@ const Mealplan = (mealplans) => {
   return container
 }
 
-const DateRangeFilter = () => {
+const MealplanFilter = () => {
   let form = D.createElement("form")
-  let start = D.createElement("input")
-  let end = D.createElement("input")
-  start.setAttribute("type", "date")
-  end.setAttribute("type", "date")
-  start.id = "start_date"
-  end.id = "end_date"
-
-  let start_label = D.createElement("label") 
-  let end_label = D.createElement("label") 
-  start_label.setAttribute("for", start.id)
-  end_label.setAttribute("for", end.id)
-  start_label.textContent = "Start date"
-  end_label.textContent = "End date"
+  let [start_label, start] = Input({id: "start_date", type: "date"}, "Start date")
+  let [end_label, end] = Input({id: "end_date", type: "date"}, "End date")
+  
+  let [done_label, donecheckbox] = Input({id: "done-chechbox", type: "checkbox"}, "Hide done")
+  donecheckbox.checked = false
 
   //eventhandlers for changes
-
-  //this will need a refactoring when shopping list is implemented
   const callback = () => {
     sd = start.value || "0000-00-00"
     ed = end.value || "9999-99-99"
 
-    let show_data = state.mealplans.filter(mp => ((sd <= mp.date) && (mp.date <= ed)))
+    let show_done = !donecheckbox.checked
+
+    let show_data = state.mealplans
+      .filter(mp => ((sd <= mp.date) && (mp.date <= ed)))
+      .filter(mp => show_done || mp.state !== "done")
 
     let container = D.querySelector(".mealplan-container")
     container.replaceWith(Mealplan(show_data))
   }
 
-  start.addEventListener("change", callback)
-  end.addEventListener("change", callback)
+  start.onchange = callback
+  end.onchange = callback
+  donecheckbox.onchange = callback
 
   form.append(
     start_label,
     start,
     end_label,
     end,
+    done_label,
+    donecheckbox,
   )
   return form
 }
@@ -731,11 +734,13 @@ const MealplanPage = () => {
     container.childNodes.forEach(card => {
       let plan_id = parseInt(card.getAttribute("id"))
       let recipe_id = parseInt(card.getElementsByTagName("select").item(0).value)
+      let mp_state = card.getElementsByTagName("select").item(1).value
       
       const plan = state.mealplans.find(mp => mp.id === plan_id)
       const newPlan = {
         ...plan,
-        recipe_id
+        recipe_id,
+        state: mp_state
       }
       
       //this isn't very efficient put shall do for now
@@ -762,7 +767,9 @@ const MealplanPage = () => {
     let start = D.getElementById("start_date").value || "0000-00-00" 
     let end = D.getElementById("end_date").value || "9999-99-99"
   
-    let show_data = state.mealplans.filter(mp => start <= mp.date && mp.date <= end && mp.recipe_id)
+    let show_data = state.mealplans
+      .filter(mp => start <= mp.date && mp.date <= end && mp.recipe_id)
+      .filter(mp => mp.state === "open")
     let body = shoppinglist_modal.querySelector(".modal-body")
     
     body.replaceChildren(...MealplansToShoppinglist(show_data))
@@ -772,7 +779,7 @@ const MealplanPage = () => {
   }
 
   return [
-    DateRangeFilter(),
+    MealplanFilter(),
     createbutton,
     mealplan_modal, 
     mealplan_overlay,

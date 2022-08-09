@@ -463,6 +463,9 @@ const AddRecipeForm = () => {
   let savebutton = D.createElement("button")
   savebutton.textContent = "Save"
 
+  let datalist = D.createElement("datalist")
+  datalist.id = "ingredientlist"
+
   form.onsubmit = async (ev) => {
     ev.preventDefault()
     ev.stopImmediatePropagation()
@@ -533,7 +536,8 @@ const AddRecipeForm = () => {
     method,
     table,
     addrowbutton,
-    savebutton
+    savebutton,
+    datalist,
   )
   
   return form
@@ -802,6 +806,14 @@ api.recipes.get()
 
 api.ingredients.get()
   .then(data => state.ingredients = data)
+  .then(() => {
+    let datalist = D.getElementById("ingredientlist")
+    datalist.append(
+      ...state.ingredients
+        .sort((a,b) => a.name >= b.name ? 1 : -1)
+        .map(ing => new Option(ing.name))
+    )
+  })
 
 api.recipe_ingredients.get()
   .then(data => state.recipe_ingredients = data)

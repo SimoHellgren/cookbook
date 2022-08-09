@@ -2,6 +2,8 @@ from sqlalchemy.orm import Session
 from backend.app.crud import recipe, ingredient, recipe_ingredient
 from backend.app.schemas.ingredient import IngredientCreate
 from backend.app.schemas.recipe import RecipeCreate
+from backend.app.schemas.recipe_ingredient import RecipeIngredientCreate
+from backend.tests.utils import create_random_recipe, random_decimal
 
 
 def test_get(test_db: Session):
@@ -63,3 +65,36 @@ def test_get_many(test_db: Session) -> None:
 
     assert recipe_ingredient_1 in db_rows
     assert recipe_ingredient_2 in db_rows
+
+
+def test_delete(test_db: Session) -> None:
+    recipe = create_random_recipe(db=test_db)
+    ingredient_data = IngredientCreate(name="Warm milk")
+    db_ingredient = ingredient.create(db=test_db, obj_in=ingredient_data)
+
+    ri_data = RecipeIngredientCreate(
+        recipe_id=recipe.id,
+        ingredient_id=db_ingredient.id,
+        quantity=random_decimal(),
+        measure="dl",
+        optional=False,
+    )
+
+    db_ri = recipe_ingredient.create(db=test_db, obj_in=ri_data)
+
+    assert db_ri
+
+    deleted_obj = recipe_ingredient.remove(
+        db=test_db, recipe_id=recipe.id, ingredient_id=db_ingredient.id
+    )
+
+    assert deleted_obj is not None
+    assert deleted_obj.recipe_id == db_ri.recipe_id
+    assert deleted_obj.ingredient_id == db_ri.ingredient_id
+
+    assert (
+        recipe_ingredient.get(
+            db=test_db, recipe_id=recipe.id, ingredient_id=db_ingredient.id
+        )
+        is None
+    )

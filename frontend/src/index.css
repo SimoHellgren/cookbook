@@ -8,12 +8,29 @@
     --primary: #ebb5e6;
     --primary-dark: #b885b4;
     --primary-light: #ffe7ff;
+
+    --warning: #c62828;
+    --warning-dark: #8e0000;
+    --text-on-warning: #FFFFFF;
 }
 
 main {
     margin-top: 5rem;
     padding: 1rem; 
 }
+
+.delete-button {
+    background-color: var(--warning);
+    border-color: var(--warning-dark);
+    color: var(--text-on-warning);
+    font-weight: bold;
+    border-radius: 3px;
+    margin: 1rem;
+    padding: 0.5rem;
+    text-align: center;
+    width: fit-content;
+}
+
 
 nav {
     background-color: var(--surface-color);
@@ -110,6 +127,9 @@ nav li {
 .recipe-header {
     background-color: var(--surface-color);
     box-shadow: var(--surface-shadow);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    justify-content: space-between;
 }
 
 .recipe-method {

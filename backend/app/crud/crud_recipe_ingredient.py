@@ -20,5 +20,17 @@ class CRUDRecipeIngredient(
             .first()
         )
 
+    def remove(
+        self, db: Session, recipe_id: int, ingredient_id: int
+    ) -> Optional[RecipeIngredient]:
+        db_obj = (
+            db.query(RecipeIngredient)
+            .filter_by(recipe_id=recipe_id, ingredient_id=ingredient_id)
+            .first()
+        )
+        db.delete(db_obj)
+        db.commit()
+        return db_obj
+
 
 recipe_ingredient = CRUDRecipeIngredient(RecipeIngredient)

@@ -2,12 +2,14 @@ from datetime import date
 from decimal import Decimal
 from typing import Optional
 from pydantic import BaseModel
+from backend.app.enums import MealplanState
 
 
 class MealplanBase(BaseModel):
     date: date
     name: str
     servings: Decimal
+    state: MealplanState = MealplanState.open
 
 
 class MealplanCreate(MealplanBase):

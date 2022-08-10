@@ -295,19 +295,9 @@ const MealplanFilter = () => {
 
 const CreateMealpanForm = () => {
   let form = D.createElement("form")
-  let start = D.createElement("input")
-  let end = D.createElement("input")
-  start.setAttribute("type", "date")
-  end.setAttribute("type", "date")
-  start.id = "start_date"
-  end.id = "end_date"
-  let start_label = D.createElement("label")
-  let end_label = D.createElement("label")
-  start_label.setAttribute("for", start.id)
-  end_label.setAttribute("for", end.id)
-  start_label.textContent = "Start date"
-  end_label.textContent = "End date"
-
+  let [start_label, start] = Input({id: "start_date", type: "date"}, "Start date")
+  let [end_label, end] = Input({id: "end_date", type: "date"}, "End date")
+  
   //set end date to start by default
   start.addEventListener("change", () => {
     if (!end.value) end.value = start.value
@@ -629,7 +619,6 @@ const EditRecipe = (recipe) => {
     let delete_ris = ingredients.filter(ri => 
       !recipeingredients.map(i => i.ingredient).includes(ri.ingredient.name)
     )
-
 
     //PUT existing RIs
     put_ris

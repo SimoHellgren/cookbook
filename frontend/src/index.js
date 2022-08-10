@@ -515,7 +515,7 @@ const RecipeForm = () => {
     delbutton.setAttribute("type", "button")
     
     let [ingredient] = Input({id: "ingredient_" + i, list: "ingredientlist", autocomplete: "off"})
-    let [quantity] = Input({id: "quantity_" + i, type: "number", step: "0.01"})
+    let [quantity] = Input({id: "quantity_" + i, type: "number", step: "any"})
     let [measure] = Input({id: "measure_" + i, placeholder: "e.g dl"})
     let [optional] = Input({id: "optional_" + i, type: "checkbox"})
 

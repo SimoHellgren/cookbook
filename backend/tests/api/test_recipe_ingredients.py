@@ -3,7 +3,11 @@ from backend.app import crud
 from backend.app.models.recipe_ingredient import RecipeIngredient
 from backend.app.schemas.ingredient import IngredientCreate
 from backend.app.schemas.recipe_ingredient import RecipeIngredientCreate
-from backend.tests.utils import create_random_recipe, random_decimal
+from backend.tests.utils import (
+    create_random_recipe,
+    create_random_recipe_with_ingredients,
+    random_decimal,
+)
 
 
 def test_get_all(test_db, client):
@@ -34,6 +38,32 @@ def test_get_all(test_db, client):
     assert Decimal(str(api_obj["quantity"])) == db_obj.quantity
     assert api_obj["measure"] == db_obj.measure
     assert api_obj["optional"] == db_obj.optional
+
+
+def test_put(test_db, client):
+    *_, (ri,) = create_random_recipe_with_ingredients(test_db)
+
+    ri_in = {
+        "recipe_id": ri.recipe_id,
+        "ingredient_id": ri.ingredient_id,
+        "quantity": 10,
+        "measure": "dl",
+        "optional": not (ri.optional),
+    }
+
+    res = client.put(
+        f"/recipe_ingredients/{ri.recipe_id}:{ri.ingredient_id}", json=ri_in
+    )
+
+    assert res.status_code == 200
+
+    new_ri = res.json()
+
+    assert new_ri["recipe_id"] == ri_in["recipe_id"]
+    assert new_ri["ingredient_id"] == ri_in["ingredient_id"]
+    assert new_ri["quantity"] == ri_in["quantity"]
+    assert new_ri["measure"] == ri_in["measure"]
+    assert new_ri["optional"] == ri_in["optional"]
 
 
 def test_delete(test_db, client):

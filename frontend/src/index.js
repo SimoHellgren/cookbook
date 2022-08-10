@@ -410,9 +410,9 @@ const AddRecipe = () => {
 
     //prepare recipe
     const recipe_data = {
-      name: name[1].value,
-      servings: servings[1].value,
-      tags: tags[1].value,
+      name: name.value,
+      servings: servings.value,
+      tags: tags.value,
       method: method.value,
     }
 
@@ -474,10 +474,10 @@ const TableRow = (data, header) => {
   tag = header ? "th" : "td"
 
   let row = D.createElement("tr")
-
+  
   let cells = data.map(x => {
     let cell = D.createElement(tag)
-    cell.append(...x)
+    cell.append(x)
     return cell
   })
 
@@ -501,7 +501,7 @@ const RecipeForm = () => {
 
   let table = D.createElement("table")
   let tablehead = D.createElement("thead")
-  let colnames = ["Ingredient", "Quantity", "Measure", "Optional"]
+  let colnames = ["", "Ingredient", "Quantity", "Measure", "Optional"]
   let headrow = TableRow(colnames, true)
   tablehead.append(headrow)
   table.append(tablehead)
@@ -510,13 +510,20 @@ const RecipeForm = () => {
   table.append(tablebody)
 
   const addRow = (i) => {
-    let ingredient = Input({id: "ingredient_" + i, list: "ingredientlist", autocomplete: "off"})
-    let quantity = Input({id: "quantity_" + i, type: "number", step: "0.01"})
-    let measure = Input({id: "measure_" + i, placeholder: "e.g dl"})
-    let optional = Input({id: "optional_" + i, type: "checkbox"})
+    let delbutton = D.createElement("button")
+    delbutton.textContent = "\u00D7"
+    delbutton.setAttribute("type", "button")
+    
+    let [ingredient] = Input({id: "ingredient_" + i, list: "ingredientlist", autocomplete: "off"})
+    let [quantity] = Input({id: "quantity_" + i, type: "number", step: "0.01"})
+    let [measure] = Input({id: "measure_" + i, placeholder: "e.g dl"})
+    let [optional] = Input({id: "optional_" + i, type: "checkbox"})
 
-    let row = TableRow([ingredient, quantity, measure, optional])
+    let row = TableRow([delbutton, ingredient, quantity, measure, optional])
+    row.id = i
 
+    delbutton.onclick = () => row.remove()
+    
     tablebody.append(row)
   }
 
@@ -526,7 +533,7 @@ const RecipeForm = () => {
   addrowbutton.id = "add-row-button"
   addrowbutton.setAttribute("type", "button")
   addrowbutton.textContent = "Add row"
-  addrowbutton.onclick = () => addRow(tablebody.children.length)
+  addrowbutton.onclick = () => addRow(Number(tablebody.lastChild.id) + 1)
 
   let savebutton = D.createElement("button")
   savebutton.textContent = "Save"

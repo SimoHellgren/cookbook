@@ -60,6 +60,16 @@ let api = (function() {
       ingredients: endpoint("/ingredients"),
       recipe_ingredients: {
         ...endpoint("/recipe_ingredients"),
+        put: (recipe_id, ingredient_id, data) => fetch(
+          `${APIURL}/recipe_ingredients/${recipe_id}:${ingredient_id}`,
+          {
+            method: "PUT",
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+          }
+        ).then(r => r.json()),
         delete: (recipe_id, ingredient_id) => fetch(
           `${APIURL}/recipe_ingredients/${recipe_id}:${ingredient_id}`, {method: "DELETE"}
           ).then(r => r.json()),
@@ -396,76 +406,14 @@ const ModalOverlay = (id, title, content) => {
 }
 
 const AddRecipe = () => {
-  form = AddRecipeForm()
+  form = RecipeForm()
+  const name = form.querySelector("#name")
+  const servings = form.querySelector("#servings")
+  const tags = form.querySelector("#tags")
+  const method = form.querySelector("#method")
+  const tablebody = form.querySelector("tbody")
+  
   let [modal, overlay, closefunc] = ModalOverlay("add-recipe-modal", "Add Recipe", form)
-  form.addEventListener("submit", closefunc)
-
-  return [modal, overlay]
-}
-
-const TableRow = (data, header) => {
-  tag = header ? "th" : "td"
-
-  let row = D.createElement("tr")
-
-  let cells = data.map(x => {
-    let cell = D.createElement(tag)
-    cell.append(...x)
-    return cell
-  })
-
-  row.append(...cells)
-  return row
-}
-
-const AddRecipeForm = () => {
-  let form = D.createElement("form")
-
-  let name = Input({id: "name"}, "Recipe name")
-  let servings = Input({type: "number", id: "servings"}, "Servings")
-  let tags = Input({id: "tags"}, "Tags")
-
-  let method = D.createElement("textarea")
-  method.id = "method"
-
-  let methodlabel = D.createElement("label")
-  methodlabel.setAttribute("for", method.id)
-  methodlabel.textContent = "Method"
-
-  let table = D.createElement("table")
-  let tablehead = D.createElement("thead")
-  let colnames = ["Ingredient", "Quantity", "Measure", "Optional"]
-  let headrow = TableRow(colnames, true)
-  tablehead.append(headrow)
-  table.append(tablehead)
-
-  let tablebody = D.createElement("tbody")
-  table.append(tablebody)
-
-  const addRow = (i) => {
-    let ingredient = Input({id: "ingredient_" + i, list: "ingredientlist", autocomplete: "off"})
-    let quantity = Input({id: "quantity_" + i, type: "number", step: "0.01"})
-    let measure = Input({id: "measure_" + i, placeholder: "e.g dl"})
-    let optional = Input({id: "optional_" + i, type: "checkbox"})
-
-    let row = TableRow([ingredient, quantity, measure, optional])
-
-    tablebody.append(row)
-  }
-
-  addRow(0)
-
-  let addrowbutton = D.createElement("button")
-  addrowbutton.setAttribute("type", "button")
-  addrowbutton.textContent = "Add row"
-  addrowbutton.onclick = () => addRow(tablebody.children.length)
-
-  let savebutton = D.createElement("button")
-  savebutton.textContent = "Save"
-
-  let datalist = D.createElement("datalist")
-  datalist.id = "ingredientlist"
-
   form.onsubmit = async (ev) => {
     ev.preventDefault()
     ev.stopImmediatePropagation()
@@ -527,6 +475,74 @@ const AddRecipeForm = () => {
     let container = D.querySelector(".recipe-grid")
     container.replaceWith(RecipeGrid(state.recipes))
   }
+  form.addEventListener("submit", closefunc)
+
+  return [modal, overlay]
+}
+
+const TableRow = (data, header) => {
+  tag = header ? "th" : "td"
+
+  let row = D.createElement("tr")
+
+  let cells = data.map(x => {
+    let cell = D.createElement(tag)
+    cell.append(...x)
+    return cell
+  })
+
+  row.append(...cells)
+  return row
+}
+
+const RecipeForm = () => {
+  let form = D.createElement("form")
+
+  let name = Input({id: "name"}, "Recipe name")
+  let servings = Input({type: "number", id: "servings"}, "Servings")
+  let tags = Input({id: "tags"}, "Tags")
+
+  let method = D.createElement("textarea")
+  method.id = "method"
+
+  let methodlabel = D.createElement("label")
+  methodlabel.setAttribute("for", method.id)
+  methodlabel.textContent = "Method"
+
+  let table = D.createElement("table")
+  let tablehead = D.createElement("thead")
+  let colnames = ["Ingredient", "Quantity", "Measure", "Optional"]
+  let headrow = TableRow(colnames, true)
+  tablehead.append(headrow)
+  table.append(tablehead)
+
+  let tablebody = D.createElement("tbody")
+  table.append(tablebody)
+
+  const addRow = (i) => {
+    let ingredient = Input({id: "ingredient_" + i, list: "ingredientlist", autocomplete: "off"})
+    let quantity = Input({id: "quantity_" + i, type: "number", step: "0.01"})
+    let measure = Input({id: "measure_" + i, placeholder: "e.g dl"})
+    let optional = Input({id: "optional_" + i, type: "checkbox"})
+
+    let row = TableRow([ingredient, quantity, measure, optional])
+
+    tablebody.append(row)
+  }
+
+  addRow(0)
+
+  let addrowbutton = D.createElement("button")
+  addrowbutton.id = "add-row-button"
+  addrowbutton.setAttribute("type", "button")
+  addrowbutton.textContent = "Add row"
+  addrowbutton.onclick = () => addRow(tablebody.children.length)
+
+  let savebutton = D.createElement("button")
+  savebutton.textContent = "Save"
+
+  let datalist = D.createElement("datalist")
+  datalist.id = "ingredientlist"
 
   form.append(
     ...name,
@@ -541,6 +557,122 @@ const AddRecipeForm = () => {
   )
   
   return form
+}
+
+const EditRecipe = (recipe) => {
+  let form = RecipeForm()
+  
+  let name = form.querySelector("#name")
+  let servings = form.querySelector("#servings")
+  let tags = form.querySelector("#tags")
+  let method = form.querySelector("#method")
+
+  let addrowbutton = form.querySelector("#add-row-button")
+
+  name.value = recipe.name
+  servings.value = recipe.servings
+  tags.value = recipe.tags
+  method.value = recipe.method
+
+  let ingredients = state.recipe_ingredients.filter(ri => ri.recipe_id == recipe.id)
+  
+  //add ingredient rows - not pretty but shall do
+  ingredients.slice(1).forEach(ri => addrowbutton.dispatchEvent(new Event("click")))
+
+  let tablerows = [...form.querySelector("tbody").children]
+
+  ingredients.map((ing, i) => {
+    let [name, quantity, measure, optional] = tablerows[i].querySelectorAll("input")
+    name.value = ing.ingredient.name
+    quantity.value = ing.quantity
+    measure.value = ing.measure
+    optional.checked = ing.optional
+  })
+
+  form.onsubmit = async (ev) => {
+    ev.preventDefault()
+    ev.stopImmediatePropagation()
+
+    //prepare recipe
+    const recipe_data = {
+      id: recipe.id,
+      name: name.value,
+      servings: servings.value,
+      tags: tags.value,
+      method: method.value,
+    }
+
+    //prepare ingredients
+    //refresh data
+    let rows = [...form.querySelector("tbody").children]
+    let recipeingredients = rows.map(row => {
+      let [ingredient, quantity, measure, optional] = row.querySelectorAll("input")
+      
+      return {
+        ingredient: ingredient.value,
+        quantity: quantity.value,
+        measure: measure.value,
+        optional: optional.checked
+      }
+    })
+
+    //prepare missing ingredients
+    let missing_ingredients = recipeingredients
+      .filter(ri => 
+        !state.ingredients.map(ing => ing.name).includes(ri.ingredient)
+      )
+
+    //split RIs to existing (PUT), new (POST) and deleted (DELETE)
+    let current_ing_names = ingredients.map(i => i.ingredient.name)
+    let put_ris = recipeingredients.filter(ri => current_ing_names.includes(ri.ingredient))
+    let post_ris = recipeingredients.filter(ri => !current_ing_names.includes(ri.ingredient))
+    let delete_ris = ingredients.filter(ri => 
+      !recipeingredients.map(i => i.ingredient).includes(ri.ingredient.name)
+    )
+
+
+    //PUT existing RIs
+    put_ris
+      .map(ri => ({
+        recipe_id: recipe.id,
+        ingredient_id: state.ingredients.find(i => i.name === ri.ingredient).id,
+        quantity: ri.quantity,
+        measure: ri.measure,
+        optional: ri.optional,
+      })).forEach(ri => api.recipe_ingredients.put(ri.recipe_id, ri.ingredient_id, ri))
+
+    //create missing ingredients, then POST new RIs
+    Promise.all(missing_ingredients.map(i => {
+      api.ingredients.post({name: i.ingredient})
+    }))
+    .then(data => state.ingredients = state.ingredients.concat(data))
+    .then(
+      post_ris.map(ri => ({
+        recipe_id: recipe.id,
+        ingredient_id: state.ingredients.find(i => i.name === ri.ingredient).id,
+        quantity: ri.quantity,
+        measure: ri.measure,
+        optional: ri.optional,
+      })).forEach(ri => api.recipes.ingredients.add(recipe.id, ri))
+    ).then(
+      //delete disappeared recipe ingredients
+      delete_ris.forEach(ri => {
+        let ingredient_id = state.ingredients.find(i => i.name === ri.ingredient.name).id
+        api.recipe_ingredients.delete(recipe.id, ingredient_id)
+        .then(data => state.recipe_ingredients = state.recipe_ingredients.filter(
+          i => (i.recipe_id !== data.recipe_id && i.ingredient_id !== data.ingredient_id)))
+      })
+    )
+    // TODO
+    //PUT recipe
+    api.recipes.put(recipe.id, recipe_data)
+
+  }
+
+  let [modal, overlay, closefunc] = ModalOverlay("edit-recipe-modal", "Edit Recipe: " + recipe.name, form)
+
+  return [modal, overlay]
+
 }
 
 const ShoppingList = () => {
@@ -615,6 +747,15 @@ const RecipeView = (recipe) => {
   header.className = "recipe-header"
   header.textContent = `${recipe.name} (${recipe.servings} servings)`
 
+  let [edit_modal, edit_overlay] = EditRecipe(recipe)
+
+  let editbutton = D.createElement("button")
+  editbutton.textContent = "EDIT"
+  editbutton.onclick = () => {
+    edit_modal.classList.add("active")
+    edit_overlay.classList.add("active")
+  }
+
   let deletebutton = D.createElement("button")
   deletebutton.className = "delete-button"
   deletebutton.textContent = "DELETE"
@@ -673,7 +814,7 @@ const RecipeView = (recipe) => {
   }
   
   deletebutton.onclick = () => deletedialog.showModal()
-  header.append(deletebutton, deletedialog)
+  header.append(editbutton, deletebutton, deletedialog)
 
   if (recipe.tags) {
     let taggrid = TagGrid(recipe.tags.split(","))
@@ -696,7 +837,9 @@ const RecipeView = (recipe) => {
 
   container.append(
     header,
-    method
+    method,
+    edit_modal,
+    edit_overlay
   )
 
   return container

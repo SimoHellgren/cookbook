@@ -69,4 +69,5 @@ def add_ingredient(
         recipe_ingredient.quantity,
         recipe_ingredient.measure,
         recipe_ingredient.optional,
+        recipe_ingredient.position,
     )

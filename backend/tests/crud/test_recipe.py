@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from backend.app.schemas.ingredient import IngredientCreate
 from backend.app.schemas.recipe import RecipeCreate
 from backend.app.crud import recipe, ingredient
+from backend.tests.utils import create_random_recipe_with_ingredients
 
 
 def test_create(test_db: Session) -> None:
@@ -125,6 +126,7 @@ def test_add_ingredient(test_db: Session) -> None:
         quantity=10.0,
         measure="dl",
         optional=True,
+        position=1,
     )
 
     assert recipe_ingredient.recipe_id == db_recipe.id
@@ -135,27 +137,8 @@ def test_add_ingredient(test_db: Session) -> None:
 
 
 def test_get_recipe_ingredients(test_db: Session) -> None:
-    recipe_in = RecipeCreate(
-        name="Test recipe",
-        servings=2.0,
-        method="Do the thing with the ingredients",
-        tags="japan,食べ物",
-    )
+    db_recipe, _, db_ris = create_random_recipe_with_ingredients(test_db)
 
-    db_recipe = recipe.create(db=test_db, obj_in=recipe_in)
+    get_ris = recipe.get_ingredients(test_db, db_recipe.id)
 
-    obj_in = IngredientCreate(name="Warm milk")
-    db_ingredient = ingredient.create(db=test_db, obj_in=obj_in)
-
-    recipe_ingredient_in = recipe.add_ingredient(
-        db=test_db,
-        recipe_id=db_recipe.id,
-        ingredient_id=db_ingredient.id,
-        quantity=10.0,
-        measure="dl",
-        optional=True,
-    )
-
-    db_recipe_ingredients = recipe.get_ingredients(test_db, db_recipe.id)
-    assert recipe_ingredient_in in db_recipe_ingredients
-    assert [recipe_ingredient_in] == db_recipe_ingredients
+    assert set(get_ris) == set(db_ris)

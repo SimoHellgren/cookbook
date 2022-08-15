@@ -9,6 +9,7 @@ class RecipeIngredientBase(BaseModel):
     quantity: Decimal
     measure: str
     optional: bool
+    position: int
 
 
 class RecipeIngredientCreate(RecipeIngredientBase):

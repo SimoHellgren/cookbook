@@ -54,9 +54,10 @@ def create_random_recipe_with_ingredients(
                 quantity=random_decimal(),
                 measure=random_string(3),
                 optional=random.random() > 0.5,
+                position=i,
             ),
         )
-        for ing in ingredients
+        for i, ing in enumerate(ingredients, 1)
     ]
 
     return recipe, ingredients, recipe_ingredients

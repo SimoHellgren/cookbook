@@ -4,7 +4,12 @@ import pytest
 from backend.app.models.recipe import Recipe
 from backend.app import crud
 from backend.app.schemas.ingredient import IngredientCreate
-from backend.tests.utils import create_random_recipe, create_random_recipe_with_ingredients, random_decimal, random_string
+from backend.tests.utils import (
+    create_random_recipe,
+    create_random_recipe_with_ingredients,
+    random_decimal,
+    random_string,
+)
 
 
 def test_get_all(test_db, client):

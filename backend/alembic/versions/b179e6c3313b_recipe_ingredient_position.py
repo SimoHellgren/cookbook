@@ -10,14 +10,14 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'b179e6c3313b'
-down_revision = '931478b39591'
+revision = "b179e6c3313b"
+down_revision = "931478b39591"
 branch_labels = None
 depends_on = None
 
 
 def upgrade() -> None:
-    op.add_column("recipe_ingredient", sa.Column('position', sa.Integer()))
+    op.add_column("recipe_ingredient", sa.Column("position", sa.Integer()))
     op.execute(
         "UPDATE recipe_ingredient "
         "SET position = temp.row "
@@ -26,15 +26,16 @@ def upgrade() -> None:
         ") AS temp "
         "WHERE recipe_ingredient.recipe_id = temp.recipe_id "
         "AND recipe_ingredient.ingredient_id = temp.ingredient_id"
-
     )
 
     with op.batch_alter_table("recipe_ingredient") as batch_op:
         batch_op.alter_column("position", nullable=False)
-        batch_op.create_unique_constraint('recipeid_position_unique', ['recipe_id', 'position'])
+        batch_op.create_unique_constraint(
+            "recipeid_position_unique", ["recipe_id", "position"]
+        )
 
 
 def downgrade() -> None:
     with op.batch_alter_table("recipe_ingredient") as batch_op:
-        batch_op.drop_constraint('recipeid_position_unique', type_='unique')
-        batch_op.drop_column('position')
+        batch_op.drop_constraint("recipeid_position_unique", type_="unique")
+        batch_op.drop_column("position")

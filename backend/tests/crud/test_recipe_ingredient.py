@@ -20,7 +20,9 @@ def test_get(test_db: Session):
 
 
 def test_get_many(test_db: Session) -> None:
-    *_, [db_ri_1, db_ri_2] = create_random_recipe_with_ingredients(test_db, ingredient_count=2)
+    *_, [db_ri_1, db_ri_2] = create_random_recipe_with_ingredients(
+        test_db, ingredient_count=2
+    )
 
     db_rows = recipe_ingredient.get_many(test_db)
 

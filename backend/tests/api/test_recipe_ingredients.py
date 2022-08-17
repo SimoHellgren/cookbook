@@ -51,6 +51,49 @@ def test_put(test_db, client):
     assert new_ri["position"] == ri_in["position"]
 
 
+def test_put_many(test_db, client):
+    *_, [ri_1, ri_2] = create_random_recipe_with_ingredients(test_db, 2)
+
+    # swap the positions of the ingredients (and other changes)
+    in_1 = {
+        "recipe_id": ri_1.recipe_id,
+        "ingredient_id": ri_1.ingredient_id,
+        "quantity": 10,
+        "measure": "dl",
+        "optional": not (ri_1.optional),
+        "position": ri_2.position,
+    }
+
+    in_2 = {
+        "recipe_id": ri_2.recipe_id,
+        "ingredient_id": ri_2.ingredient_id,
+        "quantity": 10,
+        "measure": "dl",
+        "optional": not (ri_2.optional),
+        "position": ri_1.position,
+    }
+
+    res = client.put("/recipe_ingredients/bulk", json=[in_1, in_2])
+
+    assert res.status_code == 200
+
+    db_1, db_2 = res.json()
+
+    assert db_1["recipe_id"] == in_1["recipe_id"]
+    assert db_1["ingredient_id"] == in_1["ingredient_id"]
+    assert db_1["quantity"] == in_1["quantity"]
+    assert db_1["measure"] == in_1["measure"]
+    assert db_1["optional"] == in_1["optional"]
+    assert db_1["position"] == in_1["position"]
+
+    assert db_2["recipe_id"] == in_2["recipe_id"]
+    assert db_2["ingredient_id"] == in_2["ingredient_id"]
+    assert db_2["quantity"] == in_2["quantity"]
+    assert db_2["measure"] == in_2["measure"]
+    assert db_2["optional"] == in_2["optional"]
+    assert db_2["position"] == in_2["position"]
+
+
 def test_delete(test_db, client):
     db_recipe, [db_ingredient], [db_ri] = create_random_recipe_with_ingredients(test_db)
 

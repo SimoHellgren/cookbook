@@ -35,6 +35,16 @@ def put(
     return crud.recipe_ingredient.update(db, db_obj, obj_in)
 
 
+@router.put(
+    "/bulk", response_model=list[RecipeIngredient], status_code=status.HTTP_200_OK
+)
+def put_many(data: list[RecipeIngredientUpdate], db: Session = Depends(get_db)) -> Any:
+    pairs = [
+        (crud.recipe_ingredient.get(db, x.recipe_id, x.ingredient_id), x) for x in data
+    ]
+    return crud.recipe_ingredient.update_many(db, pairs)
+
+
 @router.delete("/{recipe_id}:{ingredient_id}", response_model=RecipeIngredient)
 def delete(recipe_id: int, ingredient_id: int, db: Session = Depends(get_db)) -> Any:
     return crud.recipe_ingredient.remove(

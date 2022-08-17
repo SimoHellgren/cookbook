@@ -418,14 +418,15 @@ const AddRecipe = () => {
 
     //prepare ingredients
     let rows = [...tablebody.children]
-    let recipeingredients = rows.map(row => {
+    let recipeingredients = rows.map((row, i) => {
       [ingredient, quantity, measure, optional] = row.querySelectorAll("input")
       
       return {
         ingredient: ingredient.value,
         quantity: quantity.value,
         measure: measure.value,
-        optional: optional.checked
+        optional: optional.checked,
+        position: i,
       }
     })
 
@@ -449,7 +450,8 @@ const AddRecipe = () => {
         ingredient_id: state.ingredients.find(i => i.name === ri.ingredient).id,
         quantity: ri.quantity,
         measure: ri.measure,
-        optional: ri.optional
+        optional: ri.optional,
+        position: ri.position,
       }
     })
 
@@ -458,7 +460,6 @@ const AddRecipe = () => {
     //reset the form
     form.reset()
     tablebody.innerHTML = ""
-    addRow(0)
 
     //update state and re-render grid
     state.recipes = state.recipes.concat(recipe)
@@ -602,14 +603,15 @@ const EditRecipe = (recipe) => {
     //prepare ingredients
     //refresh data
     let rows = [...form.querySelector("tbody").children]
-    let recipeingredients = rows.map(row => {
+    let recipeingredients = rows.map((row, i) => {
       let [ingredient, quantity, measure, optional] = row.querySelectorAll("input")
       
       return {
         ingredient: ingredient.value,
         quantity: quantity.value,
         measure: measure.value,
-        optional: optional.checked
+        optional: optional.checked,
+        position: i,
       }
     })
 
@@ -635,6 +637,7 @@ const EditRecipe = (recipe) => {
         quantity: ri.quantity,
         measure: ri.measure,
         optional: ri.optional,
+        position: ri.position,
       })).forEach(ri => api.recipe_ingredients.put(ri.recipe_id, ri.ingredient_id, ri))
 
     //create missing ingredients, then POST new RIs
@@ -643,21 +646,24 @@ const EditRecipe = (recipe) => {
     }))
     .then(data => state.ingredients = state.ingredients.concat(data))
     .then(
-      post_ris.map(ri => ({
-        recipe_id: recipe.id,
-        ingredient_id: state.ingredients.find(i => i.name === ri.ingredient).id,
-        quantity: ri.quantity,
-        measure: ri.measure,
-        optional: ri.optional,
-      })).forEach(ri => api.recipes.ingredients.add(recipe.id, ri))
-    ).then(
-      //delete disappeared recipe ingredients
+      // delete disappeared recipe ingredients
+      // done before posting to avoid conflicts with position
       delete_ris.forEach(ri => {
         let ingredient_id = state.ingredients.find(i => i.name === ri.ingredient.name).id
         api.recipe_ingredients.delete(recipe.id, ingredient_id)
         .then(data => state.recipe_ingredients = state.recipe_ingredients.filter(
           i => (i.recipe_id !== data.recipe_id && i.ingredient_id !== data.ingredient_id)))
       })
+    )
+    .then(
+      post_ris.map(ri => ({
+        recipe_id: recipe.id,
+        ingredient_id: state.ingredients.find(i => i.name === ri.ingredient).id,
+        quantity: ri.quantity,
+        measure: ri.measure,
+        optional: ri.optional,
+        position: ri.position,
+      })).forEach(ri => api.recipes.ingredients.add(recipe.id, ri))
     )
     // TODO
     //PUT recipe

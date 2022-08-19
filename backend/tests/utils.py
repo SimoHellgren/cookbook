@@ -2,12 +2,14 @@ from decimal import Decimal
 from datetime import date
 import random
 import string
-from typing import Optional
+from typing import List, Optional, Tuple
 from sqlalchemy.orm import Session
 from backend.app import models
+from backend.app.schemas.ingredient import IngredientCreate
 from backend.app.schemas.recipe import RecipeCreate
 from backend.app.models import Mealplan
 from backend.app import crud
+from backend.app.schemas.recipe_ingredient import RecipeIngredientCreate
 
 
 def random_string(length=16):
@@ -27,6 +29,38 @@ def create_random_recipe(db: Session) -> models.Recipe:
     )
 
     return crud.recipe.create(db, recipe_in)
+
+
+def create_random_recipe_with_ingredients(
+    db: Session, ingredient_count: int = 1
+) -> Tuple[models.Recipe, List[models.Ingredient], List[models.RecipeIngredient]]:
+    recipe = create_random_recipe(db)
+
+    # generate random ingredient names
+    names = set()
+    while len(names) < ingredient_count:
+        names.add(random_string())
+
+    ingredients = [
+        crud.ingredient.create(db, IngredientCreate(name=name)) for name in names
+    ]
+
+    recipe_ingredients = [
+        crud.recipe_ingredient.create(
+            db,
+            RecipeIngredientCreate(
+                recipe_id=recipe.id,
+                ingredient_id=ing.id,
+                quantity=random_decimal(),
+                measure=random_string(3),
+                optional=random.random() > 0.5,
+                position=i,
+            ),
+        )
+        for i, ing in enumerate(ingredients, 1)
+    ]
+
+    return recipe, ingredients, recipe_ingredients
 
 
 def create_random_mealplan(db: Session, recipe_id: Optional[int] = None):

@@ -20,6 +20,7 @@ class CRUDRecipe(CRUDBase[Recipe, RecipeCreate, RecipeUpdate]):
         quantity: Decimal,
         measure: str,
         optional: bool,
+        position: int,
     ) -> RecipeIngredient:
 
         db_obj = RecipeIngredient(
@@ -28,6 +29,7 @@ class CRUDRecipe(CRUDBase[Recipe, RecipeCreate, RecipeUpdate]):
             quantity=quantity,
             measure=measure,
             optional=optional,
+            position=position,
         )
 
         db.add(db_obj)

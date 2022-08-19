@@ -128,7 +128,7 @@ nav li {
     background-color: var(--surface-color);
     box-shadow: var(--surface-shadow);
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
     justify-content: space-between;
 }
 

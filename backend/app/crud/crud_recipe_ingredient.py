@@ -20,6 +20,31 @@ class CRUDRecipeIngredient(
             .first()
         )
 
+    def update_many(
+        self, db: Session, data: list[tuple[RecursionError, RecipeIngredientUpdate]]
+    ) -> list[RecipeIngredient]:
+        # set positions temporarily to large values to avoid uniqueness conflicts
+        for db_obj, _ in data:
+            setattr(db_obj, "position", db_obj.position + 10000)
+            db.add(db_obj)
+
+        db.commit()
+
+        # then do the actual updates
+        for db_obj, obj_in in data:
+            for field, value in obj_in.dict().items():
+                setattr(db_obj, field, value)
+
+        for obj, _ in data:
+            db.add(obj)
+
+        db.commit()
+
+        for obj, _ in data:
+            db.refresh(obj)
+
+        return [obj for obj, _ in data]
+
     def remove(
         self, db: Session, recipe_id: int, ingredient_id: int
     ) -> Optional[RecipeIngredient]:

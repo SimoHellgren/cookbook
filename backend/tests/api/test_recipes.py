@@ -4,7 +4,12 @@ import pytest
 from backend.app.models.recipe import Recipe
 from backend.app import crud
 from backend.app.schemas.ingredient import IngredientCreate
-from backend.tests.utils import create_random_recipe, random_decimal, random_string
+from backend.tests.utils import (
+    create_random_recipe,
+    create_random_recipe_with_ingredients,
+    random_decimal,
+    random_string,
+)
 
 
 def test_get_all(test_db, client):
@@ -145,17 +150,7 @@ def test_delete(test_db, client):
 
 
 def test_get_ingredients(test_db, client):
-    db_recipe = create_random_recipe(test_db)
-    db_ingredient = crud.ingredient.create(test_db, IngredientCreate(name="Warm Milk"))
-
-    db_obj = crud.recipe.add_ingredient(
-        db=test_db,
-        recipe_id=db_recipe.id,
-        ingredient_id=db_ingredient.id,
-        quantity=random_decimal(),
-        measure="dl",
-        optional=False,
-    )
+    db_recipe, _, [db_ri] = create_random_recipe_with_ingredients(test_db)
 
     res = client.get(f"/recipes/{db_recipe.id}/ingredients")
 
@@ -167,11 +162,11 @@ def test_get_ingredients(test_db, client):
 
     (api_obj,) = data
 
-    assert api_obj["recipe_id"] == db_obj.recipe_id
-    assert api_obj["ingredient_id"] == db_obj.ingredient_id
-    assert Decimal(str(api_obj["quantity"])) == db_obj.quantity
-    assert api_obj["measure"] == db_obj.measure
-    assert api_obj["optional"] == db_obj.optional
+    assert api_obj["recipe_id"] == db_ri.recipe_id
+    assert api_obj["ingredient_id"] == db_ri.ingredient_id
+    assert Decimal(str(api_obj["quantity"])) == db_ri.quantity
+    assert api_obj["measure"] == db_ri.measure
+    assert api_obj["optional"] == db_ri.optional
 
 
 def test_add_ingredient(test_db, client):
@@ -186,6 +181,7 @@ def test_add_ingredient(test_db, client):
             "quantity": 2,
             "measure": "dl",
             "optional": True,
+            "position": 1,
         },
     )
 
@@ -198,3 +194,4 @@ def test_add_ingredient(test_db, client):
     assert data["quantity"] == 2
     assert data["measure"] == "dl"
     assert data["optional"] is True
+    assert data["position"] == 1

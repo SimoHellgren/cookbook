@@ -529,9 +529,25 @@ const RecipeForm = () => {
     let [quantity] = Input({id: "quantity_" + i, type: "number", step: "any"})
     let [measure] = Input({id: "measure_" + i, placeholder: "e.g dl"})
     let [optional] = Input({id: "optional_" + i, type: "checkbox"})
+    
+    let up = D.createElement("button")
+    up.textContent = "上" || "\u2191"
+    up.setAttribute("type", "button")
 
-    let row = TableRow([delbutton, ingredient, quantity, measure, optional])
+    let down = D.createElement("button")
+    down.textContent = "下" || "\u2193"
+    down.setAttribute("type", "button")
+
+    let row = TableRow([delbutton, ingredient, quantity, measure, optional, up, down])
     row.id = i
+
+    up.onclick = () => {
+      tablebody.insertBefore(row, row.previousSibling)
+    }
+
+    down.onclick = () => {
+      tablebody.insertBefore(row.nextSibling, row)
+    }
 
     delbutton.onclick = () => row.remove()
     

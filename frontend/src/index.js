@@ -73,6 +73,16 @@ let api = (function() {
         delete: (recipe_id, ingredient_id) => fetch(
           `${APIURL}/recipe_ingredients/${recipe_id}:${ingredient_id}`, {method: "DELETE"}
           ).then(r => r.json()),
+        put_many: (data) => fetch(
+          `${APIURL}/recipe_ingredients/bulk`,
+          {
+            method: "PUT",
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+          }
+        ),
       },
       mealplans: endpoint("/mealplans")
   }
@@ -426,7 +436,7 @@ const AddRecipe = () => {
         quantity: quantity.value,
         measure: measure.value,
         optional: optional.checked,
-        position: i,
+        position: i+1, // +1 to index from 1
       }
     })
 
@@ -611,7 +621,7 @@ const EditRecipe = (recipe) => {
         quantity: quantity.value,
         measure: measure.value,
         optional: optional.checked,
-        position: i,
+        position: i+1, // +1 to index from 1
       }
     })
 
@@ -630,16 +640,17 @@ const EditRecipe = (recipe) => {
     )
 
     //PUT existing RIs
-    put_ris
-      .map(ri => ({
-        recipe_id: recipe.id,
-        ingredient_id: state.ingredients.find(i => i.name === ri.ingredient).id,
-        quantity: ri.quantity,
-        measure: ri.measure,
-        optional: ri.optional,
-        position: ri.position,
-      })).forEach(ri => api.recipe_ingredients.put(ri.recipe_id, ri.ingredient_id, ri))
-
+    api.recipe_ingredients.put_many(
+      put_ris
+        .map(ri => ({
+          recipe_id: recipe.id,
+          ingredient_id: state.ingredients.find(i => i.name === ri.ingredient).id,
+          quantity: ri.quantity,
+          measure: ri.measure,
+          optional: ri.optional,
+          position: ri.position,
+        }))
+    )
     //create missing ingredients, then POST new RIs
     Promise.all(missing_ingredients.map(i => {
       api.ingredients.post({name: i.ingredient})
@@ -961,7 +972,7 @@ api.ingredients.get()
   })
 
 api.recipe_ingredients.get()
-  .then(data => state.recipe_ingredients = data)
+  .then(data => state.recipe_ingredients = data.sort((a,b) => a.recipe_id - b.recipe_id || a.position - b.position)) 
 
 api.mealplans.get()
   .then(data => state.mealplans = data.sort((a,b) => b.date > a.date ? -1 : 1))

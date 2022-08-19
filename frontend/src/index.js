@@ -733,6 +733,7 @@ const IngredientList = (ingredients) => {
   p.textContent = "Ingredients"
 
   let ul = D.createElement("ul")
+  ul.className = "ingredientlist"
 
   ingredients.forEach(i => {
     let li = D.createElement("li")
@@ -740,7 +741,13 @@ const IngredientList = (ingredients) => {
     if (i.optional) {
       text = "(" + text + ")"
     }
-    li.textContent = text
+
+    let [label, checkbox] = Input({type: "checkbox"}, text)
+    checkbox.onclick = () => {
+      label.classList.toggle("checked")
+    }
+
+    li.append(checkbox, label)
     ul.appendChild(li)
   })
 
@@ -841,7 +848,16 @@ const RecipeView = (recipe) => {
   let ul = D.createElement("ul")
   recipe.method.split("\n").forEach(line => {
     let li = D.createElement("li")
-    li.textContent = line
+    
+    let [label, chechbox] = Input({type: "checkbox"}, line)
+    chechbox.onclick = () => {
+      label.classList.toggle("checked")
+    }
+
+    li.append(
+      chechbox,
+      label
+    )
     ul.appendChild(li)
   }
   )

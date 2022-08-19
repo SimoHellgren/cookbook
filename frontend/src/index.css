@@ -3,6 +3,8 @@
     --background-color: #FFFFFF;
 
     --surface-color: #f4f4f4;
+    --surface-dark: #c1c1c1;
+    --surface-light: #ffffff;
     --surface-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
 
     --primary: #ebb5e6;
@@ -135,6 +137,36 @@ nav li {
 .recipe-method {
     background-color: var(--surface-color);
     box-shadow: var(--surface-shadow);
+}
+
+.recipe-method ul {
+    padding: 0;
+    margin: 1rem;
+}
+
+.recipe-method li {
+    list-style: none;
+}
+
+.recipe-method li .checked {
+    color: var(--surface-dark);
+    text-decoration: line-through;
+}
+
+ul.ingredientlist {
+    padding: 0;
+    margin: 1rem;
+    list-style: none;
+    text-align: left;
+}
+
+.ingredientlist input  {
+    width: initial;
+}
+
+.ingredientlist li .checked {
+    color: var(--surface-dark);
+    text-decoration: line-through;
 }
 
 .mealcard {

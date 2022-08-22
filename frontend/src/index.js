@@ -233,7 +233,53 @@ const MealCard = (mealplan) => {
 
   let header = D.createElement("div")
   header.className = "mealcard-header"
-  header.textContent = `${mealplan.date} ${mealplan.name} (${mealplan.servings})`
+
+  let namediv = D.createElement("div")
+
+  let [name] = Input({})
+  name.className = "mealcard-mealname"
+  name.value = mealplan.name
+
+  let [servings] = Input({})
+  servings.className = "mealcard-servingscount"
+  servings.value = mealplan.servings
+
+  namediv.append(mealplan.date, name, servings)
+
+  let deletebutton = D.createElement("button")
+  deletebutton.setAttribute("type", "button")
+  deletebutton.textContent = "DELETE"
+
+  let deletedialog = D.createElement("dialog")
+  let deleteform = D.createElement("form")
+  deleteform.method = "dialog"
+  
+  let confirm = D.createElement("button")
+  confirm.setAttribute("type", "submit")
+  confirm.setAttribute("value", "delete")
+  confirm.textContent = "Delete"
+  
+  let cancel = D.createElement("button")
+  cancel.setAttribute("value", "cancel")
+  cancel.textContent = "Cancel"
+  
+  deleteform.append(
+    `Do you really wish to delete ${mealplan.date} ${mealplan.name}?`,
+    confirm,
+    cancel,
+  )
+  
+  deletedialog.append(deleteform)
+
+  deletebutton.onclick = () => deletedialog.showModal() 
+
+  deletedialog.onclose = () => {
+    if (deletedialog.returnValue === "delete") {
+      api.mealplans.delete(mealplan.id)
+    }
+  }
+
+  header.append(namediv, deletebutton)
 
   let recipedropdown = D.createElement("select")
   recipedropdown.append(
@@ -251,7 +297,7 @@ const MealCard = (mealplan) => {
 
   card.append(header, recipedropdown, statedropdown)
 
-  return card
+  return [card, deletedialog]
 }
 
 const Mealplan = (mealplans) => {
@@ -259,7 +305,7 @@ const Mealplan = (mealplans) => {
   container.className = "mealplan-container"
   
   container.append(
-    ...mealplans.map(MealCard)
+    ...mealplans.map(MealCard).flat()
   )
 
   return container
@@ -837,11 +883,6 @@ const RecipeView = (recipe) => {
   let cancelbutton = D.createElement("button")
   cancelbutton.textContent = "Cancel"
   cancelbutton.setAttribute("value", "cancel")
-
-  
-  deletedialog.onclose = () => {
-    console.log(deletedialog.returnValue)
-  }
   
   deleteform.append(confirmdelete, okbutton, cancelbutton)
   
@@ -949,11 +990,15 @@ const MealplanPage = () => {
       let plan_id = parseInt(card.getAttribute("id"))
       let recipe_id = parseInt(card.getElementsByTagName("select").item(0).value)
       let mp_state = card.getElementsByTagName("select").item(1).value
-      
+      let name = card.querySelector(".mealcard-mealname").value
+      let servings = parseInt(card.querySelector(".mealcard-servingscount").value)
+
       const plan = state.mealplans.find(mp => mp.id === plan_id)
       const newPlan = {
         ...plan,
         recipe_id,
+        name,
+        servings,
         state: mp_state
       }
       

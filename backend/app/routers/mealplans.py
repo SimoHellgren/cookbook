@@ -39,3 +39,8 @@ def update(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
     return crud.mealplan.update(db, db_obj=db_mealplan, obj_in=mealplan)
+
+
+@router.delete("/{mealplan_id}", response_model=Mealplan, status_code=200)
+def delete(mealplan_id: int, db: Session = Depends(get_db)):
+    return crud.mealplan.remove(db=db, id=mealplan_id)

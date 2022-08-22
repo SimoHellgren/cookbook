@@ -33,7 +33,6 @@ main {
     width: fit-content;
 }
 
-
 nav {
     background-color: var(--surface-color);
     top: 0;
@@ -183,7 +182,18 @@ ul.ingredientlist {
 }
 
 .mealcard-header {
+    padding: 5px 5px;
+    display: flex;
     font-size: 16px;
+    justify-content: space-between;
+}
+
+.mealcard-mealname {
+    width: 5rem;
+}
+
+.mealcard-servingscount {
+    width: 1rem;
 }
 
 .modal {

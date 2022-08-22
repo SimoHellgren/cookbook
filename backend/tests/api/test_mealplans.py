@@ -101,3 +101,17 @@ def test_update_nonexistent(client):
     res = client.put("/mealplans/1", json=data_in)
 
     assert res.status_code == 404
+
+
+def test_delete(test_db, client):
+    db_mealplan = create_random_mealplan(test_db)
+
+    res = client.delete(f"/mealplans/{db_mealplan.id}")
+
+    assert res.status_code == 200
+
+    assert res.json()["id"] == db_mealplan.id
+
+    get_res = client.get(f"/mealplans/{db_mealplan.id}")
+
+    assert get_res.status_code == 404

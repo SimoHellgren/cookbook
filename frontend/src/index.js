@@ -233,7 +233,24 @@ const MealCard = (mealplan) => {
 
   let header = D.createElement("div")
   header.className = "mealcard-header"
-  header.textContent = `${mealplan.date} ${mealplan.name} (${mealplan.servings})`
+
+  let namediv = D.createElement("div")
+
+  let [name] = Input({})
+  name.className = "mealcard-mealname"
+  name.value = mealplan.name
+
+  let [servings] = Input({})
+  servings.className = "mealcard-servingscount"
+  servings.value = mealplan.servings
+
+  namediv.append(mealplan.date, name, servings)
+
+  let editbutton = D.createElement("button")
+  editbutton.setAttribute("type", "button")
+  editbutton.textContent = "DELETE"
+
+  header.append(namediv, editbutton)
 
   let recipedropdown = D.createElement("select")
   recipedropdown.append(
@@ -837,11 +854,6 @@ const RecipeView = (recipe) => {
   let cancelbutton = D.createElement("button")
   cancelbutton.textContent = "Cancel"
   cancelbutton.setAttribute("value", "cancel")
-
-  
-  deletedialog.onclose = () => {
-    console.log(deletedialog.returnValue)
-  }
   
   deleteform.append(confirmdelete, okbutton, cancelbutton)
   
@@ -949,11 +961,15 @@ const MealplanPage = () => {
       let plan_id = parseInt(card.getAttribute("id"))
       let recipe_id = parseInt(card.getElementsByTagName("select").item(0).value)
       let mp_state = card.getElementsByTagName("select").item(1).value
-      
+      let name = card.querySelector(".mealcard-mealname").value
+      let servings = parseInt(card.querySelector(".mealcard-servingscount").value)
+
       const plan = state.mealplans.find(mp => mp.id === plan_id)
       const newPlan = {
         ...plan,
         recipe_id,
+        name,
+        servings,
         state: mp_state
       }
       

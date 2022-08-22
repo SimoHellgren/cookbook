@@ -781,7 +781,29 @@ const RecipeView = (recipe) => {
 
   let header = D.createElement("div")
   header.className = "recipe-header"
-  header.textContent = `${recipe.name} (${recipe.servings} servings)`
+
+  let title = D.createElement("h1")
+  title.textContent = recipe.name
+  
+  let scale_div = D.createElement("div")
+
+  let [scale_label, scale_input] = Input({type: "number", step: "any", value: recipe.servings}, "servings")
+  scale_input.onchange = () => {
+    let scaled_ingredients = state.recipe_ingredients
+      .filter(i => i.recipe_id === recipe.id)
+      .map(i => ({
+        ...i,
+        quantity: +(i.quantity * scale_input.value / recipe.servings).toFixed(2) // the + strips unnecessary decimal places
+      }))
+
+      let inglist = IngredientList(scaled_ingredients)
+
+      D.querySelector(".sidebar").replaceWith(inglist)
+  }
+
+  scale_div.append(scale_input, scale_label)
+
+  header.append(title, scale_div)
 
   let [edit_modal, edit_overlay] = EditRecipe(recipe)
 

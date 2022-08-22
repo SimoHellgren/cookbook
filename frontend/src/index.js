@@ -246,11 +246,40 @@ const MealCard = (mealplan) => {
 
   namediv.append(mealplan.date, name, servings)
 
-  let editbutton = D.createElement("button")
-  editbutton.setAttribute("type", "button")
-  editbutton.textContent = "DELETE"
+  let deletebutton = D.createElement("button")
+  deletebutton.setAttribute("type", "button")
+  deletebutton.textContent = "DELETE"
 
-  header.append(namediv, editbutton)
+  let deletedialog = D.createElement("dialog")
+  let deleteform = D.createElement("form")
+  deleteform.method = "dialog"
+  
+  let confirm = D.createElement("button")
+  confirm.setAttribute("type", "submit")
+  confirm.setAttribute("value", "delete")
+  confirm.textContent = "Delete"
+  
+  let cancel = D.createElement("button")
+  cancel.setAttribute("value", "cancel")
+  cancel.textContent = "Cancel"
+  
+  deleteform.append(
+    `Do you really wish to delete ${mealplan.date} ${mealplan.name}?`,
+    confirm,
+    cancel,
+  )
+  
+  deletedialog.append(deleteform)
+
+  deletebutton.onclick = () => deletedialog.showModal() 
+
+  deletedialog.onclose = () => {
+    if (deletedialog.returnValue === "delete") {
+      api.mealplans.delete(mealplan.id)
+    }
+  }
+
+  header.append(namediv, deletebutton)
 
   let recipedropdown = D.createElement("select")
   recipedropdown.append(
@@ -268,7 +297,7 @@ const MealCard = (mealplan) => {
 
   card.append(header, recipedropdown, statedropdown)
 
-  return card
+  return [card, deletedialog]
 }
 
 const Mealplan = (mealplans) => {
@@ -276,7 +305,7 @@ const Mealplan = (mealplans) => {
   container.className = "mealplan-container"
   
   container.append(
-    ...mealplans.map(MealCard)
+    ...mealplans.map(MealCard).flat()
   )
 
   return container

@@ -173,6 +173,16 @@ ul.ingredientlist {
     text-decoration: line-through;
 }
 
+.mealplan-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.mealcard-row {
+    display: flex;
+    flex-direction: row;
+}
+
 .mealcard {
     background-color: var(--surface-color);
     box-shadow: var(--surface-shadow);

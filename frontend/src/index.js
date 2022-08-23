@@ -300,12 +300,36 @@ const MealCard = (mealplan) => {
   return [card, deletedialog]
 }
 
+const MealCardRow = (mealplans) => {
+  let div = D.createElement("div")
+  div.className = "mealcard-row"
+  mealplans.forEach(mp => {
+    let [card, dialog] = MealCard(mp)
+    div.append(card, dialog)
+  })
+
+  return div
+}
+
+
 const Mealplan = (mealplans) => {
   let container = D.createElement("div")
   container.className = "mealplan-container"
   
+  // group mealplans by date
+  m = new Map()
+  mealplans.forEach(mp => {
+    if (!m.has(mp.date)) {
+      m.set(mp.date, [])
+    }
+
+    m.set(mp.date, [...m.get(mp.date), mp])
+  })
+
+  let rows = [...m].sort().map(([_, mps]) => MealCardRow(mps))
+
   container.append(
-    ...mealplans.map(MealCard).flat()
+    ...rows
   )
 
   return container

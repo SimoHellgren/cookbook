@@ -756,35 +756,62 @@ const ShoppingList = () => {
 }
 
 const MealplansToShoppinglist = (mealplans) => {
-  let list = mealplans.map(meal => {
-    let li = document.createElement("li")
-    let recipe = state.recipes.find(r => r.id === meal.recipe_id)
-    if (!recipe) return
+  let ingredientlist = mealplans
+    .filter(mp => mp.recipe_id)  
+    .flatMap(meal => {
+      const recipe = state.recipes.find(r => r.id === meal.recipe_id)
+      const ingredients = state.recipe_ingredients.filter(ri => ri.recipe_id === recipe.id)
+      const scale = meal.servings / recipe.servings
 
-    let ingredients = state.recipe_ingredients.filter(i => i.recipe_id === recipe.id)
+      const scaled_ingredients = ingredients.map(ing => ({
+        ...ing,
+        quantity: ing.quantity * scale
+      }))
 
-    const scale = meal.servings / recipe.servings
-    const scaled_ingredients = ingredients.map(ing => ({
-      ...ing, quantity: ing.quantity * scale
-    }))
-
-    li.textContent = `${recipe.name} (${meal.name} ${meal.date}, ${meal.servings} servings)`
-    
-    let ul = document.createElement("ul")
-
-    scaled_ingredients.forEach(ing => {
-      let li = document.createElement("li")
-      let text = `${ing.ingredient.name} ${ing.quantity}${ing.measure}`
-      if (ing.optional) {text = `(${text})`}
-      li.textContent = text
-      ul.appendChild(li)
-    })
-
-    li.appendChild(ul)
-    return li
+      return scaled_ingredients.map(ingredient => ({
+        meal,
+        recipe,
+        ingredient,
+      }))
   })
 
-  return list
+  let gb = new Map()
+  ingredientlist.forEach(row => {
+    let key = row.ingredient.ingredient.name + "_" + row.ingredient.measure
+
+    if (!gb.has(key)) {
+      gb.set(key, [])
+    }
+
+    gb.set(key, [...gb.get(key), row])
+  })
+
+  let entries = [...gb]
+    .sort() // sort by keys (default behavior)
+    .map(([key, items]) => {
+      let [name, measure] = key.split("_")
+      let total = items.reduce((r,e) => r+e.ingredient.quantity, 0)
+
+      let details = D.createElement("details")
+      let summary = D.createElement("summary")
+      summary.textContent = `${name} - ${total} ${measure}`
+
+      let detailrows = items.map(i => {
+        let p = D.createElement("p")
+        p.textContent = `${i.meal.date} ${i.meal.name}: ${i.recipe.name} \
+        ${i.ingredient.quantity} ${i.ingredient.measure}`
+        return p
+      })
+      
+      details.append(
+        summary,
+        ...detailrows
+      )
+      return details
+    })
+
+  return entries
+  
 }
 
 const IngredientList = (ingredients) => {
@@ -986,7 +1013,7 @@ const MealplanPage = () => {
   save.onclick = () => {
     let container = D.querySelector(".mealplan-container")
 
-    container.childNodes.forEach(card => {
+    container.querySelectorAll(".mealcard").forEach(card => {
       let plan_id = parseInt(card.getAttribute("id"))
       let recipe_id = parseInt(card.getElementsByTagName("select").item(0).value)
       let mp_state = card.getElementsByTagName("select").item(1).value

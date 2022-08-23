@@ -10,6 +10,7 @@ class MealplanBase(BaseModel):
     name: str
     servings: Decimal
     state: MealplanState = MealplanState.open
+    position: int
 
 
 class MealplanCreate(MealplanBase):

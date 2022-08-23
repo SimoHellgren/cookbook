@@ -10,6 +10,7 @@ def test_create(test_db: Session) -> None:
         date="2022-01-01",
         name="lunch",
         servings=2.0,
+        position=1,
     )
 
     db_obj = mealplan.create(db=test_db, obj_in=obj_in)
@@ -18,6 +19,7 @@ def test_create(test_db: Session) -> None:
     assert db_obj.id
     assert db_obj.date == date(2022, 1, 1)
     assert db_obj.name == "lunch"
+    assert db_obj.position == 1
     assert db_obj.recipe_id is None
 
 
@@ -26,6 +28,7 @@ def test_get(test_db: Session) -> None:
         date="2022-01-01",
         name="lunch",
         servings=2.0,
+        position=1,
     )
 
     db_obj = mealplan.create(db=test_db, obj_in=obj_in)
@@ -39,6 +42,7 @@ def test_get(test_db: Session) -> None:
     assert get_obj.name == db_obj.name
     assert get_obj.date == db_obj.date
     assert get_obj.servings == db_obj.servings
+    assert get_obj.position == db_obj.position
 
 
 def test_get_nonexistent(test_db: Session) -> None:
@@ -53,6 +57,7 @@ def test_get_many(test_db: Session) -> None:
         date="2022-01-01",
         name="lunch",
         servings=2.0,
+        position=1,
     )
 
     obj_in_2 = MealplanCreate(
@@ -60,6 +65,7 @@ def test_get_many(test_db: Session) -> None:
         date="2022-01-01",
         name="dinner",
         servings=2.0,
+        position=2,
     )
 
     db_obj_1 = mealplan.create(db=test_db, obj_in=obj_in_1)
@@ -80,6 +86,7 @@ def test_delete(test_db: Session) -> None:
         date="2022-01-01",
         name="lunch",
         servings=2.0,
+        position=1,
     )
 
     db_obj = mealplan.create(db=test_db, obj_in=obj_in)
@@ -107,6 +114,7 @@ def test_update(test_db: Session) -> None:
         date="2022-01-01",
         name="lunch",
         servings=2.0,
+        position=1,
     )
 
     db_mealplan = mealplan.create(db=test_db, obj_in=mealplan_in)
@@ -118,6 +126,7 @@ def test_update(test_db: Session) -> None:
         date="2022-02-02",
         name="second lunch",
         servings=3.0,
+        position=1,
     )
 
     mealplan_updated = mealplan.update(

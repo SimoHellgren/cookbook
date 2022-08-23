@@ -69,6 +69,7 @@ def create_random_mealplan(db: Session, recipe_id: Optional[int] = None):
         name=random_string(),
         servings=random_decimal(),
         recipe_id=recipe_id,
+        position=1,
     )
 
     db.add(mealplan)

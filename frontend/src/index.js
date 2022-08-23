@@ -303,10 +303,12 @@ const MealCard = (mealplan) => {
 const MealCardRow = (mealplans) => {
   let div = D.createElement("div")
   div.className = "mealcard-row"
-  mealplans.forEach(mp => {
-    let [card, dialog] = MealCard(mp)
-    div.append(card, dialog)
-  })
+  mealplans
+    .sort((a,b) => a.position - b.position)
+    .forEach(mp => {
+      let [card, dialog] = MealCard(mp)
+      div.append(card, dialog)
+    })
 
   return div
 }

@@ -303,6 +303,13 @@ const MealCard = (mealplan) => {
 const MealCardRow = (mealplans) => {
   let div = D.createElement("div")
   div.className = "mealcard-row"
+
+  const date = mealplans[0].date
+  const weekday = new Date(Date.parse(date)).toLocaleString('en-Us', {weekday: "long"})
+
+  div.append(`${date} (${weekday})`)
+
+
   mealplans
     .sort((a,b) => a.position - b.position)
     .forEach(mp => {

@@ -410,11 +410,12 @@ const CreateMealpanForm = () => {
     
     let dates = daterange(sd, ed).map(d => d.toISOString().slice(0,10))
 
-    let plans = dates.map(date => meals.map(([name, servings]) => (
+    let plans = dates.map(date => meals.map(([name, servings], position) => (
       {
         date,
         name,
         servings,
+        position: position+1, 
       }  
     ))).flat()
     

@@ -343,7 +343,7 @@ const MealplanFilter = () => {
   let [end_label, end] = Input({id: "end_date", type: "date"}, "End date")
   
   let [done_label, donecheckbox] = Input({id: "done-chechbox", type: "checkbox"}, "Hide done")
-  donecheckbox.checked = false
+  donecheckbox.checked = true
 
   //eventhandlers for changes
   const callback = () => {
@@ -1099,7 +1099,7 @@ const MealplanPage = () => {
     shoppinglistbutton,
     shoppinglist_modal,
     shoppinglist_overlay,
-    Mealplan(state.mealplans),
+    Mealplan(state.mealplans.filter(mp => mp.state !== "done")),
     save,
   ]
 }

@@ -104,6 +104,10 @@ nav li {
     width: fit-content;
 }
 
+.tag.selected {
+    background-color: var(--primary-dark);
+}
+
 .tag-grid {
     padding-top: 1rem;
     margin-left: 1rem;

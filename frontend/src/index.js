@@ -300,12 +300,45 @@ const MealCard = (mealplan) => {
   return [card, deletedialog]
 }
 
+const MealCardRow = (mealplans) => {
+  let div = D.createElement("div")
+  div.className = "mealcard-row"
+
+  const date = mealplans[0].date
+  const weekday = new Date(Date.parse(date)).toLocaleString('en-Us', {weekday: "long"})
+
+  div.append(`${date} (${weekday})`)
+
+
+  mealplans
+    .sort((a,b) => a.position - b.position)
+    .forEach(mp => {
+      let [card, dialog] = MealCard(mp)
+      div.append(card, dialog)
+    })
+
+  return div
+}
+
+
 const Mealplan = (mealplans) => {
   let container = D.createElement("div")
   container.className = "mealplan-container"
   
+  // group mealplans by date
+  m = new Map()
+  mealplans.forEach(mp => {
+    if (!m.has(mp.date)) {
+      m.set(mp.date, [])
+    }
+
+    m.set(mp.date, [...m.get(mp.date), mp])
+  })
+
+  let rows = [...m].sort().map(([_, mps]) => MealCardRow(mps))
+
   container.append(
-    ...mealplans.map(MealCard).flat()
+    ...rows
   )
 
   return container
@@ -317,7 +350,7 @@ const MealplanFilter = () => {
   let [end_label, end] = Input({id: "end_date", type: "date"}, "End date")
   
   let [done_label, donecheckbox] = Input({id: "done-chechbox", type: "checkbox"}, "Hide done")
-  donecheckbox.checked = false
+  donecheckbox.checked = true
 
   //eventhandlers for changes
   const callback = () => {
@@ -384,11 +417,12 @@ const CreateMealpanForm = () => {
     
     let dates = daterange(sd, ed).map(d => d.toISOString().slice(0,10))
 
-    let plans = dates.map(date => meals.map(([name, servings]) => (
+    let plans = dates.map(date => meals.map(([name, servings], position) => (
       {
         date,
         name,
         servings,
+        position: position + 1 + state.mealplans.filter(mp => mp.date === date).length, 
       }  
     ))).flat()
     
@@ -1072,7 +1106,7 @@ const MealplanPage = () => {
     shoppinglistbutton,
     shoppinglist_modal,
     shoppinglist_overlay,
-    Mealplan(state.mealplans),
+    Mealplan(state.mealplans.filter(mp => mp.state !== "done")),
     save,
   ]
 }

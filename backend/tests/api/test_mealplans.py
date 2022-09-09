@@ -48,6 +48,7 @@ def test_create(client):
         "date": "2022-01-02",
         "name": "lunch",
         "servings": 2.0,
+        "position": 1,
     }
 
     res = client.post("/mealplans/", json=data_in)
@@ -74,6 +75,7 @@ def test_update(test_db, client):
         "servings": 10,
         "name": "new name who dis?",
         "recipe_id": db_recipe.id,
+        "position": 2,
     }
 
     res = client.put(f"/mealplans/{db_mp.id}", json=data_in)
@@ -87,6 +89,7 @@ def test_update(test_db, client):
     assert api_data["servings"] == data_in["servings"]
     assert api_data["name"] == data_in["name"]
     assert api_data["recipe_id"] == data_in["recipe_id"]
+    assert api_data["position"] == data_in["position"]
 
 
 def test_update_nonexistent(client):
@@ -96,6 +99,7 @@ def test_update_nonexistent(client):
         "servings": 10,
         "name": "new name who dis?",
         "recipe_id": 0,
+        "position": 1,
     }
 
     res = client.put("/mealplans/1", json=data_in)

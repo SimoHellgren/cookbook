@@ -161,22 +161,24 @@ const TagGrid = (tags) => {
   let taggrid = D.createElement("div")
   taggrid.className = "tag-grid"
 
-  let elements = tags.map(tag => {
-    let elem = D.createElement("div")
-    elem.className = "tag"
-    elem.textContent = tag
+  let elements = tags
+    .sort()
+    .map(tag => {
+      let elem = D.createElement("div")
+      elem.className = "tag"
+      elem.textContent = tag
 
-    elem.onclick = (ev) => {
-      ev.stopPropagation()
-      // find the tag in then sidebar and select that
-      let tags = [...D.querySelectorAll(".sidebar .tag")]
-      let target = tags.filter(t => t.textContent === tag)[0]
-      target.classList.toggle("selected")
-      renderRecipeGrid();
-    }
+      elem.onclick = (ev) => {
+        ev.stopPropagation()
+        // find the tag in then sidebar and select that
+        let tags = [...D.querySelectorAll(".sidebar .tag")]
+        let target = tags.filter(t => t.textContent === tag)[0]
+        target.classList.toggle("selected")
+        renderRecipeGrid();
+      }
 
-    return elem
-  })
+      return elem
+    })
 
   taggrid.append(...elements)
 

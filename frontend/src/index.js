@@ -422,7 +422,7 @@ const CreateMealpanForm = () => {
         date,
         name,
         servings,
-        position: position+1, 
+        position: position + 1 + state.mealplans.filter(mp => mp.date === date).length, 
       }  
     ))).flat()
     

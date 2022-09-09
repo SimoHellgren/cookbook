@@ -26,5 +26,5 @@ class Mealplan(Base):
     recipe: Recipe = relationship(Recipe, back_populates="mealplans", uselist=False)
 
     __table_args__ = (
-        UniqueConstraint("id", "position", name="mealplan_position_unique"),
+        UniqueConstraint("date", "position", name="mealplan_position_unique"),
     )

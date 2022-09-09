@@ -168,7 +168,10 @@ const TagGrid = (tags) => {
 
     elem.onclick = (ev) => {
       ev.stopPropagation()
-      elem.classList.toggle("selected")
+      // find the tag in then sidebar and select that
+      let tags = [...D.querySelectorAll(".sidebar .tag")]
+      let target = tags.filter(t => t.textContent === tag)[0]
+      target.classList.toggle("selected")
       renderRecipeGrid();
     }
 

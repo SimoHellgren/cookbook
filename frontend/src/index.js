@@ -137,22 +137,48 @@ const Navbar = () => {
   $body.replaceChild(nav, $body.querySelector("nav"))
 }
 
+
+const renderRecipeGrid = () => {
+  let $grid = D.querySelector(".recipe-grid")
+  let tags = [...D.querySelectorAll(".tag.selected")].map(t => t.textContent)
+  let search = D.getElementById("recipesearch")
+
+  let data = state.recipes
+    .filter(r => {
+      // all selected tags must be found on recipe
+      for (tag of tags) {
+        if (!r.tags.split(",").includes(tag)) return false
+      }
+      return true
+    })
+    .filter(r => r.name.toLowerCase().includes(search.value.toLowerCase()))
+
+  $grid.replaceWith(RecipeGrid(data))
+}
+
+
 const TagGrid = (tags) => {
   let taggrid = D.createElement("div")
   taggrid.className = "tag-grid"
 
-  let elements = tags.map(tag => {
-    let elem = D.createElement("div")
-    elem.className = "tag"
-    elem.textContent = tag
+  let elements = tags
+    .sort()
+    .map(tag => {
+      let elem = D.createElement("div")
+      elem.className = "tag"
+      elem.textContent = tag
 
-    elem.onclick = (ev) => {
-      ev.stopPropagation()
-      alert("You clicked on tag " + tag)
-    }
+      elem.onclick = (ev) => {
+        ev.stopPropagation()
+        // find the tag in then sidebar and select that
+        let tags = [...D.querySelectorAll(".sidebar .tag")]
+        let target = tags.filter(t => t.textContent === tag)[0]
+        target.classList.toggle("selected")
+        renderRecipeGrid();
+      }
 
-    return elem
-  })
+      return elem
+    })
 
   taggrid.append(...elements)
 
@@ -198,6 +224,7 @@ const RecipeSearch = () => {
     let form = document.createElement("form")
     
     let input = D.createElement("input")
+    input.id = "recipesearch"
     input.placeholder = "Search by name"
     
     let submit = D.createElement("input")
@@ -208,11 +235,7 @@ const RecipeSearch = () => {
 
     form.onsubmit = (ev) => {
       ev.preventDefault()
-
-      let data = state.recipes.filter(r => r.name.toLowerCase().includes(input.value.toLowerCase()))
-      let $grid = D.querySelector(".recipe-grid")
-
-      $grid.replaceWith(RecipeGrid(data))
+      renderRecipeGrid()
     }
 
     let alltags = new Set(state.recipes.map(r => r.tags.split(",")).flat().filter(e => e !== ""))

@@ -13,6 +13,7 @@ class Recipe(Base):
     servings = Column(Numeric)
     method = Column(String)
     tags = Column(String)
+    source = Column(String)
 
     ingredients: List["RecipeIngredient"] = relationship(
         "RecipeIngredient", back_populates="recipe", uselist=True

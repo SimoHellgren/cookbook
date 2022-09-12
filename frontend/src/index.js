@@ -508,82 +508,6 @@ const ModalOverlay = (id, title, content) => {
   return [modal, overlay, closefunc]
 }
 
-const AddRecipe = () => {
-  form = RecipeForm()
-  const name = form.querySelector("#name")
-  const servings = form.querySelector("#servings")
-  const tags = form.querySelector("#tags")
-  const method = form.querySelector("#method")
-  const tablebody = form.querySelector("tbody")
-  
-  let [modal, overlay, closefunc] = ModalOverlay("add-recipe-modal", "Add Recipe", form)
-  form.onsubmit = async (ev) => {
-    ev.preventDefault()
-    ev.stopImmediatePropagation()
-
-    //prepare recipe
-    const recipe_data = {
-      name: name.value,
-      servings: servings.value,
-      tags: tags.value,
-      method: method.value,
-    }
-
-    //prepare ingredients
-    let rows = [...tablebody.children]
-    let recipeingredients = rows.map((row, i) => {
-      [ingredient, quantity, measure, optional] = row.querySelectorAll("input")
-      
-      return {
-        ingredient: ingredient.value,
-        quantity: quantity.value,
-        measure: measure.value,
-        optional: optional.checked,
-        position: i+1, // +1 to index from 1
-      }
-    })
-
-    //alert if recipe already exists
-    if (state.recipes.find(r => r.name === recipe_data.name)) alert(`Recipe with name "${recipe_data.name}" already exists`)
-
-    //missing ingredients
-    const missing = recipeingredients.filter(ri => !state.ingredients.map(i => i.name).includes(ri.ingredient)).map(x => ({name: x.ingredient}))
-    
-    
-    //create recipe and missing ingredients
-    const [recipe, _] = await Promise.all([
-      api.recipes.post(recipe_data),
-      Promise.all(missing.map(api.ingredients.post)).then(res => state.ingredients = state.ingredients.concat(...res))
-    ])
-
-    //create recipe ingredients
-    const ri_data = recipeingredients.map(ri => {
-      return {
-        recipe_id: recipe.id,
-        ingredient_id: state.ingredients.find(i => i.name === ri.ingredient).id,
-        quantity: ri.quantity,
-        measure: ri.measure,
-        optional: ri.optional,
-        position: ri.position,
-      }
-    })
-
-    ri_data.forEach(ri => api.recipes.ingredients.add(ri.recipe_id, ri))
-
-    //reset the form
-    form.reset()
-    tablebody.innerHTML = ""
-
-    //update state and re-render grid
-    state.recipes = state.recipes.concat(recipe)
-    let container = D.querySelector(".recipe-grid")
-    container.replaceWith(RecipeGrid(state.recipes))
-  }
-  form.addEventListener("submit", closefunc)
-
-  return [modal, overlay]
-}
-
 const TableRow = (data, header) => {
   tag = header ? "th" : "td"
 
@@ -605,6 +529,7 @@ const RecipeForm = () => {
   let name = Input({id: "name"}, "Recipe name")
   let servings = Input({type: "number", id: "servings"}, "Servings")
   let tags = Input({id: "tags"}, "Tags")
+  let source = Input({id: "source"}, "Source")
 
   let method = D.createElement("textarea")
   method.id = "method"
@@ -675,6 +600,7 @@ const RecipeForm = () => {
     ...name,
     ...servings,
     ...tags,
+    ...source,
     methodlabel,
     method,
     table,
@@ -686,12 +612,100 @@ const RecipeForm = () => {
   return form
 }
 
+const ParseFormData = (form) => {
+  // gets the recipe, ingredients and recipe ingredients from a form
+  const name = form.querySelector("#name").value
+  const servings = form.querySelector("#servings").value
+  const tags = form.querySelector("#tags").value
+  const source = form.querySelector("#source").value
+  const method = form.querySelector("#method").value
+  const rows = [...form.querySelector("tbody").children]
+
+  const recipe = {
+    name,
+    servings,
+    tags,
+    source,
+    method,
+  }
+
+  const recipeingredients = rows.map((row, i) => {
+    let [ingredient, quantity, measure, optional] = row.querySelectorAll("input")
+    
+    return {
+      ingredient: ingredient.value,
+      quantity: quantity.value,
+      measure: measure.value,
+      optional: optional.checked,
+      position: i+1, // +1 to index from 1
+    }
+  })
+
+  const ingredients = recipeingredients.map(ri => ({name: ri.ingredient}))
+
+  return {
+    recipe,
+    ingredients,
+    recipeingredients,
+  }
+}
+
+const AddRecipe = () => {
+  form = RecipeForm()
+  
+  let [modal, overlay, closefunc] = ModalOverlay("add-recipe-modal", "Add Recipe", form)
+  
+  form.onsubmit = async (ev) => {
+    ev.preventDefault()
+    ev.stopImmediatePropagation()
+
+    const {recipe: recipe_data, ingredients, recipeingredients} = ParseFormData(form)
+
+    //alert if recipe already exists
+    if (state.recipes.find(r => r.name === recipe_data.name)) alert(`Recipe with name "${recipe_data.name}" already exists`)
+
+    //missing ingredients
+    const missing = ingredients.filter(a => !state.ingredients.map(b => b.name).includes(a.name))
+
+    //create recipe and missing ingredients
+    const [recipe, _] = await Promise.all([
+      api.recipes.post(recipe_data),
+      Promise.all(missing.map(api.ingredients.post)).then(res => state.ingredients = state.ingredients.concat(...res))
+    ])
+
+    //create recipe ingredients
+    const ri_data = recipeingredients.map(ri => {
+      const {ingredient: name, ...rest} = ri 
+      return {
+        recipe_id: recipe.id,
+        ingredient_id: state.ingredients.find(i => i.name === name).id,
+        ...rest,
+      }
+    })
+
+    ri_data.forEach(ri => api.recipes.ingredients.add(ri.recipe_id, ri))
+
+    //reset the form
+    form.reset()
+    form.querySelector("tbody").innerHTML = ""
+
+    //update state and re-render grid
+    state.recipes = state.recipes.concat(recipe)
+    let container = D.querySelector(".recipe-grid")
+    container.replaceWith(RecipeGrid(state.recipes))
+  }
+  form.addEventListener("submit", closefunc)
+
+  return [modal, overlay]
+}
+
 const EditRecipe = (recipe) => {
   let form = RecipeForm()
   
   let name = form.querySelector("#name")
   let servings = form.querySelector("#servings")
   let tags = form.querySelector("#tags")
+  let source = form.querySelector("#source")
   let method = form.querySelector("#method")
 
   let addrowbutton = form.querySelector("#add-row-button")
@@ -700,15 +714,16 @@ const EditRecipe = (recipe) => {
   servings.value = recipe.servings
   tags.value = recipe.tags
   method.value = recipe.method
+  source.value = recipe.source
 
-  let ingredients = state.recipe_ingredients.filter(ri => ri.recipe_id == recipe.id)
+  let state_ingredients = state.recipe_ingredients.filter(ri => ri.recipe_id == recipe.id)
   
   //add ingredient rows - not pretty but shall do
-  ingredients.slice(1).forEach(ri => addrowbutton.dispatchEvent(new Event("click")))
+  state_ingredients.slice(1).forEach(ri => addrowbutton.dispatchEvent(new Event("click")))
 
   let tablerows = [...form.querySelector("tbody").children]
 
-  ingredients.map((ing, i) => {
+  state_ingredients.map((ing, i) => {
     let [name, quantity, measure, optional] = tablerows[i].querySelectorAll("input")
     name.value = ing.ingredient.name
     quantity.value = ing.quantity
@@ -720,41 +735,19 @@ const EditRecipe = (recipe) => {
     ev.preventDefault()
     ev.stopImmediatePropagation()
 
-    //prepare recipe
-    const recipe_data = {
-      id: recipe.id,
-      name: name.value,
-      servings: servings.value,
-      tags: tags.value,
-      method: method.value,
-    }
+    const {recipe: recipe_data, ingredients, recipeingredients} = ParseFormData(form)
 
-    //prepare ingredients
-    //refresh data
-    let rows = [...form.querySelector("tbody").children]
-    let recipeingredients = rows.map((row, i) => {
-      let [ingredient, quantity, measure, optional] = row.querySelectorAll("input")
-      
-      return {
-        ingredient: ingredient.value,
-        quantity: quantity.value,
-        measure: measure.value,
-        optional: optional.checked,
-        position: i+1, // +1 to index from 1
-      }
-    })
+    //PUT recipe
+    api.recipes.put(recipe.id, {id: recipe.id, ...recipe_data})
 
-    //prepare missing ingredients
-    let missing_ingredients = recipeingredients
-      .filter(ri => 
-        !state.ingredients.map(ing => ing.name).includes(ri.ingredient)
-      )
+    //missing ingredients
+    const missing = ingredients.filter(a => !state.ingredients.map(b => b.name).includes(a.name))
 
     //split RIs to existing (PUT), new (POST) and deleted (DELETE)
-    let current_ing_names = ingredients.map(i => i.ingredient.name)
+    let current_ing_names = state_ingredients.map(i => i.ingredient.name)
     let put_ris = recipeingredients.filter(ri => current_ing_names.includes(ri.ingredient))
     let post_ris = recipeingredients.filter(ri => !current_ing_names.includes(ri.ingredient))
-    let delete_ris = ingredients.filter(ri => 
+    let delete_ris = state_ingredients.filter(ri => 
       !recipeingredients.map(i => i.ingredient).includes(ri.ingredient.name)
     )
 
@@ -771,34 +764,28 @@ const EditRecipe = (recipe) => {
         }))
     )
     //create missing ingredients, then POST new RIs
-    Promise.all(missing_ingredients.map(i => {
-      api.ingredients.post({name: i.ingredient})
-    }))
-    .then(data => state.ingredients = state.ingredients.concat(data))
-    .then(
-      // delete disappeared recipe ingredients
-      // done before posting to avoid conflicts with position
-      delete_ris.forEach(ri => {
-        let ingredient_id = state.ingredients.find(i => i.name === ri.ingredient.name).id
-        api.recipe_ingredients.delete(recipe.id, ingredient_id)
-        .then(data => state.recipe_ingredients = state.recipe_ingredients.filter(
-          i => (i.recipe_id !== data.recipe_id && i.ingredient_id !== data.ingredient_id)))
-      })
-    )
-    .then(
-      post_ris.map(ri => ({
-        recipe_id: recipe.id,
-        ingredient_id: state.ingredients.find(i => i.name === ri.ingredient).id,
-        quantity: ri.quantity,
-        measure: ri.measure,
-        optional: ri.optional,
-        position: ri.position,
-      })).forEach(ri => api.recipes.ingredients.add(recipe.id, ri))
-    )
-    // TODO
-    //PUT recipe
-    api.recipes.put(recipe.id, recipe_data)
-
+    Promise.all(missing.map(api.ingredients.post))
+      .then(data => state.ingredients = state.ingredients.concat(data))
+      .then( () => 
+        // delete disappeared recipe ingredients
+        // done before posting to avoid conflicts with position
+        delete_ris.forEach(ri => {
+          let ingredient_id = state.ingredients.find(i => i.name === ri.ingredient.name).id
+          api.recipe_ingredients.delete(recipe.id, ingredient_id)
+          .then(data => state.recipe_ingredients = state.recipe_ingredients.filter(
+            i => (i.recipe_id !== data.recipe_id && i.ingredient_id !== data.ingredient_id)))
+        })
+      )
+      .then( () => 
+        post_ris.map(ri => ({
+          recipe_id: recipe.id,
+          ingredient_id: state.ingredients.find(i => i.name === ri.ingredient).id,
+          quantity: ri.quantity,
+          measure: ri.measure,
+          optional: ri.optional,
+          position: ri.position,
+        })).forEach(ri => api.recipes.ingredients.add(recipe.id, ri))
+      )
   }
 
   let [modal, overlay, closefunc] = ModalOverlay("edit-recipe-modal", "Edit Recipe: " + recipe.name, form)
@@ -933,7 +920,23 @@ const RecipeView = (recipe) => {
 
   scale_div.append(scale_input, scale_label)
 
-  header.append(title, scale_div)
+  let source = D.createElement("div")
+  source.append("Source: ")
+  if (recipe.source && recipe.source.includes("http")) {
+    let link = D.createElement("a")
+    link.setAttribute("href", recipe.source)
+    link.textContent = recipe.source
+    link.onclick = (ev) => {
+      ev.preventDefault()
+      window.open(recipe.source)
+    }
+    source.append(link)
+  } else {
+    source.append(recipe.source)
+  }
+  
+
+  header.append(title, scale_div, source)
 
   let [edit_modal, edit_overlay] = EditRecipe(recipe)
 

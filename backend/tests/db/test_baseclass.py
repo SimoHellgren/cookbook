@@ -18,6 +18,7 @@ def test_as_dict() -> None:
         "servings": 2.0,
         "method": "Do the thing with the ingredients",
         "tags": "japan,食べ物",
+        "source": None,
     }
 
     assert d == expected_result

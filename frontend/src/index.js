@@ -508,11 +508,13 @@ const ModalOverlay = (id, title, content) => {
   return [modal, overlay, closefunc]
 }
 
+
 const AddRecipe = () => {
   form = RecipeForm()
   const name = form.querySelector("#name")
   const servings = form.querySelector("#servings")
   const tags = form.querySelector("#tags")
+  const source = form.querySelector("#source")
   const method = form.querySelector("#method")
   const tablebody = form.querySelector("tbody")
   
@@ -527,6 +529,7 @@ const AddRecipe = () => {
       servings: servings.value,
       tags: tags.value,
       method: method.value,
+      source: source.value,
     }
 
     //prepare ingredients
@@ -605,6 +608,7 @@ const RecipeForm = () => {
   let name = Input({id: "name"}, "Recipe name")
   let servings = Input({type: "number", id: "servings"}, "Servings")
   let tags = Input({id: "tags"}, "Tags")
+  let source = Input({id: "source"}, "Source")
 
   let method = D.createElement("textarea")
   method.id = "method"
@@ -675,6 +679,7 @@ const RecipeForm = () => {
     ...name,
     ...servings,
     ...tags,
+    ...source,
     methodlabel,
     method,
     table,
@@ -692,6 +697,7 @@ const EditRecipe = (recipe) => {
   let name = form.querySelector("#name")
   let servings = form.querySelector("#servings")
   let tags = form.querySelector("#tags")
+  let source = form.querySelector("#source")
   let method = form.querySelector("#method")
 
   let addrowbutton = form.querySelector("#add-row-button")
@@ -700,6 +706,7 @@ const EditRecipe = (recipe) => {
   servings.value = recipe.servings
   tags.value = recipe.tags
   method.value = recipe.method
+  source.value = recipe.source
 
   let ingredients = state.recipe_ingredients.filter(ri => ri.recipe_id == recipe.id)
   
@@ -727,6 +734,7 @@ const EditRecipe = (recipe) => {
       servings: servings.value,
       tags: tags.value,
       method: method.value,
+      source: source.value,
     }
 
     //prepare ingredients

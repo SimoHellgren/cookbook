@@ -941,7 +941,23 @@ const RecipeView = (recipe) => {
 
   scale_div.append(scale_input, scale_label)
 
-  header.append(title, scale_div)
+  let source = D.createElement("div")
+  source.append("Source: ")
+  if (recipe.source && recipe.source.includes("http")) {
+    let link = D.createElement("a")
+    link.setAttribute("href", recipe.source)
+    link.textContent = recipe.source
+    link.onclick = (ev) => {
+      ev.preventDefault()
+      window.open(recipe.source)
+    }
+    source.append(link)
+  } else {
+    source.append(recipe.source)
+  }
+  
+
+  header.append(title, scale_div, source)
 
   let [edit_modal, edit_overlay] = EditRecipe(recipe)
 

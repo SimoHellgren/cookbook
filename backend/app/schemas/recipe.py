@@ -1,4 +1,5 @@
 from decimal import Decimal
+from typing import Optional
 from pydantic import BaseModel
 
 
@@ -7,6 +8,7 @@ class RecipeBase(BaseModel):
     servings: Decimal
     method: str
     tags: str
+    source: Optional[str] = None
 
 
 class RecipeCreate(RecipeBase):

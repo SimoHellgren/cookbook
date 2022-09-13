@@ -1,7 +1,8 @@
-from typing import Any, List
+from typing import Any
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends, HTTPException, status
 from backend.app import crud
+from backend.app.schemas.comment import Comment
 from backend.app.schemas.recipe import Recipe, RecipeCreate, RecipeUpdate
 from backend.app.dependencies import get_db
 from backend.app.schemas.recipe_ingredient import (
@@ -12,7 +13,7 @@ from backend.app.schemas.recipe_ingredient import (
 router = APIRouter(prefix="/recipes")
 
 
-@router.get("/", response_model=List[Recipe])
+@router.get("/", response_model=list[Recipe])
 def get_many(db: Session = Depends(get_db)) -> Any:
     return crud.recipe.get_many(db=db)
 
@@ -47,7 +48,7 @@ def delete(recipe_id: int, db: Session = Depends(get_db)) -> Any:
     return crud.recipe.remove(db, recipe_id)
 
 
-@router.get("/{recipe_id}/ingredients", response_model=List[RecipeIngredient])
+@router.get("/{recipe_id}/ingredients", response_model=list[RecipeIngredient])
 def get_ingredients(recipe_id: int, db: Session = Depends(get_db)) -> Any:
     return crud.recipe.get_ingredients(db, recipe_id)
 
@@ -71,3 +72,8 @@ def add_ingredient(
         recipe_ingredient.optional,
         recipe_ingredient.position,
     )
+
+
+@router.get("/{recipe_id}/comments", response_model=list[Comment])
+def get_comments(recipe_id: int, db: Session = Depends(get_db)) -> Any:
+    return crud.recipe.get_comments(db, recipe_id)

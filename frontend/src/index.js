@@ -84,7 +84,8 @@ let api = (function() {
           }
         ),
       },
-      mealplans: endpoint("/mealplans")
+      mealplans: endpoint("/mealplans"),
+      comments: endpoint("/comments"),
   }
   
 })()
@@ -1058,13 +1059,30 @@ const RecipesPage = () => {
   ]
 }
 
+const CommentSection = (comments) => {
+  let container = D.createElement("div")
+  container.className = "comments-container"
+  
+  comments.forEach(c => {
+    let comment = D.createElement("div")
+    comment.className = "comment"
+    comment.textContent = c.comment
+    
+    container.append(comment)
+  })
+
+  return container
+} 
+
 const RecipePage = () => {
   let recipe = state.recipes.find(r => r.id === state.selected_recipe)
   let ingredients = state.recipe_ingredients.filter(i => i.recipe_id === state.selected_recipe)
+  let comments = state.comments.filter(i => i.recipe_id === state.selected_recipe)
 
   return [
     IngredientList(ingredients),
     RecipeView(recipe),
+    CommentSection(comments),
   ]
 } 
 
@@ -1164,3 +1182,6 @@ api.recipe_ingredients.get()
 
 api.mealplans.get()
   .then(data => state.mealplans = data.sort((a,b) => b.date > a.date ? -1 : 1))
+
+api.comments.get()
+  .then(data => state.comments = data)

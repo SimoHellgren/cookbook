@@ -123,6 +123,17 @@ nav li {
     margin: 0;
 }
 
+.comments-container {
+    margin-left: 16rem;
+    padding-left: 1rem;
+    background-color: var(--background-color)
+}
+
+.comment {
+    background-color: var(--surface-color);
+    box-shadow: var(--surface-shadow);
+}
+
 .recipe-container {
     margin-left: 16rem;
     padding-left: 1rem;

@@ -1012,21 +1012,23 @@ const RecipeView = (recipe) => {
   method.className = "recipe-method"
   
   let ul = D.createElement("ul")
-  recipe.method.split("\n").forEach(line => {
-    let li = D.createElement("li")
-    
-    let [label, chechbox] = Input({type: "checkbox"}, line)
-    chechbox.onclick = () => {
-      label.classList.toggle("checked")
+  if (recipe.method) {
+    recipe.method.split("\n").forEach(line => {
+      let li = D.createElement("li")
+      
+      let [label, checkbox] = Input({type: "checkbox"}, line)
+      checkbox.onclick = () => {
+        label.classList.toggle("checked")
+      }
+  
+      li.append(
+        checkbox,
+        label
+      )
+      ul.appendChild(li)
     }
-
-    li.append(
-      chechbox,
-      label
     )
-    ul.appendChild(li)
   }
-  )
 
   method.appendChild(ul)
 

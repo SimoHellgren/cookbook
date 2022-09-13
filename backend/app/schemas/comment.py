@@ -5,7 +5,7 @@ from pydantic import BaseModel
 class CommentBase(BaseModel):
     id: int
     comment: str
-    recipe_id: id
+    recipe_id: int
     parent_id: Optional[int] = None
 
 

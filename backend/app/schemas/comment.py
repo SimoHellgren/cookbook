@@ -3,7 +3,6 @@ from pydantic import BaseModel
 
 
 class CommentBase(BaseModel):
-    id: int
     comment: str
     recipe_id: int
     parent_id: Optional[int] = None
@@ -14,11 +13,12 @@ class CommentCreate(CommentBase):
 
 
 class CommentUpdate(CommentBase):
-    pass
+    id: int
 
 
 class Comment(CommentBase):
     """For use as API response model"""
+    id: int
 
     class Config:
         orm_mode = True

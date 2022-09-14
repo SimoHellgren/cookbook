@@ -132,6 +132,7 @@ nav li {
 .comment {
     background-color: var(--surface-color);
     box-shadow: var(--surface-shadow);
+    margin-left: 1rem;
 }
 
 .recipe-container {

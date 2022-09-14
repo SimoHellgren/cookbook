@@ -1063,13 +1063,34 @@ const CommentSection = (comments) => {
   let container = D.createElement("div")
   container.className = "comments-container"
   
-  comments.forEach(c => {
-    let comment = D.createElement("div")
-    comment.className = "comment"
-    comment.textContent = c.comment
-    
-    container.append(comment)
+  // construct tree
+  lookup = new Map()
+  children = new Map([[0, []]]) // 0 as root
+
+  comments.sort((a,b) => a.id - b.id).forEach(c => {
+    lookup.set(c.id, c)
+
+    children.set(c.id, [])
+
+    let parent = c.parent_id || 0
+
+    children.set(parent, children.get(parent).concat(c.id))
+
   })
+
+  // gather comments depth first
+  const walk = (node, parent) => {
+    children.get(node).forEach(n => {
+      let div = D.createElement("div")
+      div.className = "comment"
+      div.textContent = lookup.get(n).comment
+      
+      parent.append(div)
+      walk(n, div)
+    })
+  }
+
+  walk(0, container)
 
   return container
 } 

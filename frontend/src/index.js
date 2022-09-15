@@ -1059,10 +1059,52 @@ const RecipesPage = () => {
   ]
 }
 
+const AddComentForm = () => {
+  let form = D.createElement("form")
+  let comment = D.createElement("textarea")
+  let [savebutton] = Input({"type": "submit", "value": "Save comment"})
+  savebutton.onclick = (ev) => {
+    ev.preventDefault()
+    const result = api.comments.post({
+      recipe_id: state.selected_recipe,
+      comment: comment.value
+    }).then(data => {state.comments = state.comments.concat(result)})
+  }
+
+  form.append(comment, savebutton)
+  return form
+}
+
+const Comment = (comment) => {
+  let div = D.createElement("div")
+  div.className = "comment"
+  div.textContent = comment.comment
+
+  return div
+}
+
 const CommentSection = (comments) => {
   let container = D.createElement("div")
   container.className = "comments-container"
+
+  let header = D.createElement("div")
+  header.className = "comments-header"
+  header.textContent = "Comments"
+
+  let body = D.createElement("div")
+  body.className = "comments-body"
   
+  let footer = D.createElement("div")
+  footer.className = "comments-footer"
+  
+  let [modal, overlay, closefunc] = ModalOverlay('create-comment-modal', "New comment", AddComentForm())
+  let [createbutton] = Input({'type': 'button', 'value': 'New comment'})
+  createbutton.onclick = () => modal.classList.add("active")
+
+  footer.append(createbutton, modal)
+
+  container.append(header, body, footer)
+
   // construct tree
   lookup = new Map()
   children = new Map([[0, []]]) // 0 as root
@@ -1081,16 +1123,14 @@ const CommentSection = (comments) => {
   // gather comments depth first
   const walk = (node, parent) => {
     children.get(node).forEach(n => {
-      let div = D.createElement("div")
-      div.className = "comment"
-      div.textContent = lookup.get(n).comment
-      
+      let div = Comment(lookup.get(n))
       parent.append(div)
+
       walk(n, div)
     })
   }
 
-  walk(0, container)
+  walk(0, body)
 
   return container
 } 

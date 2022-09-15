@@ -6,6 +6,7 @@ class CommentBase(BaseModel):
     comment: str
     recipe_id: int
     parent_id: Optional[int] = None
+    author: Optional[str]
 
 
 class CommentCreate(CommentBase):

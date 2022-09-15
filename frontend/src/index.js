@@ -1065,15 +1065,35 @@ const AddComentForm = (parent_id) => {
   let [savebutton] = Input({"type": "submit", "value": "Save comment"})
   savebutton.onclick = (ev) => {
     ev.preventDefault()
-    const result = api.comments.post({
+    api.comments.post({
       recipe_id: state.selected_recipe,
       comment: comment.value,
       parent_id: parent_id
-    }).then(data => {state.comments = state.comments.concat(result)})
+    }).then(data => {state.comments = state.comments.concat(data)})
   }
 
   form.append(comment, savebutton)
   return form
+}
+
+const EditCommentForm = (commentdata) => {
+  let form = D.createElement("form")
+  let comment = D.createElement("textarea")
+  let [savebutton] = Input({"type": "submit", "value": "Save comment"})
+
+  comment.value = commentdata.comment
+
+  savebutton.onclick = (ev) => {
+    ev.preventDefault()
+    api.comments.put(commentdata.id, {
+      ...commentdata,
+      comment: comment.value
+    })
+    .then(data => {state.comments = state.comments.concat(data)})
+  }
+
+  form.append(comment, savebutton)
+  return form 
 }
 
 const Comment = (comment) => {
@@ -1084,14 +1104,20 @@ const Comment = (comment) => {
   commenttext.className = "commenttext"
   commenttext.textContent = comment.comment
 
-  let [replybutton] = Input({"type": "button", "value": "Reply"})
-  let msg_preview = comment.comment.split(" ").slice(0,5).join(" ")
-  let [modal, ...rest] = ModalOverlay("reply-comment-modal", `Reply to "${msg_preview}..."`, AddComentForm(comment.id))
-  replybutton.onclick = () => {
-    modal.classList.add("active")
+  let [editbutton] = Input({"type": "button", "value": "Edit"})
+  let [editmodal, ] = ModalOverlay("edit-comment-modal", "Edit comment", EditCommentForm(comment))
+  editbutton.onclick = () => {
+    editmodal.classList.add("active")
   }
 
-  container.append(commenttext, modal, replybutton)
+  let [replybutton] = Input({"type": "button", "value": "Reply"})
+  let msg_preview = comment.comment.split(" ").slice(0,5).join(" ")
+  let [replymodal, ] = ModalOverlay("reply-comment-modal", `Reply to "${msg_preview}..."`, AddComentForm(comment.id))
+  replybutton.onclick = () => {
+    replymodal.classList.add("active")
+  }
+
+  container.append(commenttext, editbutton, editmodal, replymodal, replybutton)
   return container
 }
 

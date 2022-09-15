@@ -5,5 +5,6 @@ from backend.app.db.base_class import Base
 class Comment(Base):
     id = Column(Integer, primary_key=True)
     comment = Column(String, nullable=False)
+    author = Column(String)
     recipe_id = Column(Integer, ForeignKey("recipe.id"), nullable=False)
     parent_id = Column(Integer, ForeignKey("comment.id"))

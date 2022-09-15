@@ -129,10 +129,17 @@ nav li {
     background-color: var(--background-color)
 }
 
+.comments-header {
+    font-size: 16px;
+    font-weight: bold;
+}
+
 .comment {
     background-color: var(--surface-color);
     box-shadow: var(--surface-shadow);
+    margin-top: 1rem;
     margin-left: 1rem;
+    padding: 0.5rem;
 }
 
 .recipe-container {

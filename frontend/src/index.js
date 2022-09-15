@@ -1092,7 +1092,13 @@ const EditCommentForm = (commentdata) => {
     .then(data => {state.comments = state.comments.concat(data)})
   }
 
-  form.append(comment, savebutton)
+  let [deletebutton] = Input({"type": "button", "value": "DELETE"})
+  deletebutton.className = "delete-button"
+  deletebutton.onclick = () => {
+    api.comments.delete(commentdata.id)
+  }
+
+  form.append(comment, savebutton, deletebutton)
   return form 
 }
 

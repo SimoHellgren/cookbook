@@ -84,7 +84,8 @@ let api = (function() {
           }
         ),
       },
-      mealplans: endpoint("/mealplans")
+      mealplans: endpoint("/mealplans"),
+      comments: endpoint("/comments"),
   }
   
 })()
@@ -1058,13 +1059,146 @@ const RecipesPage = () => {
   ]
 }
 
+const AddComentForm = (parent_id) => {
+  let form = D.createElement("form")
+  let [author_label, author] = Input({type: "text"}, "Author")
+  let comment = D.createElement("textarea")
+  let [savebutton] = Input({"type": "submit", "value": "Save comment"})
+  savebutton.onclick = (ev) => {
+    ev.preventDefault()
+    api.comments.post({
+      recipe_id: state.selected_recipe,
+      comment: comment.value,
+      parent_id: parent_id,
+      author: author.value,
+    }).then(data => {state.comments = state.comments.concat(data)})
+  }
+
+  form.append(author_label, author, comment, savebutton)
+  return form
+}
+
+const EditCommentForm = (commentdata) => {
+  let form = D.createElement("form")
+  let [author_label, author] = Input({type: "text"}, "Author")
+  let comment = D.createElement("textarea")
+  let [savebutton] = Input({"type": "submit", "value": "Save comment"})
+
+  author.value = commentdata.author
+  comment.value = commentdata.comment
+
+  savebutton.onclick = (ev) => {
+    ev.preventDefault()
+    api.comments.put(commentdata.id, {
+      ...commentdata,
+      comment: comment.value,
+      author: author.value
+    })
+    .then(data => {state.comments = state.comments.concat(data)})
+  }
+
+  let [deletebutton] = Input({"type": "button", "value": "DELETE"})
+  deletebutton.className = "delete-button"
+  deletebutton.onclick = () => {
+    api.comments.delete(commentdata.id)
+  }
+
+  form.append(author_label, author, comment, savebutton, deletebutton)
+  return form 
+}
+
+const Comment = (comment) => {
+  let container = D.createElement("div")
+  container.className = "comment"
+
+  let author = D.createElement("div")
+  author.className = "comment-author"
+  let name = D.createElement("i")
+  name.textContent = comment.author
+  author.append("by: ", name)
+
+  let commenttext = D.createElement("div")
+  commenttext.className = "comment-text"
+  commenttext.textContent = comment.comment
+
+  let [editbutton] = Input({"type": "button", "value": "Edit"})
+  let [editmodal, ] = ModalOverlay("edit-comment-modal", "Edit comment", EditCommentForm(comment))
+  editbutton.onclick = () => {
+    editmodal.classList.add("active")
+  }
+
+  let [replybutton] = Input({"type": "button", "value": "Reply"})
+  let msg_preview = comment.comment.split(" ").slice(0,5).join(" ")
+  let [replymodal, ] = ModalOverlay("reply-comment-modal", `Reply to "${msg_preview}..."`, AddComentForm(comment.id))
+  replybutton.onclick = () => {
+    replymodal.classList.add("active")
+  }
+
+  container.append(commenttext, author, editbutton, editmodal, replymodal, replybutton)
+  return container
+}
+
+const CommentSection = (comments) => {
+  let container = D.createElement("div")
+  container.className = "comments-container"
+
+  let header = D.createElement("div")
+  header.className = "comments-header"
+  header.textContent = "Comments"
+
+  let body = D.createElement("div")
+  body.className = "comments-body"
+  
+  let footer = D.createElement("div")
+  footer.className = "comments-footer"
+  
+  let [modal, overlay, closefunc] = ModalOverlay('create-comment-modal', "New comment", AddComentForm())
+  let [createbutton] = Input({'type': 'button', 'value': 'New comment'})
+  createbutton.onclick = () => modal.classList.add("active")
+
+  footer.append(createbutton, modal)
+
+  container.append(header, body, footer)
+
+  // construct tree
+  lookup = new Map()
+  children = new Map([[0, []]]) // 0 as root
+
+  comments.sort((a,b) => a.id - b.id).forEach(c => {
+    lookup.set(c.id, c)
+
+    children.set(c.id, [])
+
+    let parent = c.parent_id || 0
+
+    children.set(parent, children.get(parent).concat(c.id))
+
+  })
+
+  // gather comments depth first
+  const walk = (node, parent) => {
+    children.get(node).forEach(n => {
+      let div = Comment(lookup.get(n))
+      parent.append(div)
+
+      walk(n, div)
+    })
+  }
+
+  walk(0, body)
+
+  return container
+} 
+
 const RecipePage = () => {
   let recipe = state.recipes.find(r => r.id === state.selected_recipe)
   let ingredients = state.recipe_ingredients.filter(i => i.recipe_id === state.selected_recipe)
+  let comments = state.comments.filter(i => i.recipe_id === state.selected_recipe)
 
   return [
     IngredientList(ingredients),
     RecipeView(recipe),
+    CommentSection(comments),
   ]
 } 
 
@@ -1164,3 +1298,6 @@ api.recipe_ingredients.get()
 
 api.mealplans.get()
   .then(data => state.mealplans = data.sort((a,b) => b.date > a.date ? -1 : 1))
+
+api.comments.get()
+  .then(data => state.comments = data)

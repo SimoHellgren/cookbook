@@ -1,13 +1,14 @@
 from decimal import Decimal
-from typing import List, Optional
+from typing import Optional
 from sqlalchemy.orm import Session
 from backend.app.models import Recipe, RecipeIngredient
+from backend.app.models.comment import Comment
 from backend.app.schemas.recipe import RecipeCreate, RecipeUpdate
 from backend.app.crud.base import CRUDBase
 
 
 class CRUDRecipe(CRUDBase[Recipe, RecipeCreate, RecipeUpdate]):
-    def get_ingredients(self, db: Session, id: int) -> Optional[List[RecipeIngredient]]:
+    def get_ingredients(self, db: Session, id: int) -> Optional[list[RecipeIngredient]]:
         db_obj = db.query(self.model).get(id)
 
         return db_obj.ingredients if db_obj else None
@@ -36,6 +37,11 @@ class CRUDRecipe(CRUDBase[Recipe, RecipeCreate, RecipeUpdate]):
         db.commit()
         db.refresh(db_obj)
         return db_obj
+
+    def get_comments(self, db: Session, id: int) -> Optional[list[Comment]]:
+        db_obj = db.query(self.model).get(id)
+
+        return db_obj.comments if db_obj else None
 
 
 recipe = CRUDRecipe(Recipe)

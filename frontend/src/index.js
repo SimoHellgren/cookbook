@@ -1061,6 +1061,7 @@ const RecipesPage = () => {
 
 const AddComentForm = (parent_id) => {
   let form = D.createElement("form")
+  let [author_label, author] = Input({type: "text"}, "Author")
   let comment = D.createElement("textarea")
   let [savebutton] = Input({"type": "submit", "value": "Save comment"})
   savebutton.onclick = (ev) => {
@@ -1068,26 +1069,30 @@ const AddComentForm = (parent_id) => {
     api.comments.post({
       recipe_id: state.selected_recipe,
       comment: comment.value,
-      parent_id: parent_id
+      parent_id: parent_id,
+      author: author.value,
     }).then(data => {state.comments = state.comments.concat(data)})
   }
 
-  form.append(comment, savebutton)
+  form.append(author_label, author, comment, savebutton)
   return form
 }
 
 const EditCommentForm = (commentdata) => {
   let form = D.createElement("form")
+  let [author_label, author] = Input({type: "text"}, "Author")
   let comment = D.createElement("textarea")
   let [savebutton] = Input({"type": "submit", "value": "Save comment"})
 
+  author.value = commentdata.author
   comment.value = commentdata.comment
 
   savebutton.onclick = (ev) => {
     ev.preventDefault()
     api.comments.put(commentdata.id, {
       ...commentdata,
-      comment: comment.value
+      comment: comment.value,
+      author: author.value
     })
     .then(data => {state.comments = state.comments.concat(data)})
   }
@@ -1098,7 +1103,7 @@ const EditCommentForm = (commentdata) => {
     api.comments.delete(commentdata.id)
   }
 
-  form.append(comment, savebutton, deletebutton)
+  form.append(author_label, author, comment, savebutton, deletebutton)
   return form 
 }
 
@@ -1106,8 +1111,14 @@ const Comment = (comment) => {
   let container = D.createElement("div")
   container.className = "comment"
 
+  let author = D.createElement("div")
+  author.className = "comment-author"
+  let name = D.createElement("i")
+  name.textContent = comment.author
+  author.append("by: ", name)
+
   let commenttext = D.createElement("div")
-  commenttext.className = "commenttext"
+  commenttext.className = "comment-text"
   commenttext.textContent = comment.comment
 
   let [editbutton] = Input({"type": "button", "value": "Edit"})
@@ -1123,7 +1134,7 @@ const Comment = (comment) => {
     replymodal.classList.add("active")
   }
 
-  container.append(commenttext, editbutton, editmodal, replymodal, replybutton)
+  container.append(commenttext, author, editbutton, editmodal, replymodal, replybutton)
   return container
 }
 

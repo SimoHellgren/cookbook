@@ -1059,7 +1059,7 @@ const RecipesPage = () => {
   ]
 }
 
-const AddComentForm = () => {
+const AddComentForm = (parent_id) => {
   let form = D.createElement("form")
   let comment = D.createElement("textarea")
   let [savebutton] = Input({"type": "submit", "value": "Save comment"})
@@ -1067,7 +1067,8 @@ const AddComentForm = () => {
     ev.preventDefault()
     const result = api.comments.post({
       recipe_id: state.selected_recipe,
-      comment: comment.value
+      comment: comment.value,
+      parent_id: parent_id
     }).then(data => {state.comments = state.comments.concat(result)})
   }
 
@@ -1076,11 +1077,22 @@ const AddComentForm = () => {
 }
 
 const Comment = (comment) => {
-  let div = D.createElement("div")
-  div.className = "comment"
-  div.textContent = comment.comment
+  let container = D.createElement("div")
+  container.className = "comment"
 
-  return div
+  let commenttext = D.createElement("div")
+  commenttext.className = "commenttext"
+  commenttext.textContent = comment.comment
+
+  let [replybutton] = Input({"type": "button", "value": "Reply"})
+  let msg_preview = comment.comment.split(" ").slice(0,5).join(" ")
+  let [modal, ...rest] = ModalOverlay("reply-comment-modal", `Reply to "${msg_preview}..."`, AddComentForm(comment.id))
+  replybutton.onclick = () => {
+    modal.classList.add("active")
+  }
+
+  container.append(commenttext, modal, replybutton)
+  return container
 }
 
 const CommentSection = (comments) => {

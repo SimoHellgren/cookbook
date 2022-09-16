@@ -6,8 +6,10 @@ from sqlalchemy import func
 
 @as_declarative()
 class Base:
-    created = Column(DateTime, default=func.utc_timestamp())
-    updated = Column(DateTime, onupdate=func.utc_timestamp())
+    created = Column(DateTime, server_default=func.utc_timestamp())
+    updated = Column(
+        DateTime, server_default=func.utc_timestamp(), onupdate=func.utc_timestamp()
+    )
 
     # generate tablename automatically
     @declared_attr

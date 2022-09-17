@@ -13,8 +13,7 @@ from alembic import context
 config = context.config
 
 load_dotenv()
-configuration = config.get_section(config.config_ini_section)
-configuration['sqlalchemy.url'] = os.getenv("DB_CONNECTION_STRING")
+config.set_main_option('sqlalchemy.url', os.getenv("DB_CONNECTION_STRING"))
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
@@ -66,6 +65,7 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
+    print(config.config_ini_section)
     connectable = engine_from_config(
         config.get_section(config.config_ini_section),
         prefix="sqlalchemy.",

@@ -13,7 +13,7 @@ from alembic import context
 config = context.config
 
 load_dotenv()
-config.set_main_option('sqlalchemy.url', os.getenv("DB_CONNECTION_STRING"))
+config.set_main_option("sqlalchemy.url", os.getenv("DB_CONNECTION_STRING"))
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.

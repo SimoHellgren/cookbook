@@ -20,7 +20,9 @@ def create(comment: CommentCreate, db: Session = Depends(get_db)) -> Any:
 
 
 @router.put("/{comment_id}", response_model=Comment)
-def update(comment_id: int, comment: CommentUpdate, db: Session = Depends(get_db)) -> Any:
+def update(
+    comment_id: int, comment: CommentUpdate, db: Session = Depends(get_db)
+) -> Any:
     db_obj = crud.comment.get(db, comment_id)
 
     if not db_obj:

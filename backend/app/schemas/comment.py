@@ -19,6 +19,7 @@ class CommentUpdate(CommentBase):
 
 class Comment(CommentBase):
     """For use as API response model"""
+
     id: int
 
     class Config:

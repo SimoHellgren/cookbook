@@ -1,8 +1,12 @@
+import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from dotenv import load_dotenv
 
-engine = create_engine(
-    "sqlite:///backend/app/test.db", connect_args={"check_same_thread": False}
-)
+load_dotenv()
+
+DB_CONNECTION_STRING = os.getenv("DB_CONNECTION_STRING")
+
+engine = create_engine(DB_CONNECTION_STRING)
 
 SessionLocal = sessionmaker(bind=engine)

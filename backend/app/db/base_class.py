@@ -1,14 +1,17 @@
 from typing import Any, Dict
 from sqlalchemy.ext.declarative import as_declarative, declared_attr
-from sqlalchemy import Column, DateTime
-from sqlalchemy import func
+from sqlalchemy import Column, DateTime, text
+
+_utc_timestamp = text("(now() at time zone 'utc')")
 
 
 @as_declarative()
 class Base:
-    created = Column(DateTime, server_default=func.utc_timestamp())
+    created = Column(DateTime, server_default=_utc_timestamp)
     updated = Column(
-        DateTime, server_default=func.utc_timestamp(), onupdate=func.utc_timestamp()
+        DateTime,
+        server_default=_utc_timestamp,
+        onupdate=_utc_timestamp,
     )
 
     # generate tablename automatically

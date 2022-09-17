@@ -18,16 +18,6 @@ depends_on = None
 
 def upgrade() -> None:
     op.add_column("mealplan", sa.Column("position", sa.Integer()))
-
-    op.execute(
-        "UPDATE mealplan "
-        "SET position = temp.row "
-        "FROM ("
-        "SELECT id, ROW_NUMBER() OVER (PARTITION BY date) row FROM mealplan"
-        ") AS temp "
-        "WHERE mealplan.id = temp.id"
-    )
-
     with op.batch_alter_table("mealplan") as batch_op:
         batch_op.alter_column("position", nullable=False)
         batch_op.create_unique_constraint(

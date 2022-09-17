@@ -18,16 +18,6 @@ depends_on = None
 
 def upgrade() -> None:
     op.add_column("recipe_ingredient", sa.Column("position", sa.Integer()))
-    op.execute(
-        "UPDATE recipe_ingredient "
-        "SET position = temp.row "
-        "FROM ("
-        "SELECT recipe_id, ingredient_id, ROW_NUMBER() OVER (PARTITION BY recipe_id) row FROM recipe_ingredient"
-        ") AS temp "
-        "WHERE recipe_ingredient.recipe_id = temp.recipe_id "
-        "AND recipe_ingredient.ingredient_id = temp.ingredient_id"
-    )
-
     with op.batch_alter_table("recipe_ingredient") as batch_op:
         batch_op.alter_column("position", nullable=False)
         batch_op.create_unique_constraint(

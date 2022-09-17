@@ -1,15 +1,33 @@
+import os
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
+from sqlalchemy_utils import database_exists, create_database, drop_database
 from fastapi.testclient import TestClient
 from backend.app.main import app
 from backend.app.dependencies import get_db
 from backend.app.db.base import Base
+from dotenv import load_dotenv
 
 
-engine = create_engine("sqlite://", connect_args={"check_same_thread": False})
-Base.metadata.drop_all(bind=engine)
-Base.metadata.create_all(bind=engine)
+load_dotenv()
+
+DB_CONNECTION_STRING = os.getenv("TEST_DB_CONNECTION_STRING")
+engine = create_engine(DB_CONNECTION_STRING)
+
+
+@pytest.fixture(scope="session", autouse=True)
+def create_test_db():
+    """Create a fresh DB for tests. NOTE: Drops any existing db with the same name."""
+    if database_exists(engine.url):
+        drop_database(engine.url)
+
+    create_database(engine.url)
+    Base.metadata.create_all(bind=engine)
+
+    yield  # tests run at this point
+
+    drop_database(engine.url)
 
 
 @pytest.fixture

@@ -17,7 +17,7 @@ const daterange = (start, end) => {
 }
 
 //api
-let api = (function() {
+let api = (function () {
 
   //default stuff
   const endpoint = path => {
@@ -38,56 +38,56 @@ let api = (function() {
         },
         body: JSON.stringify(data)
       }).then(r => r.json()),
-      delete: id => fetch(APIURL + path + "/" + id, {method: "DELETE"})
+      delete: id => fetch(APIURL + path + "/" + id, { method: "DELETE" })
         .then(r => r.json())
     }
   }
-  
+
   //expose endpoints
   return {
-      recipes: {
-        ...endpoint("/recipes"),
-        ingredients: {
-          add: (recipe_id, data) => fetch(`${APIURL}/recipes/${recipe_id}/ingredients`, {
-            method: "POST",
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-          }).then(r => r.json())
+    recipes: {
+      ...endpoint("/recipes"),
+      ingredients: {
+        add: (recipe_id, data) => fetch(`${APIURL}/recipes/${recipe_id}/ingredients`, {
+          method: "POST",
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        }).then(r => r.json())
+      }
+    },
+    ingredients: endpoint("/ingredients"),
+    recipe_ingredients: {
+      ...endpoint("/recipe_ingredients"),
+      put: (recipe_id, ingredient_id, data) => fetch(
+        `${APIURL}/recipe_ingredients/${recipe_id}:${ingredient_id}`,
+        {
+          method: "PUT",
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
         }
-      },
-      ingredients: endpoint("/ingredients"),
-      recipe_ingredients: {
-        ...endpoint("/recipe_ingredients"),
-        put: (recipe_id, ingredient_id, data) => fetch(
-          `${APIURL}/recipe_ingredients/${recipe_id}:${ingredient_id}`,
-          {
-            method: "PUT",
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-          }
-        ).then(r => r.json()),
-        delete: (recipe_id, ingredient_id) => fetch(
-          `${APIURL}/recipe_ingredients/${recipe_id}:${ingredient_id}`, {method: "DELETE"}
-          ).then(r => r.json()),
-        put_many: (data) => fetch(
-          `${APIURL}/recipe_ingredients/bulk`,
-          {
-            method: "PUT",
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-          }
-        ),
-      },
-      mealplans: endpoint("/mealplans"),
-      comments: endpoint("/comments"),
+      ).then(r => r.json()),
+      delete: (recipe_id, ingredient_id) => fetch(
+        `${APIURL}/recipe_ingredients/${recipe_id}:${ingredient_id}`, { method: "DELETE" }
+      ).then(r => r.json()),
+      put_many: (data) => fetch(
+        `${APIURL}/recipe_ingredients/bulk`,
+        {
+          method: "PUT",
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        }
+      ),
+    },
+    mealplans: endpoint("/mealplans"),
+    comments: endpoint("/comments"),
   }
-  
+
 })()
 
 // DOM manipulation
@@ -112,16 +112,16 @@ const Input = (params, label) => {
 
 const Navbar = () => {
   const pages = [
-    ["Recipes", render(RecipesPage)], 
+    ["Recipes", render(RecipesPage)],
     ["Add recipe", () => {
       let modal = D.getElementById("add-recipe-modal")
       let overlay = D.querySelector("#overlay")
       modal.classList.add("active")
       overlay.classList.add("active")
-    }], 
+    }],
     ["Mealplan", render(MealplanPage)],
   ]
-  
+
   let nav = D.createElement("nav")
   let ul = D.createElement("ul")
 
@@ -216,38 +216,38 @@ const RecipeGrid = (recipes) => {
 }
 
 const RecipeSearch = () => {
-    let $sidebar = D.createElement("div")
-    $sidebar.className = "sidebar"
+  let $sidebar = D.createElement("div")
+  $sidebar.className = "sidebar"
 
-    let p = D.createElement("p")
-    p.textContent = "Search recipes"
+  let p = D.createElement("p")
+  p.textContent = "Search recipes"
 
-    let form = document.createElement("form")
-    
-    let input = D.createElement("input")
-    input.id = "recipesearch"
-    input.placeholder = "Search by name"
-    
-    let submit = D.createElement("input")
-    submit.setAttribute("type", "submit")
-    submit.setAttribute("hidden", "")
+  let form = document.createElement("form")
 
-    form.append(input, submit)
+  let input = D.createElement("input")
+  input.id = "recipesearch"
+  input.placeholder = "Search by name"
 
-    form.onsubmit = (ev) => {
-      ev.preventDefault()
-      renderRecipeGrid()
-    }
+  let submit = D.createElement("input")
+  submit.setAttribute("type", "submit")
+  submit.setAttribute("hidden", "")
 
-    let alltags = new Set(state.recipes.map(r => r.tags.split(",")).flat().filter(e => e !== ""))
+  form.append(input, submit)
 
-    $sidebar.append(
-      p,
-      form,
-      TagGrid([...alltags])
-    )
+  form.onsubmit = (ev) => {
+    ev.preventDefault()
+    renderRecipeGrid()
+  }
 
-    return $sidebar
+  let alltags = new Set(state.recipes.map(r => r.tags.split(",")).flat().filter(e => e !== ""))
+
+  $sidebar.append(
+    p,
+    form,
+    TagGrid([...alltags])
+  )
+
+  return $sidebar
 }
 
 const MealCard = (mealplan) => {
@@ -277,25 +277,25 @@ const MealCard = (mealplan) => {
   let deletedialog = D.createElement("dialog")
   let deleteform = D.createElement("form")
   deleteform.method = "dialog"
-  
+
   let confirm = D.createElement("button")
   confirm.setAttribute("type", "submit")
   confirm.setAttribute("value", "delete")
   confirm.textContent = "Delete"
-  
+
   let cancel = D.createElement("button")
   cancel.setAttribute("value", "cancel")
   cancel.textContent = "Cancel"
-  
+
   deleteform.append(
     `Do you really wish to delete ${mealplan.date} ${mealplan.name}?`,
     confirm,
     cancel,
   )
-  
+
   deletedialog.append(deleteform)
 
-  deletebutton.onclick = () => deletedialog.showModal() 
+  deletebutton.onclick = () => deletedialog.showModal()
 
   deletedialog.onclose = () => {
     if (deletedialog.returnValue === "delete") {
@@ -329,13 +329,13 @@ const MealCardRow = (mealplans) => {
   div.className = "mealcard-row"
 
   const date = mealplans[0].date
-  const weekday = new Date(Date.parse(date)).toLocaleString('en-Us', {weekday: "long"})
+  const weekday = new Date(Date.parse(date)).toLocaleString('en-Us', { weekday: "long" })
 
   div.append(`${date} (${weekday})`)
 
 
   mealplans
-    .sort((a,b) => a.position - b.position)
+    .sort((a, b) => a.position - b.position)
     .forEach(mp => {
       let [card, dialog] = MealCard(mp)
       div.append(card, dialog)
@@ -348,7 +348,7 @@ const MealCardRow = (mealplans) => {
 const Mealplan = (mealplans) => {
   let container = D.createElement("div")
   container.className = "mealplan-container"
-  
+
   // group mealplans by date
   m = new Map()
   mealplans.forEach(mp => {
@@ -370,10 +370,10 @@ const Mealplan = (mealplans) => {
 
 const MealplanFilter = () => {
   let form = D.createElement("form")
-  let [start_label, start] = Input({id: "start_date", type: "date"}, "Start date")
-  let [end_label, end] = Input({id: "end_date", type: "date"}, "End date")
-  
-  let [done_label, donecheckbox] = Input({id: "done-chechbox", type: "checkbox"}, "Hide done")
+  let [start_label, start] = Input({ id: "start_date", type: "date" }, "Start date")
+  let [end_label, end] = Input({ id: "end_date", type: "date" }, "End date")
+
+  let [done_label, donecheckbox] = Input({ id: "done-chechbox", type: "checkbox" }, "Hide done")
   donecheckbox.checked = true
 
   //eventhandlers for changes
@@ -408,13 +408,13 @@ const MealplanFilter = () => {
 
 const CreateMealpanForm = () => {
   let form = D.createElement("form")
-  let [start_label, start] = Input({id: "start_date", type: "date"}, "Start date")
-  let [end_label, end] = Input({id: "end_date", type: "date"}, "End date")
-  
+  let [start_label, start] = Input({ id: "start_date", type: "date" }, "Start date")
+  let [end_label, end] = Input({ id: "end_date", type: "date" }, "End date")
+
   //set end date to start by default
   start.addEventListener("change", () => {
     if (!end.value) end.value = start.value
-  }, {once: true}) 
+  }, { once: true })
 
   let mealinput = D.createElement("textarea")
   mealinput.id = "meals-input"
@@ -438,18 +438,18 @@ const CreateMealpanForm = () => {
     let sd = new Date(start.value)
     let ed = new Date(end.value)
     let meals = mealinput.value.split("\n").map(e => e.split(";"))
-    
-    let dates = daterange(sd, ed).map(d => d.toISOString().slice(0,10))
+
+    let dates = daterange(sd, ed).map(d => d.toISOString().slice(0, 10))
 
     let plans = dates.map(date => meals.map(([name, servings], position) => (
       {
         date,
         name,
         servings,
-        position: position + 1 + state.mealplans.filter(mp => mp.date === date).length, 
-      }  
+        position: position + 1 + state.mealplans.filter(mp => mp.date === date).length,
+      }
     ))).flat()
-    
+
     Promise.all(plans.map(api.mealplans.post))
       .then(data => state.mealplans = state.mealplans.concat(data).sort((a, b) => b.date > a.date ? -1 : 1))
       .then(() => {
@@ -466,9 +466,9 @@ const CreateMealpanForm = () => {
 const CreateMealplans = () => {
   form = CreateMealpanForm()
   let [modal, overlay, closefunc] = ModalOverlay("create-mealplans-modal", "Create Mealplans", form)
-  
+
   form.addEventListener("submit", closefunc)
-  
+
   return [modal, overlay]
 }
 
@@ -487,7 +487,7 @@ const ModalOverlay = (id, title, content) => {
 
   let header = D.createElement("div")
   header.className = "modal-header"
-  
+
   let headertext = D.createElement("div")
   headertext.className = "title"
   headertext.textContent = title
@@ -498,7 +498,7 @@ const ModalOverlay = (id, title, content) => {
   closebutton.onclick = closefunc
 
   header.append(headertext, closebutton)
-  
+
   let body = D.createElement("div")
   body.className = "modal-body"
 
@@ -513,7 +513,7 @@ const TableRow = (data, header) => {
   tag = header ? "th" : "td"
 
   let row = D.createElement("tr")
-  
+
   let cells = data.map(x => {
     let cell = D.createElement(tag)
     cell.append(x)
@@ -527,10 +527,10 @@ const TableRow = (data, header) => {
 const RecipeForm = () => {
   let form = D.createElement("form")
 
-  let name = Input({id: "name"}, "Recipe name")
-  let servings = Input({type: "number", id: "servings"}, "Servings")
-  let tags = Input({id: "tags"}, "Tags")
-  let source = Input({id: "source"}, "Source")
+  let name = Input({ id: "name" }, "Recipe name")
+  let servings = Input({ type: "number", id: "servings" }, "Servings")
+  let tags = Input({ id: "tags" }, "Tags")
+  let source = Input({ id: "source" }, "Source")
 
   let method = D.createElement("textarea")
   method.id = "method"
@@ -553,12 +553,12 @@ const RecipeForm = () => {
     let delbutton = D.createElement("button")
     delbutton.textContent = "\u00D7"
     delbutton.setAttribute("type", "button")
-    
-    let [ingredient] = Input({id: "ingredient_" + i, list: "ingredientlist", autocomplete: "off"})
-    let [quantity] = Input({id: "quantity_" + i, type: "number", step: "any"})
-    let [measure] = Input({id: "measure_" + i, placeholder: "e.g dl"})
-    let [optional] = Input({id: "optional_" + i, type: "checkbox"})
-    
+
+    let [ingredient] = Input({ id: "ingredient_" + i, list: "ingredientlist", autocomplete: "off" })
+    let [quantity] = Input({ id: "quantity_" + i, type: "number", step: "any" })
+    let [measure] = Input({ id: "measure_" + i, placeholder: "e.g dl" })
+    let [optional] = Input({ id: "optional_" + i, type: "checkbox" })
+
     let up = D.createElement("button")
     up.textContent = "上" || "\u2191"
     up.setAttribute("type", "button")
@@ -579,7 +579,7 @@ const RecipeForm = () => {
     }
 
     delbutton.onclick = () => row.remove()
-    
+
     tablebody.append(row)
   }
 
@@ -609,7 +609,7 @@ const RecipeForm = () => {
     savebutton,
     datalist,
   )
-  
+
   return form
 }
 
@@ -632,17 +632,17 @@ const ParseFormData = (form) => {
 
   const recipeingredients = rows.map((row, i) => {
     let [ingredient, quantity, measure, optional] = row.querySelectorAll("input")
-    
+
     return {
       ingredient: ingredient.value,
       quantity: quantity.value,
       measure: measure.value,
       optional: optional.checked,
-      position: i+1, // +1 to index from 1
+      position: i + 1, // +1 to index from 1
     }
   })
 
-  const ingredients = recipeingredients.map(ri => ({name: ri.ingredient}))
+  const ingredients = recipeingredients.map(ri => ({ name: ri.ingredient }))
 
   return {
     recipe,
@@ -653,14 +653,14 @@ const ParseFormData = (form) => {
 
 const AddRecipe = () => {
   form = RecipeForm()
-  
+
   let [modal, overlay, closefunc] = ModalOverlay("add-recipe-modal", "Add Recipe", form)
-  
+
   form.onsubmit = async (ev) => {
     ev.preventDefault()
     ev.stopImmediatePropagation()
 
-    const {recipe: recipe_data, ingredients, recipeingredients} = ParseFormData(form)
+    const { recipe: recipe_data, ingredients, recipeingredients } = ParseFormData(form)
 
     //alert if recipe already exists
     if (state.recipes.find(r => r.name === recipe_data.name)) alert(`Recipe with name "${recipe_data.name}" already exists`)
@@ -676,7 +676,7 @@ const AddRecipe = () => {
 
     //create recipe ingredients
     const ri_data = recipeingredients.map(ri => {
-      const {ingredient: name, ...rest} = ri 
+      const { ingredient: name, ...rest } = ri
       return {
         recipe_id: recipe.id,
         ingredient_id: state.ingredients.find(i => i.name === name).id,
@@ -702,7 +702,7 @@ const AddRecipe = () => {
 
 const EditRecipe = (recipe) => {
   let form = RecipeForm()
-  
+
   let name = form.querySelector("#name")
   let servings = form.querySelector("#servings")
   let tags = form.querySelector("#tags")
@@ -718,7 +718,7 @@ const EditRecipe = (recipe) => {
   source.value = recipe.source
 
   let state_ingredients = state.recipe_ingredients.filter(ri => ri.recipe_id == recipe.id)
-  
+
   //add ingredient rows - not pretty but shall do
   state_ingredients.slice(1).forEach(ri => addrowbutton.dispatchEvent(new Event("click")))
 
@@ -736,10 +736,10 @@ const EditRecipe = (recipe) => {
     ev.preventDefault()
     ev.stopImmediatePropagation()
 
-    const {recipe: recipe_data, ingredients, recipeingredients} = ParseFormData(form)
+    const { recipe: recipe_data, ingredients, recipeingredients } = ParseFormData(form)
 
     //PUT recipe
-    api.recipes.put(recipe.id, {id: recipe.id, ...recipe_data})
+    api.recipes.put(recipe.id, { id: recipe.id, ...recipe_data })
 
     //missing ingredients
     const missing = ingredients.filter(a => !state.ingredients.map(b => b.name).includes(a.name))
@@ -748,7 +748,7 @@ const EditRecipe = (recipe) => {
     let current_ing_names = state_ingredients.map(i => i.ingredient.name)
     let put_ris = recipeingredients.filter(ri => current_ing_names.includes(ri.ingredient))
     let post_ris = recipeingredients.filter(ri => !current_ing_names.includes(ri.ingredient))
-    let delete_ris = state_ingredients.filter(ri => 
+    let delete_ris = state_ingredients.filter(ri =>
       !recipeingredients.map(i => i.ingredient).includes(ri.ingredient.name)
     )
 
@@ -767,17 +767,17 @@ const EditRecipe = (recipe) => {
     //create missing ingredients, then POST new RIs
     Promise.all(missing.map(api.ingredients.post))
       .then(data => state.ingredients = state.ingredients.concat(data))
-      .then( () => 
+      .then(() =>
         // delete disappeared recipe ingredients
         // done before posting to avoid conflicts with position
         delete_ris.forEach(ri => {
           let ingredient_id = state.ingredients.find(i => i.name === ri.ingredient.name).id
           api.recipe_ingredients.delete(recipe.id, ingredient_id)
-          .then(data => state.recipe_ingredients = state.recipe_ingredients.filter(
-            i => (i.recipe_id !== data.recipe_id && i.ingredient_id !== data.ingredient_id)))
+            .then(data => state.recipe_ingredients = state.recipe_ingredients.filter(
+              i => (i.recipe_id !== data.recipe_id && i.ingredient_id !== data.ingredient_id)))
         })
       )
-      .then( () => 
+      .then(() =>
         post_ris.map(ri => ({
           recipe_id: recipe.id,
           ingredient_id: state.ingredients.find(i => i.name === ri.ingredient).id,
@@ -802,7 +802,7 @@ const ShoppingList = () => {
 
 const MealplansToShoppinglist = (mealplans) => {
   let ingredientlist = mealplans
-    .filter(mp => mp.recipe_id)  
+    .filter(mp => mp.recipe_id)
     .flatMap(meal => {
       const recipe = state.recipes.find(r => r.id === meal.recipe_id)
       const ingredients = state.recipe_ingredients.filter(ri => ri.recipe_id === recipe.id)
@@ -818,7 +818,7 @@ const MealplansToShoppinglist = (mealplans) => {
         recipe,
         ingredient,
       }))
-  })
+    })
 
   let gb = new Map()
   ingredientlist.forEach(row => {
@@ -835,7 +835,7 @@ const MealplansToShoppinglist = (mealplans) => {
     .sort() // sort by keys (default behavior)
     .map(([key, items]) => {
       let [name, measure] = key.split("_")
-      let total = items.reduce((r,e) => r+e.ingredient.quantity, 0)
+      let total = items.reduce((r, e) => r + e.ingredient.quantity, 0)
 
       let details = D.createElement("details")
       let summary = D.createElement("summary")
@@ -847,7 +847,7 @@ const MealplansToShoppinglist = (mealplans) => {
         ${i.ingredient.quantity} ${i.ingredient.measure}`
         return p
       })
-      
+
       details.append(
         summary,
         ...detailrows
@@ -856,7 +856,7 @@ const MealplansToShoppinglist = (mealplans) => {
     })
 
   return entries
-  
+
 }
 
 const IngredientList = (ingredients) => {
@@ -876,7 +876,7 @@ const IngredientList = (ingredients) => {
       text = "(" + text + ")"
     }
 
-    let [label, checkbox] = Input({type: "checkbox"}, text)
+    let [label, checkbox] = Input({ type: "checkbox" }, text)
     checkbox.onclick = () => {
       label.classList.toggle("checked")
     }
@@ -891,7 +891,7 @@ const IngredientList = (ingredients) => {
   )
 
   return sidebar
-} 
+}
 
 const RecipeView = (recipe) => {
   let container = D.createElement("div")
@@ -902,10 +902,10 @@ const RecipeView = (recipe) => {
 
   let title = D.createElement("h1")
   title.textContent = recipe.name
-  
+
   let scale_div = D.createElement("div")
 
-  let [scale_label, scale_input] = Input({type: "number", step: "any", value: recipe.servings}, "servings")
+  let [scale_label, scale_input] = Input({ type: "number", step: "any", value: recipe.servings }, "servings")
   scale_input.onchange = () => {
     let scaled_ingredients = state.recipe_ingredients
       .filter(i => i.recipe_id === recipe.id)
@@ -914,9 +914,9 @@ const RecipeView = (recipe) => {
         quantity: +(i.quantity * scale_input.value / recipe.servings).toFixed(2) // the + strips unnecessary decimal places
       }))
 
-      let inglist = IngredientList(scaled_ingredients)
+    let inglist = IngredientList(scaled_ingredients)
 
-      D.querySelector(".sidebar").replaceWith(inglist)
+    D.querySelector(".sidebar").replaceWith(inglist)
   }
 
   scale_div.append(scale_input, scale_label)
@@ -935,7 +935,7 @@ const RecipeView = (recipe) => {
   } else {
     source.append(recipe.source)
   }
-  
+
 
   header.append(title, scale_div, source)
 
@@ -960,20 +960,20 @@ const RecipeView = (recipe) => {
   let deleteform = D.createElement("form")
   deleteform.method = "dialog"
 
-  let [confirmdelete, _] = Input({id: "confirm-delete"})
+  let [confirmdelete, _] = Input({ id: "confirm-delete" })
 
   let okbutton = D.createElement("button")
   okbutton.setAttribute("type", "submit")
   okbutton.setAttribute("value", "")
   okbutton.textContent = "Delete"
   okbutton.disabled = true
-  
+
   let cancelbutton = D.createElement("button")
   cancelbutton.textContent = "Cancel"
   cancelbutton.setAttribute("value", "cancel")
-  
+
   deleteform.append(confirmdelete, okbutton, cancelbutton)
-  
+
   confirmdelete.oninput = (ev) => {
     okbutton.value = ev.target.value
     let disabled = ev.target.value === recipe.name ? false : true
@@ -983,13 +983,13 @@ const RecipeView = (recipe) => {
   deletedialog.append(
     dialogtitle,
     deleteform,
-    )
+  )
 
   deletedialog.onclose = () => {
     if (!(deletedialog.returnValue === recipe.name)) return
 
 
-    let ris = state.recipe_ingredients.filter(ri => ri.recipe_id === recipe.id)  
+    let ris = state.recipe_ingredients.filter(ri => ri.recipe_id === recipe.id)
 
     Promise.all(ris.map(ri => api.recipe_ingredients.delete(ri.recipe_id, ri.ingredient_id)))
       .then(() => api.recipes.delete(recipe.id))
@@ -997,9 +997,9 @@ const RecipeView = (recipe) => {
         state.recipe_ingredients = state.recipe_ingredients.filter(ri => ri.recipe_id !== recipe.id)
         state.recipes = state.recipes.filter(r => r.id !== recipe.id)
       })
-      .then(render(RecipesPage))    
+      .then(render(RecipesPage))
   }
-  
+
   deletebutton.onclick = () => deletedialog.showModal()
   header.append(editbutton, deletebutton, deletedialog)
 
@@ -1008,20 +1008,20 @@ const RecipeView = (recipe) => {
     header.appendChild(taggrid)
   }
 
-  
+
   let method = D.createElement("div")
   method.className = "recipe-method"
-  
+
   let ul = D.createElement("ul")
   if (recipe.method) {
     recipe.method.split("\n").forEach(line => {
       let li = D.createElement("li")
-      
-      let [label, checkbox] = Input({type: "checkbox"}, line)
+
+      let [label, checkbox] = Input({ type: "checkbox" }, line)
       checkbox.onclick = () => {
         label.classList.toggle("checked")
       }
-  
+
       li.append(
         checkbox,
         label
@@ -1061,9 +1061,9 @@ const RecipesPage = () => {
 
 const AddComentForm = (parent_id) => {
   let form = D.createElement("form")
-  let [author_label, author] = Input({type: "text"}, "Author")
+  let [author_label, author] = Input({ type: "text" }, "Author")
   let comment = D.createElement("textarea")
-  let [savebutton] = Input({"type": "submit", "value": "Save comment"})
+  let [savebutton] = Input({ "type": "submit", "value": "Save comment" })
   savebutton.onclick = (ev) => {
     ev.preventDefault()
     api.comments.post({
@@ -1071,7 +1071,7 @@ const AddComentForm = (parent_id) => {
       comment: comment.value,
       parent_id: parent_id,
       author: author.value,
-    }).then(data => {state.comments = state.comments.concat(data)})
+    }).then(data => { state.comments = state.comments.concat(data) })
   }
 
   form.append(author_label, author, comment, savebutton)
@@ -1080,9 +1080,9 @@ const AddComentForm = (parent_id) => {
 
 const EditCommentForm = (commentdata) => {
   let form = D.createElement("form")
-  let [author_label, author] = Input({type: "text"}, "Author")
+  let [author_label, author] = Input({ type: "text" }, "Author")
   let comment = D.createElement("textarea")
-  let [savebutton] = Input({"type": "submit", "value": "Save comment"})
+  let [savebutton] = Input({ "type": "submit", "value": "Save comment" })
 
   author.value = commentdata.author
   comment.value = commentdata.comment
@@ -1094,17 +1094,17 @@ const EditCommentForm = (commentdata) => {
       comment: comment.value,
       author: author.value
     })
-    .then(data => {state.comments = state.comments.concat(data)})
+      .then(data => { state.comments = state.comments.concat(data) })
   }
 
-  let [deletebutton] = Input({"type": "button", "value": "DELETE"})
+  let [deletebutton] = Input({ "type": "button", "value": "DELETE" })
   deletebutton.className = "delete-button"
   deletebutton.onclick = () => {
     api.comments.delete(commentdata.id)
   }
 
   form.append(author_label, author, comment, savebutton, deletebutton)
-  return form 
+  return form
 }
 
 const Comment = (comment) => {
@@ -1121,15 +1121,15 @@ const Comment = (comment) => {
   commenttext.className = "comment-text"
   commenttext.textContent = comment.comment
 
-  let [editbutton] = Input({"type": "button", "value": "Edit"})
-  let [editmodal, ] = ModalOverlay("edit-comment-modal", "Edit comment", EditCommentForm(comment))
+  let [editbutton] = Input({ "type": "button", "value": "Edit" })
+  let [editmodal,] = ModalOverlay("edit-comment-modal", "Edit comment", EditCommentForm(comment))
   editbutton.onclick = () => {
     editmodal.classList.add("active")
   }
 
-  let [replybutton] = Input({"type": "button", "value": "Reply"})
-  let msg_preview = comment.comment.split(" ").slice(0,5).join(" ")
-  let [replymodal, ] = ModalOverlay("reply-comment-modal", `Reply to "${msg_preview}..."`, AddComentForm(comment.id))
+  let [replybutton] = Input({ "type": "button", "value": "Reply" })
+  let msg_preview = comment.comment.split(" ").slice(0, 5).join(" ")
+  let [replymodal,] = ModalOverlay("reply-comment-modal", `Reply to "${msg_preview}..."`, AddComentForm(comment.id))
   replybutton.onclick = () => {
     replymodal.classList.add("active")
   }
@@ -1148,12 +1148,12 @@ const CommentSection = (comments) => {
 
   let body = D.createElement("div")
   body.className = "comments-body"
-  
+
   let footer = D.createElement("div")
   footer.className = "comments-footer"
-  
+
   let [modal, overlay, closefunc] = ModalOverlay('create-comment-modal', "New comment", AddComentForm())
-  let [createbutton] = Input({'type': 'button', 'value': 'New comment'})
+  let [createbutton] = Input({ 'type': 'button', 'value': 'New comment' })
   createbutton.onclick = () => modal.classList.add("active")
 
   footer.append(createbutton, modal)
@@ -1164,7 +1164,7 @@ const CommentSection = (comments) => {
   lookup = new Map()
   children = new Map([[0, []]]) // 0 as root
 
-  comments.sort((a,b) => a.id - b.id).forEach(c => {
+  comments.sort((a, b) => a.id - b.id).forEach(c => {
     lookup.set(c.id, c)
 
     children.set(c.id, [])
@@ -1188,7 +1188,7 @@ const CommentSection = (comments) => {
   walk(0, body)
 
   return container
-} 
+}
 
 const RecipePage = () => {
   let recipe = state.recipes.find(r => r.id === state.selected_recipe)
@@ -1200,12 +1200,12 @@ const RecipePage = () => {
     RecipeView(recipe),
     CommentSection(comments),
   ]
-} 
+}
 
 const MealplanPage = () => {
   let save = D.createElement("button")
   save.textContent = "Save"
-  
+
   save.onclick = () => {
     let container = D.querySelector(".mealplan-container")
 
@@ -1224,7 +1224,7 @@ const MealplanPage = () => {
         servings,
         state: mp_state
       }
-      
+
       //this isn't very efficient put shall do for now
       api.mealplans.put(plan_id, newPlan)
         .then(data => state.mealplans = state.mealplans.map(mp => mp.id === data.id ? data : mp))
@@ -1246,14 +1246,14 @@ const MealplanPage = () => {
   let shoppinglistbutton = D.createElement("button")
   shoppinglistbutton.textContent = "Shopping list"
   shoppinglistbutton.onclick = () => {
-    let start = D.getElementById("start_date").value || "0000-00-00" 
+    let start = D.getElementById("start_date").value || "0000-00-00"
     let end = D.getElementById("end_date").value || "9999-99-99"
-  
+
     let show_data = state.mealplans
       .filter(mp => start <= mp.date && mp.date <= end && mp.recipe_id)
       .filter(mp => mp.state === "open")
     let body = shoppinglist_modal.querySelector(".modal-body")
-    
+
     body.replaceChildren(...MealplansToShoppinglist(show_data))
 
     shoppinglist_modal.classList.add("active")
@@ -1263,7 +1263,7 @@ const MealplanPage = () => {
   return [
     MealplanFilter(),
     createbutton,
-    mealplan_modal, 
+    mealplan_modal,
     mealplan_overlay,
     shoppinglistbutton,
     shoppinglist_modal,
@@ -1288,16 +1288,16 @@ api.ingredients.get()
     let datalist = D.getElementById("ingredientlist")
     datalist.append(
       ...state.ingredients
-        .sort((a,b) => a.name >= b.name ? 1 : -1)
+        .sort((a, b) => a.name >= b.name ? 1 : -1)
         .map(ing => new Option(ing.name))
     )
   })
 
 api.recipe_ingredients.get()
-  .then(data => state.recipe_ingredients = data.sort((a,b) => a.recipe_id - b.recipe_id || a.position - b.position)) 
+  .then(data => state.recipe_ingredients = data.sort((a, b) => a.recipe_id - b.recipe_id || a.position - b.position))
 
 api.mealplans.get()
-  .then(data => state.mealplans = data.sort((a,b) => b.date > a.date ? -1 : 1))
+  .then(data => state.mealplans = data.sort((a, b) => b.date > a.date ? -1 : 1))
 
 api.comments.get()
   .then(data => state.comments = data)

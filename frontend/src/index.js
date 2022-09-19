@@ -1111,11 +1111,19 @@ const Comment = (comment) => {
   let container = D.createElement("div")
   container.className = "comment"
 
-  let author = D.createElement("div")
-  author.className = "comment-author"
-  let name = D.createElement("i")
-  name.textContent = comment.author
-  author.append("by: ", name)
+  let metadata = D.createElement("div")
+  metadata.className = "comment-metadata"
+
+  const created = new Date(Date.parse(comment.created))
+  const updated = new Date(Date.parse(comment.updated))
+
+  let metadata_text = `${comment.author}, ${created.toLocaleDateString('fi')} ${created.toLocaleTimeString('fi')}`
+
+  if (comment.created !== comment.updated) {
+    metadata_text += ` (edited ${updated.toLocaleDateString('fi')} ${updated.toLocaleTimeString('fi')})`
+  }
+
+  metadata.textContent = metadata_text
 
   let commenttext = D.createElement("div")
   commenttext.className = "comment-text"
@@ -1134,7 +1142,7 @@ const Comment = (comment) => {
     replymodal.classList.add("active")
   }
 
-  container.append(commenttext, author, editbutton, editmodal, replymodal, replybutton)
+  container.append(commenttext, metadata, editbutton, editmodal, replymodal, replybutton)
   return container
 }
 

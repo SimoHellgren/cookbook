@@ -1117,10 +1117,10 @@ const Comment = (comment) => {
   const created = new Date(Date.parse(comment.created))
   const updated = new Date(Date.parse(comment.updated))
 
-  let metadata_text = `${comment.author}, ${created.toLocaleDateString('fi')} ${created.toLocaleTimeString('fi')}`
+  let metadata_text = `${comment.author}, ${created.toLocaleDateString('fi')} ${created.toLocaleTimeString('fi')} UTC`
 
   if (comment.created !== comment.updated) {
-    metadata_text += ` (edited ${updated.toLocaleDateString('fi')} ${updated.toLocaleTimeString('fi')})`
+    metadata_text += ` (edited ${updated.toLocaleDateString('fi')} ${updated.toLocaleTimeString('fi')} UTC)`
   }
 
   metadata.textContent = metadata_text

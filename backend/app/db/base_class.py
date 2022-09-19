@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Any, Dict
 from sqlalchemy.ext.declarative import as_declarative, declared_attr
 from sqlalchemy import Column, DateTime, text
@@ -11,7 +12,7 @@ class Base:
     updated = Column(
         DateTime,
         server_default=_utc_timestamp,
-        onupdate=_utc_timestamp,
+        onupdate=datetime.utcnow,
     )
 
     # generate tablename automatically

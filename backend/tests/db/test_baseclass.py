@@ -1,3 +1,4 @@
+from time import sleep
 from datetime import datetime
 from backend.app.models import Recipe
 from backend.tests.utils import create_random_recipe
@@ -47,6 +48,8 @@ def test_updated_timestamp_updates(test_db):
 
     before = datetime.utcnow()
     updated = obj.updated
+
+    sleep(0.1)
 
     obj.name = "A name so long that there is no chance it already was this"
     test_db.add(obj)

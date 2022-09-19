@@ -19,6 +19,8 @@ def test_as_dict() -> None:
         "method": "Do the thing with the ingredients",
         "tags": "japan,食べ物",
         "source": None,
+        "created": None,  # None because we don't commit
+        "updated": None,  # None because we don't commit
     }
 
     assert d == expected_result

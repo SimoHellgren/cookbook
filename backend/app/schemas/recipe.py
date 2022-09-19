@@ -1,3 +1,4 @@
+from datetime import datetime
 from decimal import Decimal
 from typing import Optional
 from pydantic import BaseModel
@@ -23,6 +24,8 @@ class Recipe(RecipeBase):
     """For use as API response model"""
 
     id: int
+    created: datetime
+    updated: datetime
 
     class Config:
         orm_mode = True

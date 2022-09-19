@@ -1,3 +1,4 @@
+from datetime import datetime
 from decimal import Decimal
 from pydantic import BaseModel
 from backend.app.schemas.ingredient import Ingredient
@@ -24,6 +25,8 @@ class RecipeIngredient(RecipeIngredientBase):
     """For use as API response model"""
 
     ingredient: Ingredient
+    created: datetime
+    updated: datetime
 
     class Config:
         orm_mode = True

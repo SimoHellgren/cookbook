@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from decimal import Decimal
 from typing import Optional
 from pydantic import BaseModel
@@ -27,6 +27,8 @@ class Mealplan(MealplanBase):
 
     id: int
     recipe_id: Optional[int]
+    created: datetime
+    updated: datetime
 
     class Config:
         orm_mode = True

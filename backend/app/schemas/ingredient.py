@@ -1,3 +1,4 @@
+from datetime import datetime
 from pydantic import BaseModel
 
 
@@ -17,6 +18,8 @@ class Ingredient(IngredientBase):
     """For use as API response model"""
 
     id: int
+    created: datetime
+    updated: datetime
 
     class Config:
         orm_mode = True

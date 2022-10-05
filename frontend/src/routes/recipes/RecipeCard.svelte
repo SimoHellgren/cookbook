@@ -1,4 +1,5 @@
 <script>
+    import Tag from './Tag.svelte'
     export let id;
     export let name;
     export let servings;
@@ -18,9 +19,7 @@
     </a>    
 
     {#each tagarray as tag}
-        <div class="tag">
-            {tag}
-        </div>
+        <Tag name={tag}/>
     {/each}
 
 </div>

@@ -1,5 +1,6 @@
 <script>
     import RecipeCard from './RecipeCard.svelte'
+    import Tag from './Tag.svelte'
     export let data;
 
     $: alltags = [...new Set(data.recipes.map(r => r.tags.split(",")).flat())]
@@ -16,7 +17,7 @@
     <div class="sidebar">
         <input placeholder="Search by name" bind:value={search}>
         {#each alltags as tag}
-            <div>{tag}</div>
+            <Tag name={tag}/>
         {/each}
 
     </div>

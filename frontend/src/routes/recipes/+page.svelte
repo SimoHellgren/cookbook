@@ -5,7 +5,8 @@
 
 
 <h1>Recipes</h1>
-<ul>
+
+<div class="recipecard-grid">
     {#await recipes}
         <p>Fetching data</p>
     {:then recipes} 
@@ -13,4 +14,13 @@
             <RecipeCard {...recipe}/>
         {/each}
     {/await}
-</ul>
+
+</div>
+
+<style>
+    .recipecard-grid {
+        display: grid;
+        gap: 1rem;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr))
+    }
+</style>

@@ -6,7 +6,26 @@
     $: alltags = [...new Set(data.recipes.map(r => r.tags.split(",")).flat())].filter(t => t)
 
     let search = "";
-    $: showrecipes = data.recipes.filter(r => r.name.toLowerCase().includes(search.toLowerCase()))
+    let selectedtags = [];
+    $: showrecipes = data.recipes
+        .filter(r => r.name.toLowerCase().includes(search.toLowerCase()))
+        .filter(r => {
+            let ts = r.tags.split(",")
+            for (const tag of selectedtags) {
+                if (!ts.includes(tag)) return false
+            }
+            return true
+        })
+
+
+    const toggleTag = (tag) => {
+        if (selectedtags.includes(tag)) {
+            selectedtags = selectedtags.filter(t => t !== tag)
+        } else {
+            selectedtags = [...selectedtags, tag]
+        }
+    }
+
 
 </script>
 
@@ -18,7 +37,7 @@
         <input placeholder="Search by name" bind:value={search}>
         <div class="tag-grid">
             {#each alltags as tag}
-                <Tag name={tag}/>
+                <Tag name={tag} on:click={() => toggleTag(tag)}/>
             {/each}
         </div>
 

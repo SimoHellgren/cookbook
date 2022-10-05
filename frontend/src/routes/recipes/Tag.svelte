@@ -2,7 +2,7 @@
     export let name;
 </script>
 
-<div>
+<div on:click>
     {name}
 </div>
 

@@ -5,6 +5,7 @@
 
     let startdate;
     let enddate;
+    let hidedone = true;
 
     // group mealpans by date
     const groupByDate = (data) => {
@@ -23,6 +24,7 @@
     $: grouped = groupByDate(
         data.mealplans
             .filter(mp => mp.date >= (startdate || "0000") && mp.date <= (enddate || "9999"))
+            .filter(mp => !hidedone || mp.state !== "done")
     )
 </script>
 
@@ -36,6 +38,10 @@
 <label>
     End
     <input type="date" bind:value={enddate}>
+</label>
+<label>
+    Hide done
+    <input type="checkbox" bind:checked={hidedone}>
 </label>
 
 {#each grouped as [date, meals]}

@@ -9,7 +9,7 @@
     export let created;
     export let updated;
 
-    $: tagarray = tags.split(",")
+    $: tagarray = tags.split(",").filter(t => t)
 
 </script>
 

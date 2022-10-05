@@ -3,7 +3,7 @@
     import Tag from './Tag.svelte'
     export let data;
 
-    $: alltags = [...new Set(data.recipes.map(r => r.tags.split(",")).flat())]
+    $: alltags = [...new Set(data.recipes.map(r => r.tags.split(",")).flat())].filter(t => t)
 
     let search = "";
     $: showrecipes = data.recipes.filter(r => r.name.toLowerCase().includes(search.toLowerCase()))

@@ -1,5 +1,4 @@
 <script>
-    import {recipes} from '../../stores.js'
     import MealCard from "./MealCard.svelte";
     export let data;
 

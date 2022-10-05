@@ -1,13 +1,13 @@
 <script>
+    import { recipes } from '../../stores.js'
     import RecipeCard from './RecipeCard.svelte'
     import Tag from './Tag.svelte'
-    export let data;
 
-    $: alltags = [...new Set(data.recipes.map(r => r.tags.split(",")).flat())].filter(t => t)
+    $: alltags = [...new Set($recipes.map(r => r.tags.split(",")).flat())].filter(t => t)
 
     let search = "";
     let selectedtags = [];
-    $: showrecipes = data.recipes
+    $: showrecipes = $recipes
         .filter(r => r.name.toLowerCase().includes(search.toLowerCase()))
         .filter(r => {
             let ts = r.tags.split(",")

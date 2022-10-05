@@ -1,16 +1,35 @@
 <script>
-    export let date;
-    export let name;
-    export let servings;
-    export let state;
-    export let recipe;
+    import { recipes } from "../../stores";
+    export let date
+    export let meals
+
 </script>
 
 
 <div class="container">
-    {date} {name} ({servings}) {state} {recipe.name || ""}
+    <header>
+        {date}, {new Date(date).toLocaleDateString("en", {weekday: "long"})}
+    </header>
+    {#each meals as meal}
+        <div class="meal">
+            <div>
+                {meal.name} ({meal.servings})
+            </div>
+            <div>
+                <select value={meal.state}>
+                    <option>open</option>
+                    <option>bought</option>
+                    <option>done</option>
+                </select>
+                <select value={meal.recipe_id}>
+                    {#each $recipes as recipe}
+                        <option value={recipe.id}>{recipe.name}</option>
+                    {/each}
+                </select>
+            </div>
+        </div>
+    {/each}
 </div>
-
 
 <style>
     .container {
@@ -19,5 +38,9 @@
         margin: 1rem;
         padding: 0.5rem;
         width: fit-content;
+    }
+
+    .meal {
+        display: flex;
     }
 </style>

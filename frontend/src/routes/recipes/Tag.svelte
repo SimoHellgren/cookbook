@@ -12,7 +12,6 @@
         background-color: #ebb5e6;
         border: 1px solid #b885b4;
         border-radius: 3px;
-        margin: 1rem;
         padding: 0.5rem;
         text-align: center;
         width: fit-content;

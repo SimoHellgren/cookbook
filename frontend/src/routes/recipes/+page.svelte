@@ -16,9 +16,11 @@
 <div class="container">
     <div class="sidebar">
         <input placeholder="Search by name" bind:value={search}>
-        {#each alltags as tag}
-            <Tag name={tag}/>
-        {/each}
+        <div class="tag-grid">
+            {#each alltags as tag}
+                <Tag name={tag}/>
+            {/each}
+        </div>
 
     </div>
 
@@ -42,4 +44,20 @@
         gap: 1rem;
         grid-template-columns: repeat(auto-fit, minmax(240px, 1fr))
     }
+
+    .sidebar {
+        padding: 1rem;
+        background-color: #f4f4f4;
+        text-align: center;
+        box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
+        height: fit-content;
+    }
+
+    .tag-grid {
+        margin-top: 1rem;
+        display: grid;
+        gap: 0.5rem;
+        grid-template-columns: 1fr 1fr;
+    }
+
 </style>

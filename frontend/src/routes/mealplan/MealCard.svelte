@@ -3,25 +3,37 @@
     export let date
     export let meals
 
+    const save = () => {
+        meals.forEach(meal => {
+            fetch(`http://127.0.0.1:8000/mealplans/${meal.id}`, {
+                method: "PUT",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(meal)
+            }).then(r => r.json()).then(d => alert("You need to update state"))
+        })
+    }
 </script>
 
 
 <div class="container">
     <header>
         {date}, {new Date(date).toLocaleDateString("en", {weekday: "long"})}
+        <button on:click={save}>Save</button>
     </header>
     {#each meals as meal}
         <div class="meal">
+            <input bind:value={meal.name}>
+            (<input bind:value={meal.servings} style="width: 1rem;">)
             <div>
-                {meal.name} ({meal.servings})
-            </div>
-            <div>
-                <select value={meal.state}>
+                <select bind:value={meal.state}>
                     <option>open</option>
                     <option>bought</option>
                     <option>done</option>
                 </select>
-                <select value={meal.recipe_id}>
+                <select bind:value={meal.recipe_id}>
+                    <option value={null}></option>
                     {#each $recipes as recipe}
                         <option value={recipe.id}>{recipe.name}</option>
                     {/each}

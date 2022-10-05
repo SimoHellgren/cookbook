@@ -4,6 +4,9 @@
 
     $: alltags = [...new Set(data.recipes.map(r => r.tags.split(",")).flat())]
 
+    let search = "";
+    $: showrecipes = data.recipes.filter(r => r.name.toLowerCase().includes(search.toLowerCase()))
+
 </script>
 
 
@@ -11,7 +14,7 @@
 
 <div class="container">
     <div class="sidebar">
-        <input placeholder="Search by name">
+        <input placeholder="Search by name" bind:value={search}>
         {#each alltags as tag}
             <div>{tag}</div>
         {/each}
@@ -19,7 +22,7 @@
     </div>
 
     <div class="recipecard-grid">
-        {#each data.recipes as recipe}
+        {#each showrecipes as recipe}
             <RecipeCard {...recipe}/>
         {/each}
         

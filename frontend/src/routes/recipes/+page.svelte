@@ -28,16 +28,12 @@
 
 <style>
     .container {
-        display: grid;
-        grid-auto-columns: minmax(0, 1fr);
-    }
-
-    .sidebar {
-        grid-column: 1;
+        display: flex;
+        gap: 1rem;
     }
 
     .recipecard-grid {
-        grid-column: 2/6;
+        flex: 1;
         display: grid;
         gap: 1rem;
         grid-template-columns: repeat(auto-fit, minmax(240px, 1fr))

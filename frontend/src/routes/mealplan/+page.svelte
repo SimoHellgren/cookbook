@@ -64,6 +64,9 @@
             ]).then(arr => Promise.all(arr.map(r => r.json())))
               .then(d => data.mealplans = [...data.mealplans, ...d])
         }
+
+        create_start = null
+        create_end = null
     }
 
 </script>

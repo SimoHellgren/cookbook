@@ -1,6 +1,7 @@
 <script>
     import Checkable from "./Checkable.svelte";
     import Tag from "../Tag.svelte";
+    import CommentSection from "./CommentSection.svelte";
     export let data 
 
     const tags = data.recipe.tags.split(",").filter(t => t)
@@ -42,20 +43,32 @@
 
         </div>
     </div>
+    <div class="comments">
+        <h2>Comments</h2>
+        {#if !data.comments.length}
+            <p>No comments yet</p>
+        {:else}
+            <CommentSection comments={data.comments}/>
+        {/if}
+        <button on:click={() => alert("Not implemented yet")}>New comment</button>
+    </div>
 </div>
 
 
 <style>
     .container {
         margin-top: 1rem;
-        display: flex;
+        display: grid;
         gap: 1rem;
+        grid-template-columns: 1fr 3fr;
     }
 
     .ingredients {
         background-color: #f4f4f4;
         box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
         flex: 1;
+        grid-column: 1/2;
+        grid-row: 1/2;
     }
 
     .ingredients h3 {
@@ -71,6 +84,8 @@
         flex-direction: column;
         gap: 1rem;
         padding: 0;
+        grid-column-start: 2;
+        grid-row: 1/2;
     }
 
     .recipe header {
@@ -82,6 +97,11 @@
     .method {
         background-color: #f4f4f4;
         box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
+    }
+
+    .comments {
+        grid-row-start: 2;
+        grid-column-start: 2;
     }
     
     ul {

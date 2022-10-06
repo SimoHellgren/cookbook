@@ -35,7 +35,7 @@
         {date}, {new Date(date).toLocaleDateString("en", {weekday: "long"})}
         <button on:click={save}>Save</button>
     </header>
-    {#each meals as meal}
+    {#each meals.sort((a,b) => a.position - b.position) as meal}
         <div class="meal">
             <input bind:value={meal.name}>
             (<input bind:value={meal.servings} style="width: 1rem;">)

@@ -3,6 +3,8 @@
     export let date
     export let meals
 
+    let node;
+
     const save = () => {
         meals.forEach(meal => {
             fetch(`http://127.0.0.1:8000/mealplans/${meal.id}`, {
@@ -11,19 +13,24 @@
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(meal)
-            }).then(r => r.json()).then(d => alert("You need to update state"))
+            }).then(r => r.json())
         })
     }
 
     const remove = (meal) => {
         fetch(`http://127.0.0.1:8000/mealplans/${meal.id}`, { method: "DELETE" })
             .then(r => r.json())
-            .then(data => meals = meals.filter(m => m.id != meal.id))
+            .then(data => {
+                meals = meals.filter(m => m.id != meal.id)
+
+                // remove container if no meals - could probably be done smoother through a store
+                if (!meals.length) node.parentNode.removeChild(node)
+            })
     }
 </script>
 
 
-<div class="container">
+<div class="container" bind:this={node}>
     <header>
         {date}, {new Date(date).toLocaleDateString("en", {weekday: "long"})}
         <button on:click={save}>Save</button>

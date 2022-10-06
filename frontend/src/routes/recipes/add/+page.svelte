@@ -1,5 +1,5 @@
 <script>
-    import { recipes } from '../../../stores.js' 
+    import { recipes, ingredients } from '../../../stores.js' 
     let name;
     let servings;
     let tags = "";
@@ -7,11 +7,11 @@
     let method;
 
     const ingredientTemplate = {name: null, quantity: null, measure: null, optional: false} 
-    let ingredients = [{...ingredientTemplate, position: 1}]
+    let recipe_ingredients = [{...ingredientTemplate, position: 1}]
 
     const addIngredient = () => {
         // add new ingredient row and update positions
-        ingredients = [...ingredients, {...ingredientTemplate}].map((ing, i) => ({
+        recipe_ingredients = [...recipe_ingredients, {...ingredientTemplate}].map((ing, i) => ({
             ...ing,
             position: i+1
         }))
@@ -19,14 +19,14 @@
 
     const removeIngredient = (position) => {
         // remove ingredient with position and reset positions
-        ingredients = ingredients
+        recipe_ingredients = recipe_ingredients
             .filter(ing => ing.position !== position)
             .map((ing, i) => ({...ing, position: i+1}))
     }
 
     const submitForm = async () => {
         // create recipe and update state
-        const response = await fetch("http://127.0.0.1:8000/recipes", {
+        const recipe = await fetch("http://127.0.0.1:8000/recipes", {
             method: "POST",
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(
@@ -37,12 +37,23 @@
                     tags,
                     source,
                 }
-            )
+            ).then(r => r.json())
         })
-        const recipe = await response.json()
         $recipes = [...$recipes, recipe]
 
-        // create missing ingredients
+        // create missing ingredients and update state
+        const missing = recipe_ingredients.filter(ri => !$ingredients.find(i => i.name == ri.name))
+        const new_ingredients = await Promise.all(
+            missing.map(ri => {
+                fetch("http://127.0.0.1:8000/ingredients", {
+                    method: "POST",
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({name: ri.name})
+                }).then(r => r.json())
+            })
+        )
+        $ingredients = [...$ingredients, ...new_ingredients]
+
         // connect ingredients with recipe
     }
 
@@ -74,7 +85,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {#each ingredients as ing}
+                    {#each recipe_ingredients as ing}
                         <tr>
                             <td><button type="button" on:click|preventDefault={() => removeIngredient(ing.position)}>&times;</button></td>
                             <td><input bind:value={ing.name}></td>

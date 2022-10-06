@@ -1,4 +1,5 @@
 <script>
+    import { recipes } from '../../../stores.js' 
     let name;
     let servings;
     let tags = "";
@@ -24,7 +25,7 @@
     }
 
     const submitForm = async () => {
-        // create recipe
+        // create recipe and update state
         const response = await fetch("http://127.0.0.1:8000/recipes", {
             method: "POST",
             headers: {'Content-Type': 'application/json'},
@@ -39,6 +40,7 @@
             )
         })
         const recipe = await response.json()
+        $recipes = [...$recipes, recipe]
 
         // create missing ingredients
         // connect ingredients with recipe

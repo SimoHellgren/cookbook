@@ -14,6 +14,12 @@
             }).then(r => r.json()).then(d => alert("You need to update state"))
         })
     }
+
+    const remove = (meal) => {
+        fetch(`http://127.0.0.1:8000/mealplans/${meal.id}`, { method: "DELETE" })
+            .then(r => r.json())
+            .then(data => meals = meals.filter(m => m.id != meal.id))
+    }
 </script>
 
 
@@ -38,6 +44,7 @@
                         <option value={recipe.id}>{recipe.name}</option>
                     {/each}
                 </select>
+                <button on:click={() => remove(meal)}>&times;</button>
             </div>
         </div>
     {/each}

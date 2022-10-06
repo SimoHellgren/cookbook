@@ -9,6 +9,16 @@
     let create_start;
     let create_end;
 
+    const checkStart = () => {
+        // ensure create_start is on or before create_end by adjusting create_start
+        if (!create_start || create_start > create_end) create_start = create_end
+    }
+    
+    const checkEnd = () => {
+        // ensure create_start is on or before create_end by adjusting create_end
+        if (!create_end || create_start > create_end) create_end = create_start
+    }
+
     // group mealpans by date
     const groupByDate = (data) => {
         const m = new Map()
@@ -83,11 +93,11 @@
 <form on:submit|preventDefault={create}>
     <label>
         Start
-        <input type="date" bind:value={create_start}>
+        <input type="date" bind:value={create_start} on:change={checkEnd}>
     </label>
     <label>
         End
-        <input type="date" bind:value={create_end}>
+        <input type="date" bind:value={create_end} on:change={checkStart}>
     </label>
     <button type="submit">Go</button>
 </form>

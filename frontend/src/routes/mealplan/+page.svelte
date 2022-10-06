@@ -9,6 +9,12 @@
     let create_start;
     let create_end;
 
+    const resetFilter = () => {
+        filter_start = null;
+        filter_end = null;
+        hidedone = true;
+    }
+
     const checkStart = () => {
         // ensure create_start is on or before create_end by adjusting create_start
         if (!create_start || create_start > create_end) create_start = create_end
@@ -86,6 +92,7 @@
     Hide done
     <input type="checkbox" bind:checked={hidedone}>
 </label>
+<button on:click={resetFilter}>Reset filter</button>
 
 {#each grouped as [date, meals]}
     <MealCard {date} {meals}/>

@@ -104,7 +104,7 @@
                         <tr>
                             <td><button type="button" on:click|preventDefault={() => removeIngredient(ing.position)}>&times;</button></td>
                             <td><input bind:value={ing.name}></td>
-                            <td><input type="number" bind:value={ing.quantity}></td>
+                            <td><input type="number" step="any" bind:value={ing.quantity}></td>
                             <td><input placeholder="e.g. dl" bind:value={ing.measure}></td>
                             <td><input type="checkbox" bind:checked={ing.optional}></td>
                         </tr>   

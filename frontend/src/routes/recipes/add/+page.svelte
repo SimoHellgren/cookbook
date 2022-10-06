@@ -1,7 +1,7 @@
 <script>
     let name;
     let servings;
-    let tags;
+    let tags = "";
     let source;
     let method;
 
@@ -22,11 +22,33 @@
             .filter(ing => ing.position !== position)
             .map((ing, i) => ({...ing, position: i+1}))
     }
+
+    const submitForm = async () => {
+        // create recipe
+        const response = await fetch("http://127.0.0.1:8000/recipes", {
+            method: "POST",
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(
+                {
+                    name,
+                    servings,
+                    method,
+                    tags,
+                    source,
+                }
+            )
+        })
+        const recipe = await response.json()
+
+        // create missing ingredients
+        // connect ingredients with recipe
+    }
+
 </script>
 
 <h1>Add recipe</h1>
 
-<form>
+<form on:submit|preventDefault={submitForm}>
     <div class="container">
         <div class="recipe-metadata">
             <input bind:value={name} placeholder="Name">

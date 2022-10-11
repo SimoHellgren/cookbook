@@ -31,7 +31,7 @@
                     <Tag name={tag}/>
                 {/each}
             </div>
-            <a href={`/recipes/{data.recipe.id}/edit`}>edit</a>
+            <a href={`/recipes/${data.recipe.id}/edit`}>edit</a>
         </header>
         <div class="method">
             <ul>

@@ -4,8 +4,9 @@
 
 </script>
 
-<h1>Edit {data.name}</h1>
+<h1>Edit {data.recipe.name}</h1>
 
 <RecipeForm
-    name={data.name}
+    {...data.recipe}
+    ingredients={data.ingredients}
 />

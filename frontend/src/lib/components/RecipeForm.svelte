@@ -4,11 +4,14 @@
     export let tags = "";
     export let source;
     export let method;
+    export let ingredients = [];
     export let submitForm;
 
-
     const ingredientTemplate = {name: null, quantity: null, measure: null, optional: false} 
-    let recipe_ingredients = [{...ingredientTemplate, position: 1}]
+    
+    let recipe_ingredients = ingredients.length
+    ? ingredients
+    : [{...ingredientTemplate, position: 1}]
 
     const addIngredient = () => {
         // add new ingredient row and update positions

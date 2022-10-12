@@ -1,4 +1,5 @@
 <script>
+    import { redirect } from '@sveltejs/kit'
     import Checkable from "./Checkable.svelte";
     import Tag from "../Tag.svelte";
     import CommentSection from "./CommentSection.svelte";
@@ -6,6 +7,23 @@
     export let data 
 
     const tags = data.recipe.tags.split(",").filter(t => t)
+
+    const remove = async () => {
+        const really = window.confirm(`Really delete ${data.recipe.name}?`)
+
+        if (really) {
+            //delete recipe ingredients
+            await Promise.all(
+                data.ingredients.map(i => fetch(
+                    `http://127.0.0.1:8000/recipe_ingredients/${data.recipe.id}:${i.ingredient_id}`,
+                    { method: 'DELETE' }
+                ))
+            )
+            //delete recipe
+            await fetch(`http://127.0.0.1:8000/recipes/${data.recipe.id}`, { method: 'DELETE' })
+        }
+    }
+
 </script>
 
 <div class="container">
@@ -33,6 +51,7 @@
                 {/each}
             </div>
             <a href={`/recipes/${data.recipe.id}/edit`}>edit</a>
+            <button on:click={remove}>DELETE</button>
         </header>
         <div class="method">
             <ul>

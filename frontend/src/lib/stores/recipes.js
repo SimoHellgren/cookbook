@@ -23,12 +23,27 @@ const initRecipes = () => {
     return recipe
   }
 
+  const edit = async (id, data) => {
+    const response = await fetch(BASE + `/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    })
+
+    const recipe = await response.json()
+
+    update(state => state.map(r => r.id === id ? recipe : r))
+
+    return recipe
+
+  }
 
   return {
     subscribe,
     set,
     update,
     add,
+    edit,
   }
 }
 

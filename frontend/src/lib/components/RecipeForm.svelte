@@ -4,18 +4,17 @@
     export let tags = "";
     export let source;
     export let method;
-    export let ingredients = [];
+    export let ingredients;
     export let submitForm;
 
     const ingredientTemplate = {name: null, quantity: null, measure: null, optional: false} 
-    
-    let recipe_ingredients = ingredients.length
-    ? ingredients
-    : [{...ingredientTemplate, position: 1}]
+
+    // add empty row if no ingredients present
+    if (!ingredients.length) ingredients = [{...ingredientTemplate, position: ingredients.length + 1}]
 
     const addIngredient = () => {
         // add new ingredient row and update positions
-        recipe_ingredients = [...recipe_ingredients, {...ingredientTemplate}].map((ing, i) => ({
+        ingredients = [...ingredients, {...ingredientTemplate}].map((ing, i) => ({
             ...ing,
             position: i+1
         }))
@@ -23,7 +22,7 @@
 
     const removeIngredient = (position) => {
         // remove ingredient with position and reset positions
-        recipe_ingredients = recipe_ingredients
+        ingredients = ingredients
             .filter(ing => ing.position !== position)
             .map((ing, i) => ({...ing, position: i+1}))
     }
@@ -54,7 +53,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {#each recipe_ingredients as ing}
+                    {#each ingredients as ing}
                         <tr>
                             <td><button type="button" on:click|preventDefault={() => removeIngredient(ing.position)}>&times;</button></td>
                             <td><input bind:value={ing.name}></td>

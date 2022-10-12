@@ -1,5 +1,5 @@
 <script>
-    import { recipes } from "../../stores";
+    import recipes from '$lib/stores/recipes';
     export let date
     export let meals
 

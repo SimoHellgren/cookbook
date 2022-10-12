@@ -1,5 +1,5 @@
 <script>
-    import { recipes } from '../../stores.js'
+    import recipes from '$lib/stores/recipes'
     import RecipeCard from './RecipeCard.svelte'
     import Tag from './Tag.svelte'
 

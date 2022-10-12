@@ -1,5 +1,6 @@
 <script>
-    import { recipes, ingredients } from '../../../stores.js' 
+    import recipes from '$lib/stores/recipes';
+    import ingredients from '$lib/stores/ingredients';
     import RecipeForm from '$lib/components/RecipeForm.svelte'
     let name;
     let servings;

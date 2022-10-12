@@ -2,6 +2,7 @@
     import Checkable from "./Checkable.svelte";
     import Tag from "../Tag.svelte";
     import CommentSection from "./CommentSection.svelte";
+    import NewComment from "./NewComment.svelte";
     export let data 
 
     const tags = data.recipe.tags.split(",").filter(t => t)
@@ -51,7 +52,7 @@
         {:else}
             <CommentSection comments={data.comments}/>
         {/if}
-        <button on:click={() => alert("Not implemented yet")}>New comment</button>
+        <NewComment recipe_id={data.recipe.id}/>
     </div>
 </div>
 

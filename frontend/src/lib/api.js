@@ -51,10 +51,10 @@ export default {
   recipes: {
     ...endpoint('/recipes'),
     ingredients: {
-      get: (id) => fetch(`${BASE}/recipes/${id}/ingredients`),
+      get: (id) => fetch(`${BASE}/recipes/${id}/ingredients`).then(d => d.json()),
     },
     comments: {
-      get: (id) => fetch(`${BASE}/recipes/${id}/comments`),
+      get: (id) => fetch(`${BASE}/recipes/${id}/comments`).then(d => d.json()),
     }
   },
 }

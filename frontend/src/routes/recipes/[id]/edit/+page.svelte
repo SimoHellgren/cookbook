@@ -2,7 +2,6 @@
   import recipes from '$lib/stores/recipes';
   import ingredients from '$lib/stores/ingredients';
   import RecipeForm from '$lib/components/RecipeForm.svelte';
-  import { append } from 'svelte/internal';
   export let data;
 
   let current_ingredients = data.ingredients;

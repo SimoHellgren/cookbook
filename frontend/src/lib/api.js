@@ -52,7 +52,7 @@ export default {
     ...endpoint('/recipes'),
     ingredients: {
       get: (id) => fetch(`${BASE}/recipes/${id}/ingredients`).then(d => d.json()),
-      add: (recipe_id, data) => fetch(`${BASE}/recipes/${recipe_id}`, {
+      add: (recipe_id, data) => fetch(`${BASE}/recipes/${recipe_id}/ingredients`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),

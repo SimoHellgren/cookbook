@@ -6,10 +6,12 @@ const initRecipes = () => {
 
   api.recipes.getAll().then(data => set(data));
 
-  const create = (data) => api.recipes.create(data).then(d => update(s => {
-    [...s, d]
-    return d
-  }))
+  const create = async (data) => {
+    const result = await api.recipes.create(data)
+    update(s => [...s, result])
+    return result
+  }
+
   const edit = (id, data) => api.recipes
     .update(id, data)
     .then(data => update(state => state.map(s => s.id === data.id ? data : s)))

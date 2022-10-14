@@ -19,7 +19,8 @@ const endpoint = (path) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     })
-    return response.json()
+    const result = await response.json()
+    return result
   }
 
   const update = async (id, data) => {

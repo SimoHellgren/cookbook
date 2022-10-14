@@ -62,4 +62,5 @@ export default {
       get: (id) => fetch(`${BASE}/recipes/${id}/comments`).then(d => d.json()),
     }
   },
+  ingredients: endpoint('/ingredients'),
 }

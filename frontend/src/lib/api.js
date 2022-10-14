@@ -77,7 +77,7 @@ export default {
       fetch(`${BASE}/recipe_ingredients/${recipe_id}:${ingredient_id}`, {
         method: 'DELETE',
       }).then((r) => r.json()),
-    udpate_many: (data) =>
+    update_many: (data) =>
       fetch(`${BASE}/recipe_ingredients/bulk`, {
         method: 'PUT',
         headers: {

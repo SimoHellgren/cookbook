@@ -1,4 +1,3 @@
-
 const BASE = 'http://127.0.0.1:8000'
 
 const endpoint = (path) => {
@@ -24,7 +23,7 @@ const endpoint = (path) => {
   }
 
   const update = async (id, data) => {
-    const response = await fetch(URL, {
+    const response = await fetch(URL + '/' + id, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),

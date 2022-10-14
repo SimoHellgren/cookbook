@@ -11,7 +11,7 @@
 
   const submitForm = async () => {
     // create recipe and update state
-    const recipe = await recipes.add({
+    const recipe = await recipes.create({
       name,
       servings,
       method,

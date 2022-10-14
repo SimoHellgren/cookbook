@@ -86,4 +86,6 @@ export default {
         body: JSON.stringify(data),
       }),
   },
+  mealplans: endpoint('/mealplans'),
+  comments: endpoint('/comments'),
 }

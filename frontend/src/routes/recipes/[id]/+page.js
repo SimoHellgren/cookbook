@@ -1,10 +1,9 @@
 import api from '$lib/api'
 
 export async function load({ fetch, params }) {
-  const base = 'http://127.0.0.1:8000/recipes';
   const recipe = await api.recipes.get(params.id);
-  const ingredients = (await fetch(`${base}/${params.id}/ingredients`)).json();
-  const comments = (await fetch(`${base}/${params.id}/comments`)).json();
+  const ingredients = await api.recipes.ingredients.get(params.id);
+  const comments = await api.recipes.comments.get(params.id);
   return {
     recipe,
     ingredients,

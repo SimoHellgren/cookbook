@@ -1,4 +1,5 @@
 <script>
+  import api from '$lib/api'
   import recipes from '$lib/stores/recipes';
   import ingredients from '$lib/stores/ingredients';
   import RecipeForm from '$lib/components/RecipeForm.svelte';
@@ -37,11 +38,7 @@
         position: ri.position,
       };
 
-      fetch(`http://127.0.0.1:8000/recipes/${recipe.id}/ingredients`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
+      api.recipes.ingredients.add(recipe.id, data)
     });
   };
 </script>

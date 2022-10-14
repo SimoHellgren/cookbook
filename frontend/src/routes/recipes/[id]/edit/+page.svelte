@@ -1,4 +1,5 @@
 <script>
+  import api from '$lib/api'
   import recipes from '$lib/stores/recipes';
   import ingredients from '$lib/stores/ingredients';
   import RecipeForm from '$lib/components/RecipeForm.svelte';
@@ -36,11 +37,7 @@
           ingredient_id: $ingredients.find((i) => i.name === name).id,
         };
 
-        fetch(`http://127.0.0.1:8000/recipes/${data.recipe.id}/ingredients`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(obj),
-        });
+        api.recipes.ingredients.add(data.recipe.id, obj)
       });
 
     //put rest

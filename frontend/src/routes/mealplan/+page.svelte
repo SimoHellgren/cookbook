@@ -1,4 +1,5 @@
 <script>
+  import api from '$lib/api'
   import MealCard from './MealCard.svelte';
   export let data;
 
@@ -45,16 +46,6 @@
       .filter((mp) => !hidedone || mp.state !== 'done'),
   );
 
-  const postMealplan = (data) => {
-    return fetch('http://127.0.0.1:8000/mealplans', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-  };
-
   const create = () => {
     // create lunch and dinner for two for each date
     for (var d = new Date(create_start); d <= new Date(create_end); d.setDate(d.getDate() + 1)) {
@@ -65,10 +56,9 @@
       };
 
       Promise.all([
-        postMealplan({ ...base, name: 'lunch', position: 1 }),
-        postMealplan({ ...base, name: 'dinner', position: 2 }),
+        api.mealplans.create({ ...base, name: 'lunch', position: 1 }),
+        api.mealplans.create({ ...base, name: 'dinner', position: 2 }),
       ])
-        .then((arr) => Promise.all(arr.map((r) => r.json())))
         .then((d) => (data.mealplans = [...data.mealplans, ...d]));
     }
 

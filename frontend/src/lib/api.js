@@ -65,7 +65,7 @@ export default {
   ingredients: endpoint('/ingredients'),
   recipe_ingredients: {
     ...endpoint('/recipe_ingredients'),
-    put: (recipe_id, ingredient_id, data) =>
+    update: (recipe_id, ingredient_id, data) =>
       fetch(`${BASE}/recipe_ingredients/${recipe_id}:${ingredient_id}`, {
         method: 'PUT',
         headers: {
@@ -73,11 +73,11 @@ export default {
         },
         body: JSON.stringify(data),
       }).then((r) => r.json()),
-    delete: (recipe_id, ingredient_id) =>
+    remove: (recipe_id, ingredient_id) =>
       fetch(`${BASE}/recipe_ingredients/${recipe_id}:${ingredient_id}`, {
         method: 'DELETE',
       }).then((r) => r.json()),
-    put_many: (data) =>
+    udpate_many: (data) =>
       fetch(`${BASE}/recipe_ingredients/bulk`, {
         method: 'PUT',
         headers: {

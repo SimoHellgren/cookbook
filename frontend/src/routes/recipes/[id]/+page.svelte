@@ -1,4 +1,5 @@
 <script>
+  import api from '$lib/api'
   import recipes from '$lib/stores/recipes';
   import Checkable from './Checkable.svelte';
   import Tag from '../Tag.svelte';
@@ -15,9 +16,7 @@
       //delete recipe ingredients
       await Promise.all(
         data.ingredients.map((i) =>
-          fetch(`http://127.0.0.1:8000/recipe_ingredients/${data.recipe.id}:${i.ingredient_id}`, {
-            method: 'DELETE',
-          }),
+          api.recipe_ingredients.remove(data.recipe.id, i.ingredient_id)
         ),
       );
       //delete recipe

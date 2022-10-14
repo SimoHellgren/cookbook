@@ -63,4 +63,27 @@ export default {
     }
   },
   ingredients: endpoint('/ingredients'),
+  recipe_ingredients: {
+    ...endpoint('/recipe_ingredients'),
+    put: (recipe_id, ingredient_id, data) =>
+      fetch(`${BASE}/recipe_ingredients/${recipe_id}:${ingredient_id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      }).then((r) => r.json()),
+    delete: (recipe_id, ingredient_id) =>
+      fetch(`${BASE}/recipe_ingredients/${recipe_id}:${ingredient_id}`, {
+        method: 'DELETE',
+      }).then((r) => r.json()),
+    put_many: (data) =>
+      fetch(`${BASE}/recipe_ingredients/bulk`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      }),
+  },
 }

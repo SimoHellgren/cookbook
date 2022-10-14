@@ -1,7 +1,7 @@
 const BASE = 'http://127.0.0.1:8000'
 
 const endpoint = (path) => {
-  const URL = BASE + '/' + path;
+  const URL = BASE + path;
 
   const getAll = async () => {
     const response = await fetch(URL)
@@ -48,5 +48,13 @@ const endpoint = (path) => {
 }
 
 export default {
-  recipes: endpoint('recipes'),
+  recipes: {
+    ...endpoint('/recipes'),
+    ingredients: {
+      get: (id) => fetch(`${BASE}/recipes/${id}/ingredients`),
+    },
+    comments: {
+      get: (id) => fetch(`${BASE}/recipes/${id}/comments`),
+    }
+  },
 }

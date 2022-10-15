@@ -1,12 +1,12 @@
 import os
 from dotenv import load_dotenv
 import uvicorn
-from backend.app.main import app
+from backend.app.main import app  # noqa: F401
 
 if __name__ == "__main__":
     load_dotenv()
 
-    port = os.getenv("BACKEND_PORT")
+    port = int(os.getenv("BACKEND_PORT"))
 
     uvicorn.run(
         "run_backend:app",

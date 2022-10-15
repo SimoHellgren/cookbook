@@ -1,31 +1,21 @@
 <script>
+  import api from '$lib/api'
   import recipes from '$lib/stores/recipes';
   export let date;
   export let meals;
 
   let node;
 
-  const save = () => {
-    meals.forEach((meal) => {
-      fetch(`http://127.0.0.1:8000/mealplans/${meal.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(meal),
-      }).then((r) => r.json());
-    });
-  };
+  const save = () => meals.forEach((meal) => api.mealplans.update(meal.id, meal))
 
   const remove = (meal) => {
-    fetch(`http://127.0.0.1:8000/mealplans/${meal.id}`, { method: 'DELETE' })
-      .then((r) => r.json())
-      .then((data) => {
+    api.mealplans.remove(meal.id)
+      .then(data => {
         meals = meals.filter((m) => m.id != meal.id);
-
+    
         // remove container if no meals - could probably be done smoother through a store
         if (!meals.length) node.parentNode.removeChild(node);
-      });
+      })
   };
 </script>
 

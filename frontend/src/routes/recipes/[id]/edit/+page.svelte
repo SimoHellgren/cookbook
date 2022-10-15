@@ -1,8 +1,8 @@
 <script>
+  import api from '$lib/api'
   import recipes from '$lib/stores/recipes';
   import ingredients from '$lib/stores/ingredients';
   import RecipeForm from '$lib/components/RecipeForm.svelte';
-  import { append } from 'svelte/internal';
   export let data;
 
   let current_ingredients = data.ingredients;
@@ -17,9 +17,7 @@
       .map((ri) => $ingredients.find((i) => i.name === ri.name));
     await Promise.all(
       deleted.map((i) => {
-        fetch(`http://127.0.0.1:8000/recipe_ingredients/${data.recipe.id}:${i.id}`, {
-          method: 'DELETE',
-        });
+        api.recipe_ingredients.remove(data.recipe.id, i.id);
       }),
     );
 
@@ -37,29 +35,20 @@
           ingredient_id: $ingredients.find((i) => i.name === name).id,
         };
 
-        fetch(`http://127.0.0.1:8000/recipes/${data.recipe.id}/ingredients`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(obj),
-        });
+        api.recipes.ingredients.add(data.recipe.id, obj)
       });
 
     //put rest
     const rest = data.ingredients.filter((ri) => !missing.map((m) => m.name).includes(ri.name));
-    rest.map(({ name, ...ri }) => {
-      const obj = {
-        ...ri,
-        recipe_id: data.recipe.id,
-        ingredient_id: $ingredients.find((i) => i.name === name).id,
-      };
-
-      fetch(`http://127.0.0.1:8000/recipe_ingredients/${obj.recipe_id}:${obj.ingredient_id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(obj),
-      });
-    });
-  };
+    api.recipe_ingredients.update_many(
+      rest.map(({ name, ...ri }) => {
+        return {
+          ...ri,
+          recipe_id: data.recipe.id,
+          ingredient_id: $ingredients.find((i) => i.name === name).id,
+      }})
+    )
+  }
 </script>
 
 <h1>Edit {data.recipe.name}</h1>

@@ -1,12 +1,12 @@
 <script>
   import Comment from './Comment.svelte';
-  export let comments;
+  import comments from '$lib/stores/comments.js'
 
   // construct tree
   const lookup = new Map();
   const children = new Map([[0, []]]); // 0 is root
 
-  comments
+  $comments
     .sort((a, b) => a.id - b.id)
     .forEach((comment) => {
       // add comment to lookup

@@ -1,6 +1,7 @@
 <script>
   import api from '$lib/api'
   import recipes from '$lib/stores/recipes';
+  import comments from '$lib/stores/comments.js'
   import Checkable from './Checkable.svelte';
   import Tag from '../Tag.svelte';
   import CommentSection from './CommentSection.svelte';
@@ -64,10 +65,10 @@
   </div>
   <div class="comments">
     <h2>Comments</h2>
-    {#if !data.comments.length}
+    {#if !$comments.length}
       <p>No comments yet</p>
     {:else}
-      <CommentSection comments={data.comments} />
+      <CommentSection />
     {/if}
     <NewComment recipe_id={data.recipe.id} />
   </div>

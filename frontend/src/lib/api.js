@@ -1,4 +1,6 @@
-const BASE = 'http://127.0.0.1:8000'
+import { env } from '$env/dynamic/public'
+
+const BASE = env.PUBLIC_APIURL
 
 const endpoint = (path) => {
   const URL = BASE + path;

@@ -1,16 +1,19 @@
 <script>
   import comments from '$lib/stores/comments.js'
   export let recipe_id;
+  export let parent_id = null;
   let author;
   let comment;
   let hidden = true;
+
+  let buttonText = parent_id ? "Reply" : "New comment"
 
   const onSubmit = async () => {
     comments.create({
       recipe_id,
       comment,
       author,
-      parent_id: null,
+      parent_id,
     })
     hidden = true;
   };
@@ -30,7 +33,7 @@
     <button type="button" on:click={cancel}>Cancel</button>
   </div>
 </form>
-<button on:click={() => (hidden = false)} class:hidden={!hidden}>New comment</button>
+<button on:click={() => (hidden = false)} class:hidden={!hidden}>{buttonText}</button>
 
 <style>
   form {

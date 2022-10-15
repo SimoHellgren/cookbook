@@ -1,5 +1,9 @@
 <script>
+  import NewComment from "./NewComment.svelte";
+
   export let id;
+  export let recipe_id;
+  export let parent_id;
   export let author;
   export let created;
   export let updated;
@@ -18,7 +22,7 @@
   {/if}
   <div>
     <button on:click={() => alert('Not implemented yet')}>Edit</button>
-    <button on:click={() => alert('Not implemented yet')}>Reply</button>
+    <NewComment parent_id={id} recipe_id={recipe_id}/>
   </div>
   {#if children.length}
     {#each children as child}

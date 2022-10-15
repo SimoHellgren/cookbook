@@ -6,10 +6,12 @@ const makeStore = () => {
 
   const getForId = (id) => api.recipes.comments.get(id).then(set)
 
+  const create = (data) => api.comments.create(data).then(r => update(s => [...s, r]))
+
   return {
     subscribe,
     getForId,
-    update,
+    create,
   }
 }
 

@@ -1,11 +1,17 @@
 <script>
+  import comments from '$lib/stores/comments.js'
   export let recipe_id;
   let author;
   let comment;
   let hidden = true;
 
   const onSubmit = async () => {
-    alert(`posting comment:\n${comment}\n\nby ${author}\n\nto recipe ${recipe_id}`);
+    comments.create({
+      recipe_id,
+      comment,
+      author,
+      parent_id: null,
+    })
     hidden = true;
   };
 
